@@ -1,0 +1,12 @@
+
+
+classpath_external.sh : 
+
+This is the startup script for the Master. 
+JpAws has the automated code which will execute this when the Master machine is booted up.
+
+
+classpath.sh : 
+
+This is the startup script for the Worker. 
+JpAws has the automated code which will execute this when the Worker machine is booted up.
