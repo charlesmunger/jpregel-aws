@@ -12,8 +12,8 @@ abstract public class Machine {
     /**
      *  Starts this machine, with n workers. 
      * @param numWorkers Specifies the number of worker threads. 
-     * @param imageId Specifies the UID of the system 
-     * @return
+     * @param imageId Specifies the UID of the system image to start. 
+     * @return An array of DNS entries. The first element is public, the second private. 
      * @throws EC2Exception
      * @throws IOException
      */
