@@ -10,7 +10,7 @@ import aws.datameer.awstasks.util.IoUtil;
 import aws.datameer.awstasks.aws.ec2.InstanceGroup;
 
 /**
- * This class is used for 
+ * This class is used for asynchronously running the classpath_external script.
  * @author charlesmunger
  */
 public class MasterThread extends Thread {
@@ -20,8 +20,8 @@ public class MasterThread extends Thread {
     File privateKeyFile = new File("/home/varsha/Desktop/varshap.pem");
 
     /**
-     *
-     * @param instanceGroup
+     * Creates a new MasterThread 
+     * @param instanceGroup The instance group to 
      * @param publicDns
      */
     public MasterThread(InstanceGroup instanceGroup, String publicDns) {
@@ -30,7 +30,7 @@ public class MasterThread extends Thread {
     }
 
     /**
-     *
+     * Connects via SSH and runs the classpath script. 
      */
     public void run() {
         SshClient sshClient = null;
