@@ -37,6 +37,7 @@ import aws.datameer.awstasks.aws.ec2.ssh.SshClient;
 import aws.datameer.awstasks.aws.ec2.ssh.SshClientImpl;
 import aws.datameer.awstasks.ssh.JschRunner;
 import aws.datameer.awstasks.util.Ec2Util;
+import com.xerox.amazonws.ec2.*;
 
 public class InstanceGroupImpl implements InstanceGroup {
 
@@ -115,7 +116,7 @@ public class InstanceGroupImpl implements InstanceGroup {
     @Override
     public void shutdown() throws EC2Exception {
         checkEc2Association(true);
-        List<TerminatingInstanceDescription> terminatedInstances = _ec2.terminateInstances(Ec2Util.getInstanceIds(_reservationDescription));
+        List<InstanceStateChangeDescription> terminatedInstances = _ec2.terminateInstances(Ec2Util.getInstanceIds(_reservationDescription));
         _reservationDescription = null;
         LOG.info("stopped " + terminatedInstances.size() + " instances");
     }
