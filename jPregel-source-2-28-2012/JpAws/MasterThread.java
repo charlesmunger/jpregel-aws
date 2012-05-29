@@ -5,9 +5,9 @@ import java.io.IOException;
 
 import com.xerox.amazonws.ec2.EC2Exception;
 
-import aws.datameer.awstasks.aws.ec2.ssh.SshClient;
-import aws.datameer.awstasks.util.IoUtil;
-import aws.datameer.awstasks.aws.ec2.InstanceGroup;
+import datameer.awstasks.aws.ec2.ssh.SshClient;
+import datameer.awstasks.util.IoUtil;
+import datameer.awstasks.aws.ec2.InstanceGroup;
 
 /**
  * This class is used for asynchronously running the classpath_external script.
@@ -34,12 +34,7 @@ public class MasterThread extends Thread {
      */
     public void run() {
         SshClient sshClient = null;
-        try {
-            sshClient = instanceGroup.createSshClient("ubuntu", privateKeyFile);
-        } catch (EC2Exception e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
+        sshClient = instanceGroup.createSshClient("ubuntu", privateKeyFile);
 
         try {
             //String cmd = "java -Djava.rmi.server.hostname=" + publicDns ;  

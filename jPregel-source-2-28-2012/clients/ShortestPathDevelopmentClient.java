@@ -65,7 +65,7 @@ public class ShortestPathDevelopmentClient
         try
         {
             boolean   isEc2Master = false;
-            Client.run( jobs, isEc2Master, numWorkers );
+            Client.run( jobs, isEc2Master, numWorkers ,null,null);//TODO fix this
         }
         catch( Exception exception )
         {

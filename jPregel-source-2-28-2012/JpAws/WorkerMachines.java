@@ -1,15 +1,17 @@
 package JpAws;
 
+import com.amazonaws.services.ec2.model.Reservation;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import aws.datameer.awstasks.aws.ec2.InstanceGroup;
-import aws.datameer.awstasks.aws.ec2.InstanceGroupImpl;
 
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.services.ec2.AmazonEC2;
+import com.amazonaws.services.ec2.AmazonEC2Client;
+import com.amazonaws.services.ec2.model.RunInstancesRequest;
 import com.xerox.amazonws.ec2.EC2Exception;
-import com.xerox.amazonws.ec2.Jec2;
-import com.xerox.amazonws.ec2.LaunchConfiguration;
-import com.xerox.amazonws.ec2.ReservationDescription;
+import datameer.awstasks.aws.ec2.InstanceGroup;
+import datameer.awstasks.aws.ec2.InstanceGroupImpl;
 
 public class WorkerMachines extends Machine {
 
@@ -24,22 +26,29 @@ public class WorkerMachines extends Machine {
             IOException {
         // TODO Auto-generated method stub
         String[] returnvalue = null;
-        String accessKeyId = "AKIAIEINGU5VPVEQ4DAA";
-        String accessKeySecret = "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";
+        AmazonEC2 ec2 = new AmazonEC2Client(new AWSCredentials() {
+
+            @Override
+            public String getAWSAccessKeyId() {
+                return "AKIAIEINGU5VPVEQ4DAA";
+            }
+
+            @Override
+            public String getAWSSecretKey() {
+                return "EIdITzPxbGOFsH/r9OVAOKJ7HJ+yPL4tKjiwxyrL";
+            }
+        });
         String privateKeyName = "varshap";
 
         for (int i = 1; i <= numWorkers; i++) {
-            Jec2 ec2 = new Jec2(accessKeyId, accessKeySecret);
             InstanceGroup instanceGroup = new InstanceGroupImpl(ec2);
-
-            LaunchConfiguration launchConfiguration = new LaunchConfiguration(imageId, 1, 1);
+            RunInstancesRequest launchConfiguration = new RunInstancesRequest(imageId, 1, 1);
             launchConfiguration.setKeyName(privateKeyName);
-            ReservationDescription rs = instanceGroup.startup(launchConfiguration, TimeUnit.MINUTES, 5);
-
+            Reservation rs = instanceGroup.launch(launchConfiguration, TimeUnit.MINUTES, 5);
             WorkerThread runWorker = new WorkerThread(instanceGroup, masterDomainName);
             runWorker.start();
         }
-        
+
         return returnvalue;
     }
 

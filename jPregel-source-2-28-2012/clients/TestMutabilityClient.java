@@ -62,7 +62,7 @@ public class TestMutabilityClient
         try
         {
             boolean   isEc2Master = false;
-            Client.run( jobs, isEc2Master, numWorkers );
+            Client.run( jobs, isEc2Master, numWorkers,null,null );//TODO fix me
         } 
         catch ( Exception exception )
         {

@@ -1,16 +1,18 @@
 package JpAws;
 
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.services.ec2.AmazonEC2;
+import com.amazonaws.services.ec2.AmazonEC2Client;
+import com.amazonaws.services.ec2.model.Reservation;
+import com.amazonaws.services.ec2.model.RunInstancesRequest;
 import java.io.IOException;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 
-import aws.datameer.awstasks.aws.ec2.InstanceGroup;
-import aws.datameer.awstasks.aws.ec2.InstanceGroupImpl;
+import datameer.awstasks.aws.ec2.InstanceGroup;
+import datameer.awstasks.aws.ec2.InstanceGroupImpl;
 import com.xerox.amazonws.ec2.EC2Exception;
-import com.xerox.amazonws.ec2.Jec2;
-import com.xerox.amazonws.ec2.LaunchConfiguration;
-import com.xerox.amazonws.ec2.ReservationDescription;
 
 /**
  * This class is used to launch a machine running a Master thread.
@@ -22,17 +24,28 @@ public class MasterMachines extends Machine {
     @Override
     public String[] start(int numWorkers, String imageId) throws EC2Exception,
             IOException {
-        String accessKeyId = "AKIAIEINGU5VPVEQ4DAA";
-        String accessKeySecret = "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";
+        //String accessKeyId = 
+        //String accessKeySecret = 
         String privateKeyName = "varshap";
         String ipAddr = "";
 
-        Jec2 ec2 = new Jec2(accessKeyId, accessKeySecret);
+        AmazonEC2 ec2 = new AmazonEC2Client(new AWSCredentials() {
+
+            @Override
+            public String getAWSAccessKeyId() {
+                return "AKIAIEINGU5VPVEQ4DAA";
+            }
+
+            @Override
+            public String getAWSSecretKey() {
+                return "EIdITzPxbGOFsH/r9OVAOKJ7HJ+yPL4tKjiwxyrL";
+            }
+        });
         InstanceGroup instanceGroup = new InstanceGroupImpl(ec2);
 
-        LaunchConfiguration launchConfiguration = new LaunchConfiguration(imageId, 1, 1);
+        RunInstancesRequest launchConfiguration = new RunInstancesRequest(imageId, 1, 1);
         launchConfiguration.setKeyName(privateKeyName);
-        ReservationDescription rs = instanceGroup.startup(launchConfiguration, TimeUnit.MINUTES, 5);
+        Reservation rs = instanceGroup.launch(launchConfiguration, TimeUnit.MINUTES, 5);
 
         List list = (List) rs.getInstances();
         String instanceString = list.toString();
