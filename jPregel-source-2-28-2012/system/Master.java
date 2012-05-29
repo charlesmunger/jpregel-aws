@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.xerox.amazonws.ec2.EC2Exception;
 
 import jicosfoundation.Command;
 import jicosfoundation.DefaultRemoteExceptionHandler;
@@ -24,7 +23,7 @@ import jicosfoundation.ServiceImpl;
 import jicosfoundation.ServiceName;
 import system.commands.CommandComplete;
 
-import JpAws.WorkerMachines; 
+import JpAws.WorkerMachines;
 import system.commands.InputFileProcessingComplete;
 import system.commands.ReadWorkerInputFile;
 import system.commands.WriteWorkerOutputFile;
@@ -63,19 +62,15 @@ import system.commands.WorkerMapSet;
  * 
  * @author Pete Cappello
  */
-public class Master extends ServiceImpl implements ClientToMaster
-{
-    
+public class Master extends ServiceImpl implements ClientToMaster {
+
     // constants
-    public static final RemoteExceptionHandler REMOTE_EXCEPTION_HANDLER = new
-                                               DefaultRemoteExceptionHandler();
-                
+    public static final RemoteExceptionHandler REMOTE_EXCEPTION_HANDLER = new DefaultRemoteExceptionHandler();
     // ServiceImpl attributes
     static public String SERVICE_NAME = "Master";
     static public int PORT = 2048;
-    static private final Department[] departments = { ServiceImpl.ASAP_DEPARTMENT };
-    static private Class[][] command2DepartmentArray =
-    {   
+    static private final Department[] departments = {ServiceImpl.ASAP_DEPARTMENT};
+    static private Class[][] command2DepartmentArray = {
         // ASAP Commands
         {
             CommandComplete.class,
@@ -83,275 +78,245 @@ public class Master extends ServiceImpl implements ClientToMaster
             WorkerJobSet.class,
             WorkerMapSet.class,
             SuperStepComplete.class
-        } 
+        }
     };
-        
     // Master attributes
-    private   Map<Integer, Service> integerToWorkerMap = new HashMap<Integer, Service>();
+    private Map<Integer, Service> integerToWorkerMap = new HashMap<Integer, Service>();
     protected AtomicInteger numRegisteredWorkers = new AtomicInteger();
-    
     // computation control
-    protected int     numUnfinishedWorkers;
+    protected int numUnfinishedWorkers;
     protected boolean commandExeutionIsComplete;
     protected boolean thereIsANextStep;
-    
     // graph state
     protected Aggregator stepAggregator;
     protected Aggregator problemAggregator;
-    protected int        numVertices;
-    
-    public static void main( String[] args ) throws RemoteException, AlreadyBoundException 
-    {
-        System.setSecurityManager( new RMISecurityManager() );
-	Registry registry = LocateRegistry.createRegistry( Master.PORT );
-        ClientToMaster  master = new Master();
-	registry.bind(SERVICE_NAME, master);
-        out.println( "Master: Ready.");
+    protected int numVertices;
+
+    public static void main(String[] args) throws RemoteException, AlreadyBoundException {
+        System.setSecurityManager(new RMISecurityManager());
+        Registry registry = LocateRegistry.createRegistry(Master.PORT);
+        ClientToMaster master = new Master();
+        registry.bind(SERVICE_NAME, master);
+        out.println("Master: Ready.");
     }
-    
-    Master() throws RemoteException
-    {
+
+    Master() throws RemoteException {
         // Establish Master as a Jicos Service
-        super( command2DepartmentArray );
-        super.setService( this );
-        super.setDepartments( departments );
+        super(command2DepartmentArray);
+        super.setService(this);
+        super.setDepartments(departments);
     }
-    
+
     //abstract public void startWorkers( int numWorkers, String masterDomainName ) throws RemoteException;
     //abstract public void stopWorkers();
-    
-    public synchronized void makeWorkers( int numWorkers, String masterDomainName , String imageIdWorker) throws RemoteException
-    {
+    public synchronized void makeWorkers(int numWorkers, String masterDomainName, String imageIdWorker) throws RemoteException {
         System.out.println("Master.makeWorkers: entered: numWorkers: " + numWorkers);
         numUnfinishedWorkers += numWorkers;
         //Machine.startWorkers( masterDomainName, numWorkers, null );
-        
+
         try {
 
-        	WorkerMachines workerMachines = new WorkerMachines(masterDomainName) ; 
-        	workerMachines.start(numWorkers, imageIdWorker); 
-		} catch (EC2Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        
-        try
-        {
-        	wait(90000); //wait for Master to start 
-        	
+            WorkerMachines workerMachines = new WorkerMachines(masterDomainName);
+            workerMachines.start(numWorkers, imageIdWorker);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
-        catch(InterruptedException ignore) {} 
+
+        try {
+            wait(90000); //wait for Master to start 
+
+        } catch (InterruptedException ignore) {
+        }
         out.println("Master.makeWorkers: waiting for Worker registration to complete");
-        
-        
-        
+
+
+
         // wait for all workers to Register before proceeding
-        try
-        {
-            if ( numUnfinishedWorkers > 0 && ! commandExeutionIsComplete )
-            {
+        try {
+            if (numUnfinishedWorkers > 0 && !commandExeutionIsComplete) {
                 System.out.println("Master.makeWorkers: about to wait: numUnfinishedWorkers: " + numUnfinishedWorkers);
                 wait(); // until numUnfinishedWorkers == 0
             }
+        } catch (InterruptedException ignore) {
         }
-        catch ( InterruptedException ignore ) {}
-        
+
         // broadcaast to workers: set your integerToWorkerMap
 //        Command command = new SetWorkerMap( integerToWorkerMap );
 //        barrierComputation( command );
         setWorkerMap();
     }
-    
-    public synchronized void setWorkerMap()
-    {
+
+    public synchronized void setWorkerMap() {
         // broadcaast to workers: set your integerToWorkerMap
-        Command command = new SetWorkerMap( integerToWorkerMap );
-        barrierComputation( command );
+        Command command = new SetWorkerMap(integerToWorkerMap);
+        barrierComputation(command);
     }
-    
+
     @Override
-    public void exceptionHandler( Exception exception )
-    { 
+    public void exceptionHandler(Exception exception) {
         exception.printStackTrace();
-        System.exit( 1 );
+        System.exit(1);
     }
-    
+
     /*
      * @param masterJob - what job type & instance to run
      * @param isEc2 - run mode: EC2 (true) | development (false)
      */
-    public JobRunData run( Job job, boolean isEc2 )
-    {  
+    public JobRunData run(Job job, boolean isEc2) {
         // all Workers have registered with Master
         assert integerToWorkerMap.size() == numRegisteredWorkers.get();
-        
-        JobRunData jobRunData = new JobRunData( job, integerToWorkerMap.size() );
-                
+
+        JobRunData jobRunData = new JobRunData(job, integerToWorkerMap.size());
+
         // broadcaast to workers: set your Job & FileSystem
-        WorkerJob workerJob     = job.getWorkerJob();
+        WorkerJob workerJob = job.getWorkerJob();
         String jobDirectoryName = job.getJobDirectoryName();
-        FileSystem fileSystem = makeFileSystem( isEc2, jobDirectoryName );
+        FileSystem fileSystem = makeFileSystem(isEc2, jobDirectoryName);
         numUnfinishedWorkers = integerToWorkerMap.size();
         commandExeutionIsComplete = false;
-        Command command = new SetWorkerJob( workerJob, isEc2 );
-        broadcast( command, this );
+        Command command = new SetWorkerJob(workerJob, isEc2);
+        broadcast(command, this);
         // while workers SetWorkerJob, read Job input file, write Worker input files
-        job.readJobInputFile( fileSystem, integerToWorkerMap.size() );
-        
+        job.readJobInputFile(fileSystem, integerToWorkerMap.size());
+
         // wait for all workers to SetWorkerJob before proceeding
-        try
-        {
-            synchronized ( this )
-            {
-                if ( ! commandExeutionIsComplete )
-                {
+        try {
+            synchronized (this) {
+                if (!commandExeutionIsComplete) {
                     wait(); // until numUnfinishedWorkers == 0 for SetWorkerJob
                 }
             }
+        } catch (InterruptedException ignore) {
         }
-        catch ( InterruptedException ignore ) {}
         jobRunData.setEndTimeSetWorkerJobAndMakeWorkerFiles();
-        
+
         // broadcaast to workers: read your input file
-        barrierComputation( new ReadWorkerInputFile() );
+        barrierComputation(new ReadWorkerInputFile());
         jobRunData.setEndTimeReadWorkerInputFile();
-        
+
         // begin computation phase
         problemAggregator = workerJob.makeProblemAggregator();
         long superStep = 0;
         long startStepTime = System.currentTimeMillis(); // DEBUG
         long maxMemory = Runtime.getRuntime().maxMemory();
-        for ( thereIsANextStep = true; thereIsANextStep; superStep++ )
-        {
+        for (thereIsANextStep = true; thereIsANextStep; superStep++) {
             // BEGIN Progress monitoring
-            if ( superStep % 1 == 0 )
-            {
+            if (superStep % 1 == 0) {
                 long endStepTime = System.currentTimeMillis();
                 long elapsedTime = endStepTime - startStepTime;
                 long freeMemory = Runtime.getRuntime().freeMemory();
-                int  percentFreeMemory = (int) ( ( (float) freeMemory / maxMemory ) * 100 );
-                out.println("SuperStep: " + superStep 
-                        + " requiring " + (elapsedTime/1000) + " seconds "
+                int percentFreeMemory = (int) (((float) freeMemory / maxMemory) * 100);
+                out.println("SuperStep: " + superStep
+                        + " requiring " + (elapsedTime / 1000) + " seconds "
                         + " Maximum memory that is free: " + percentFreeMemory + "%"
-                        + " : " + (freeMemory/1000) + "KB");
+                        + " : " + (freeMemory / 1000) + "KB");
                 startStepTime = endStepTime;
             }
             // END Progress monitoring
             thereIsANextStep = false;           // until a Worker says otherwise
-            ComputeInput computeInput = new ComputeInput( stepAggregator, problemAggregator, numVertices );
-            Command startSuperStep = new StartSuperStep( computeInput );
-            stepAggregator   = workerJob.makeStepAggregator(); // initialize stepAggregator
-            barrierComputation( startSuperStep ); // broadcaast to workers: start a super step
+            ComputeInput computeInput = new ComputeInput(stepAggregator, problemAggregator, numVertices);
+            Command startSuperStep = new StartSuperStep(computeInput);
+            stepAggregator = workerJob.makeStepAggregator(); // initialize stepAggregator
+            barrierComputation(startSuperStep); // broadcaast to workers: start a super step
         }
         jobRunData.setEndTimeComputation();
-        jobRunData.setNumSuperSteps( superStep );
-                
+        jobRunData.setNumSuperSteps(superStep);
+
         // broadcaast to workers: write your output file
-        System.out.println("going to write workeroutputfile  ") ; 
-        barrierComputation( new WriteWorkerOutputFile() );
+        System.out.println("going to write workeroutputfile  ");
+        barrierComputation(new WriteWorkerOutputFile());
         jobRunData.setEndTimeWriteWorkerOutputFiles();
-        
-        job.processWorkerOutputFiles( fileSystem, integerToWorkerMap.size() );
+
+        job.processWorkerOutputFiles(fileSystem, integerToWorkerMap.size());
         jobRunData.setEndTimeRun();
-        
+
         return jobRunData;
     }
-    
-    public void shutdown()
-    {
+
+    public void shutdown() {
         // shutdown all Worker Services
         out.println("Master.shutdown: notifying Worker Services to shutdown.");
-        barrierComputation( new ShutdownWorker() );
+        barrierComputation(new ShutdownWorker());
         out.println("Master.shutdown: Worker Services shutdown.");
-        
+
         // shutdown Master
         out.println("Master.shutdown: shutting down.");
     }
-    
+
     /* _____________________________
      *  
      * Command implementations: Synchronize or know why it is not needed!
      * _____________________________
      */
-    
     // Command: CommandComplete
-    public void commandComplete( int workerNum )
-    {
+    public void commandComplete(int workerNum) {
         processAcknowledgement();
     }
-     
+
     // Command: InputFileProcessingComplete
-    synchronized public void inputFileProcessingComplete( int workerNum, int numVertices )
-    {
+    synchronized public void inputFileProcessingComplete(int workerNum, int numVertices) {
         this.numVertices += numVertices;
         processAcknowledgement();
     }
-    
+
     // Command: RegisterWorker
-    synchronized public int registerWorker( ServiceName serviceName )
-    {        
+    synchronized public int registerWorker(ServiceName serviceName) {
         assert serviceName != null;
         // !! currently not storing/using ServiceName data apart from Service
-        
+
         // !! Ensure that no service with this ID is registered already.
         // !! If there is, unregister it.
-        
+
         Service workerService = serviceName.service();
-        super.register( workerService );
-        Proxy workerProxy = new ProxyWorker( workerService, this, REMOTE_EXCEPTION_HANDLER );
-        addProxy( workerService, workerProxy );
+        super.register(workerService);
+        Proxy workerProxy = new ProxyWorker(workerService, this, REMOTE_EXCEPTION_HANDLER);
+        addProxy(workerService, workerProxy);
         int workerNum = numRegisteredWorkers.incrementAndGet();
-        integerToWorkerMap.put( workerNum, workerService );
+        integerToWorkerMap.put(workerNum, workerService);
         processAcknowledgement();
         return workerNum;
     }
-    
+
     // Command: SuperStepComplete
-    public void superStepComplete( ComputeOutput computeOutput )
-    {
+    public void superStepComplete(ComputeOutput computeOutput) {
         thereIsANextStep |= computeOutput.getThereIsANextStep();
-        numVertices      += computeOutput.deltaNumVertices();
-        stepAggregator.aggregate(    computeOutput.getStepAggregator()    );
-        problemAggregator.aggregate( computeOutput.getProblemAggregator() );
+        numVertices += computeOutput.deltaNumVertices();
+        stepAggregator.aggregate(computeOutput.getStepAggregator());
+        problemAggregator.aggregate(computeOutput.getProblemAggregator());
         processAcknowledgement();
     }
-    
+
     // Command: WorkerJobSet
-    public void workerJobSet( int workerNum ) { processAcknowledgement();
+    public void workerJobSet(int workerNum) {
+        processAcknowledgement();
     }
-    
+
     // Command: WorkerMapSet
-    public void workerMapSet() { processAcknowledgement(); }
-          
-    synchronized protected void barrierComputation( Command command )
-    {
+    public void workerMapSet() {
+        processAcknowledgement();
+    }
+
+    synchronized protected void barrierComputation(Command command) {
         numUnfinishedWorkers = integerToWorkerMap.size();
         commandExeutionIsComplete = false;
-        broadcast( command, this );
-        try
-        {
-            if ( ! commandExeutionIsComplete )
-            {
+        broadcast(command, this);
+        try {
+            if (!commandExeutionIsComplete) {
                 wait(); // until all Workers complete
             }
+        } catch (InterruptedException ignore) {
         }
-        catch ( InterruptedException ignore ) {}
     }
-    
-    synchronized private void processAcknowledgement()
-    {
-        if ( --numUnfinishedWorkers == 0 )
-        {
+
+    synchronized private void processAcknowledgement() {
+        if (--numUnfinishedWorkers == 0) {
             commandExeutionIsComplete = true;
             notify();
         }
     }
-    
-    private FileSystem makeFileSystem( boolean isEc2, String jobDirectoryName )
-    {
-        return ( isEc2 ) ? new Ec2FileSystem( jobDirectoryName, isEc2 ) : new LocalFileSystem( jobDirectoryName );
+
+    private FileSystem makeFileSystem(boolean isEc2, String jobDirectoryName) {
+        return (isEc2) ? new Ec2FileSystem(jobDirectoryName, isEc2) : new LocalFileSystem(jobDirectoryName);
     }
 }

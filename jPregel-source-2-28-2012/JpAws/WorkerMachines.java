@@ -9,11 +9,10 @@ import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.RunInstancesRequest;
-import com.xerox.amazonws.ec2.EC2Exception;
 import datameer.awstasks.aws.ec2.InstanceGroup;
 import datameer.awstasks.aws.ec2.InstanceGroupImpl;
 
-public class WorkerMachines extends Machine {
+public class WorkerMachines implements Machine {
 
     private String masterDomainName;
 
@@ -22,8 +21,7 @@ public class WorkerMachines extends Machine {
     }
 
     @Override
-    public String[] start(int numWorkers, String imageId) throws EC2Exception,
-            IOException {
+    public String[] start(int numWorkers, String imageId) throws IOException {
         // TODO Auto-generated method stub
         String[] returnvalue = null;
         AmazonEC2 ec2 = new AmazonEC2Client(new AWSCredentials() {
@@ -53,7 +51,7 @@ public class WorkerMachines extends Machine {
     }
 
     @Override
-    public void Stop() throws EC2Exception, IOException {
+    public void Stop() throws IOException {
         // TODO Doesn't actually DO anything
     }
 }
