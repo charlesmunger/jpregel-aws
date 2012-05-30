@@ -3,7 +3,6 @@ package JpAws;
 import java.io.File;
 import java.io.IOException;
 
-import com.xerox.amazonws.ec2.EC2Exception;
 
 import datameer.awstasks.aws.ec2.ssh.SshClient;
 import datameer.awstasks.util.IoUtil;

@@ -12,18 +12,16 @@ import java.util.concurrent.TimeUnit;
 
 import datameer.awstasks.aws.ec2.InstanceGroup;
 import datameer.awstasks.aws.ec2.InstanceGroupImpl;
-import com.xerox.amazonws.ec2.EC2Exception;
 
 /**
  * This class is used to launch a machine running a Master thread.
  *
  * @author charlesmunger
  */
-public class MasterMachines extends Machine {
+public class MasterMachines implements Machine {
 
     @Override
-    public String[] start(int numWorkers, String imageId) throws EC2Exception,
-            IOException {
+    public String[] start(int numWorkers, String imageId) throws IOException {
         //String accessKeyId = 
         //String accessKeySecret = 
         String privateKeyName = "varshap";
@@ -79,6 +77,6 @@ public class MasterMachines extends Machine {
     }
 
     @Override
-    public void Stop() throws EC2Exception, IOException {
+    public void Stop() throws IOException {
     }
 }
