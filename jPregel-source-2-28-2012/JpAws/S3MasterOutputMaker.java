@@ -11,7 +11,7 @@ import org.jets3t.service.ServiceException;
 import org.jets3t.service.S3Service;
 import org.jets3t.service.model.S3Object;
 
-public class S3MasterOutputMaker extends S3FileSystem {
+public class S3MasterOutputMaker implements S3FileSystem {
 
 	private int workerNum ; 
 	public S3MasterOutputMaker(int workerNum) 

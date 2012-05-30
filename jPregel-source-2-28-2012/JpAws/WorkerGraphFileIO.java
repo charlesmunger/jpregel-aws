@@ -10,7 +10,7 @@ import org.jets3t.service.S3Service;
 import org.jets3t.service.ServiceException;
 import org.jets3t.service.model.S3Object;
 
-public class WorkerGraphFileIO extends S3FileSystem {
+public class WorkerGraphFileIO implements S3FileSystem {
 
 	private int workerNum ; 
 	public WorkerGraphFileIO ( int workerNum)

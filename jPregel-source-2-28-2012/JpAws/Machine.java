@@ -15,11 +15,11 @@ interface Machine {
      * @return An array of DNS entries. The first element is public, the second private. 
      * @throws IOException
      */
-    abstract public String[] start(int numWorkers, String imageId) throws IOException;
+    public String[] start(int numWorkers, String imageId) throws IOException;
 
     /**
      * Stops the machine.
      * @throws IOException
      */
-    abstract public void Stop() throws IOException;
+    public void Stop() throws IOException;
 }
