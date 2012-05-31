@@ -1,11 +1,10 @@
 package JpAws;
 
-import java.io.File;
-import java.io.IOException;
-
 import datameer.awstasks.aws.ec2.InstanceGroup;
 import datameer.awstasks.aws.ec2.ssh.SshClient;
 import datameer.awstasks.util.IoUtil;
+import java.io.File;
+import java.io.IOException;
 
 
 public class WorkerThread extends Thread {
@@ -21,14 +20,9 @@ public class WorkerThread extends Thread {
 
     @Override
     public void run() {
-        SshClient sshClient = null;
-        sshClient = instanceGroup.createSshClient("ubuntu", privateKeyFile);
-
-
+        SshClient sshClient = instanceGroup.createSshClient("ubuntu", privateKeyFile);
         try {
-            String cmd = "./classpath.sh " + masterDomainName;
-            sshClient.executeCommand(cmd, IoUtil.closeProtectedStream(System.out));
-
+            sshClient.executeCommand("./classpath.sh " + masterDomainName, IoUtil.closeProtectedStream(System.out));
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

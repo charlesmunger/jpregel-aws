@@ -1,12 +1,10 @@
 package JpAws;
 
-import java.io.File;
-import java.io.IOException;
-
-
+import datameer.awstasks.aws.ec2.InstanceGroup;
 import datameer.awstasks.aws.ec2.ssh.SshClient;
 import datameer.awstasks.util.IoUtil;
-import datameer.awstasks.aws.ec2.InstanceGroup;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * This class is used for asynchronously running the classpath_external script.
@@ -32,20 +30,9 @@ public class MasterThread extends Thread {
      * Connects via SSH and runs the classpath script. 
      */
     public void run() {
-        SshClient sshClient = null;
-        sshClient = instanceGroup.createSshClient("ubuntu", privateKeyFile);
-
+        SshClient sshClient = instanceGroup.createSshClient("ubuntu", privateKeyFile);
         try {
-            //String cmd = "java -Djava.rmi.server.hostname=" + publicDns ;  
-            //String cmd1 = cmd + " -Djava.security.policy=system/Permission.policy system.Master" ; 
-            //String cmd2 = "javac system/Master.java" ;
-            String cmd3 = "sh classpath_external.sh " + publicDns;
-            //sshClient.executeCommand(maincmd,IoUtil.closeProtectedStream(System.out));
-            sshClient.executeCommand(cmd3, IoUtil.closeProtectedStream(System.out));
-            //sshClient.executeCommand(cmd1,IoUtil.closeProtectedStream(System.out));
-
-
-
+            sshClient.executeCommand("sh classpath_external.sh " + publicDns, IoUtil.closeProtectedStream(System.out));
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
