@@ -64,5 +64,6 @@ public class MasterMachines implements Machine {
 
     @Override
     public void Stop() throws IOException {
+        //TODO make this useful
     }
 }
