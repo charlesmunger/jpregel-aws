@@ -27,7 +27,7 @@ public class MasterThread extends Thread {
     }
 
     /**
-     * Connects via SSH and runs the classpath script. 
+     * Connects via SSH and runs the classpath_external script. 
      */
     public void run() {
         SshClient sshClient = instanceGroup.createSshClient("ubuntu", privateKeyFile);
