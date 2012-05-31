@@ -35,8 +35,6 @@ public class WorkerGraphFileIO implements S3FileSystem {
 
     @Override
     public void UploadFilesOntoS3(String jobDirectoryName) {
-
-
         String bucketName = jobDirectoryName + "/" + "out";
         String fileName = bucketName + "/" + workerNum;
         File fileData = new File(fileName);
@@ -48,7 +46,5 @@ public class WorkerGraphFileIO implements S3FileSystem {
         } catch (IOException e) {
         } catch (NoSuchAlgorithmException e) {
         }
-
-
     }
 }
