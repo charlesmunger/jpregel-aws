@@ -5,10 +5,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.NoSuchAlgorithmException;
-
+import org.jets3t.service.S3Service;
 import org.jets3t.service.S3ServiceException;
 import org.jets3t.service.ServiceException;
-import org.jets3t.service.S3Service;
 import org.jets3t.service.model.S3Object;
 
 public class S3MasterOutputMaker implements S3FileSystem {
@@ -35,8 +34,6 @@ public class S3MasterOutputMaker implements S3FileSystem {
         } catch (ServiceException e) {
             e.printStackTrace();
         }
-        //System.out.println("exiting the WorkerFileOutput function") ; 
-
         return reader;
     }
 
@@ -49,7 +46,7 @@ public class S3MasterOutputMaker implements S3FileSystem {
         try {
             S3Object fileObject = new S3Object(fileData);
             S3Service s3Service = S3Authentication.S3Identification();
-            fileObject = s3Service.putObject(bucketName, fileObject);
+            s3Service.putObject(bucketName, fileObject);
         } catch (S3ServiceException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -57,6 +54,5 @@ public class S3MasterOutputMaker implements S3FileSystem {
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
-
     }
 }
