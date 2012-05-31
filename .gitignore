@@ -6,7 +6,6 @@ nbdist/
 nbactions.xml/
 nb-configuration.xml
 *.class
-#this is a test comment
 # Package Files #
 *.war
 *.ear
