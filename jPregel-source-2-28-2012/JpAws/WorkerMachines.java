@@ -1,16 +1,13 @@
 package JpAws;
 
-import com.amazonaws.services.ec2.model.Reservation;
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-
-
-import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
+import com.amazonaws.services.ec2.model.Reservation;
 import com.amazonaws.services.ec2.model.RunInstancesRequest;
 import datameer.awstasks.aws.ec2.InstanceGroup;
 import datameer.awstasks.aws.ec2.InstanceGroupImpl;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public class WorkerMachines implements Machine {
 
@@ -24,18 +21,7 @@ public class WorkerMachines implements Machine {
     public String[] start(int numWorkers, String imageId) throws IOException {
         // TODO Auto-generated method stub
         String[] returnvalue = null;
-        AmazonEC2 ec2 = new AmazonEC2Client(new AWSCredentials() {
-
-            @Override
-            public String getAWSAccessKeyId() {
-                return "AKIAIEINGU5VPVEQ4DAA";
-            }
-
-            @Override
-            public String getAWSSecretKey() {
-                return "EIdITzPxbGOFsH/r9OVAOKJ7HJ+yPL4tKjiwxyrL";
-            }
-        });
+        AmazonEC2 ec2 = new AmazonEC2Client(PregelAuthenticator.get());
         String privateKeyName = "varshap";
 
         for (int i = 1; i <= numWorkers; i++) {

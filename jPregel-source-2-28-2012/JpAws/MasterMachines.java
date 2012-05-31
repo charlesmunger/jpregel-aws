@@ -1,17 +1,15 @@
 package JpAws;
 
-import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.Reservation;
 import com.amazonaws.services.ec2.model.RunInstancesRequest;
+import datameer.awstasks.aws.ec2.InstanceGroup;
+import datameer.awstasks.aws.ec2.InstanceGroupImpl;
 import java.io.IOException;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
-
-import datameer.awstasks.aws.ec2.InstanceGroup;
-import datameer.awstasks.aws.ec2.InstanceGroupImpl;
 
 /**
  * This class is used to launch a machine running a Master thread.
@@ -25,20 +23,8 @@ public class MasterMachines implements Machine {
         //String accessKeyId = 
         //String accessKeySecret = 
         String privateKeyName = "varshap";
-        String ipAddr = "";
 
-        AmazonEC2 ec2 = new AmazonEC2Client(new AWSCredentials() {
-
-            @Override
-            public String getAWSAccessKeyId() {
-                return "AKIAIEINGU5VPVEQ4DAA";
-            }
-
-            @Override
-            public String getAWSSecretKey() {
-                return "EIdITzPxbGOFsH/r9OVAOKJ7HJ+yPL4tKjiwxyrL";
-            }
-        });
+        AmazonEC2 ec2 = new AmazonEC2Client(PregelAuthenticator.get());
         InstanceGroup instanceGroup = new InstanceGroupImpl(ec2);
 
         RunInstancesRequest launchConfiguration = new RunInstancesRequest(imageId, 1, 1);
