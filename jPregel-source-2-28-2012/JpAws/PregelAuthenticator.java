@@ -39,13 +39,13 @@ public class PregelAuthenticator extends org.jets3t.service.security.AWSCredenti
 
     @Override
     public String getAWSAccessKeyId() {
-        update();
+        System.out.println(super.getAccessKey());
         return super.getAccessKey();
     }
 
     @Override
     public String getAWSSecretKey() {
-        update();
+        System.out.println(super.getSecretKey());
         return super.getSecretKey();
     }
 
