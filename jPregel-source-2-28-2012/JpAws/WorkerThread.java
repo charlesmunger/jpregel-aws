@@ -5,6 +5,8 @@ import datameer.awstasks.aws.ec2.ssh.SshClient;
 import datameer.awstasks.util.IoUtil;
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public class WorkerThread extends Thread {
@@ -20,6 +22,11 @@ public class WorkerThread extends Thread {
 
     @Override
     public void run() {
+        try {
+            Thread.sleep(60000);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(WorkerThread.class.getName()).log(Level.SEVERE, null, ex);
+        }
         SshClient sshClient = instanceGroup.createSshClient("ec2-user", privateKeyFile);
         try {
             sshClient.executeCommand("./classpath.sh " + masterDomainName, IoUtil.closeProtectedStream(System.out));
