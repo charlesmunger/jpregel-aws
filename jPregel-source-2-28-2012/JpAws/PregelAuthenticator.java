@@ -7,7 +7,7 @@ package JpAws;
 import java.io.*;
 
 /**
- *
+ * 
  * @author charlesmunger
  */
 public class PregelAuthenticator extends org.jets3t.service.security.AWSCredentials implements com.amazonaws.auth.AWSCredentials {
@@ -56,5 +56,10 @@ public class PregelAuthenticator extends org.jets3t.service.security.AWSCredenti
         if (singleton == null) {
             singleton = load(new File("key.AWSkey"));
         }
+    }
+    
+    @Override
+    public Object clone() {
+        throw new UnsupportedOperationException("Cannot be Cloned");
     }
 }
