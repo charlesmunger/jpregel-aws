@@ -22,7 +22,7 @@ public class MasterMachines implements Machine {
     public String[] start(int numWorkers, String imageId) throws IOException {
         //String accessKeyId = 
         //String accessKeySecret = 
-        String privateKeyName = "varshap";
+        String privateKeyName = "mungerkey";
 
         AmazonEC2 ec2 = new AmazonEC2Client(PregelAuthenticator.get());
         InstanceGroup instanceGroup = new InstanceGroupImpl(ec2);

@@ -1,18 +1,11 @@
 package clients;
 
+import JpAws.Machine;
 import static java.lang.System.out;
-
 import java.rmi.RemoteException;
 import masterGraphMakers.GridMasterGraphMaker;
 import masterOutputMakers.StandardMasterOutputMaker;
-import system.Client;
-import system.Combiner;
-import system.GraphMaker;
-import system.Job;
-import system.MasterGraphMaker;
-import system.Vertex;
-import system.WorkerWriter;
-import system.Writer;
+import system.*;
 import system.aggregators.IntegerSumAggregator;
 import system.combiners.FloatMinCombiner;
 import vertex.EuclideanShortestPathVertex;
@@ -64,8 +57,8 @@ public class Euclidean2DGridShortestPathClient
         {
             boolean   isEc2Master = false;
             System.out.println("Euclidean2DGridShortestPathClient.main: about to invoke Client.run");
-            Client.run( jobs, isEc2Master, numWorkers,null,null ); //TODO fix this
-        } 
+            Client.run( jobs, isEc2Master, numWorkers,Machine.AMIID,Machine.AMIID); //TODO fix this
+        }
         catch ( Exception exception )
         {
             exception.printStackTrace();

@@ -107,8 +107,7 @@ public class Master extends ServiceImpl implements ClientToMaster {
         super.setDepartments(departments);
     }
 
-    //abstract public void startWorkers( int numWorkers, String masterDomainName ) throws RemoteException;
-    //abstract public void stopWorkers();
+    @Override
     public synchronized void makeWorkers(int numWorkers, String masterDomainName, String imageIdWorker) throws RemoteException {
         System.out.println("Master.makeWorkers: entered: numWorkers: " + numWorkers);
         numUnfinishedWorkers += numWorkers;
