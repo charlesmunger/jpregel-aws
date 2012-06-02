@@ -27,8 +27,9 @@ public class MasterMachines implements Machine {
         AmazonEC2 ec2 = new AmazonEC2Client(PregelAuthenticator.get());
         InstanceGroup instanceGroup = new InstanceGroupImpl(ec2);
 
-        RunInstancesRequest launchConfiguration = new RunInstancesRequest(imageId, 1, 1);
-        launchConfiguration.setKeyName(privateKeyName);
+        RunInstancesRequest launchConfiguration = new RunInstancesRequest(imageId, 1, 1)
+                    .withKeyName(privateKeyName)
+                    .withInstanceType("t1.micro").withSecurityGroupIds("quick-start-1");
         Reservation rs = instanceGroup.launch(launchConfiguration, TimeUnit.MINUTES, 5);
 
         List list = (List) rs.getInstances();
