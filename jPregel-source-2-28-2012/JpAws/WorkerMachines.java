@@ -19,7 +19,6 @@ public class WorkerMachines implements Machine {
 
     @Override
     public String[] start(int numWorkers, String imageId) throws IOException {
-        // TODO Auto-generated method stub
         String[] returnvalue = null;
         AmazonEC2 ec2 = new AmazonEC2Client(PregelAuthenticator.get());
         String privateKeyName = "mungerkey";

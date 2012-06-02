@@ -11,7 +11,7 @@ public class WorkerThread extends Thread {
 
     private InstanceGroup instanceGroup;
     private String masterDomainName;
-    File privateKeyFile = new File("/home/ubuntu/varshap.pem");
+    File privateKeyFile = new File("mungerkey.pem");
 
     public WorkerThread(InstanceGroup instanceGroup, String masterDomainName) {
         this.instanceGroup = instanceGroup;
@@ -20,7 +20,7 @@ public class WorkerThread extends Thread {
 
     @Override
     public void run() {
-        SshClient sshClient = instanceGroup.createSshClient("ubuntu", privateKeyFile);
+        SshClient sshClient = instanceGroup.createSshClient("ec2-user", privateKeyFile);
         try {
             sshClient.executeCommand("./classpath.sh " + masterDomainName, IoUtil.closeProtectedStream(System.out));
         } catch (IOException e) {
