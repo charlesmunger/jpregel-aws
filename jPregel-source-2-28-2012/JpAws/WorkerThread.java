@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 
 public class WorkerThread extends Thread {
+    public static final String JARNAME = "jpregel-aws.jar";
 
     private InstanceGroup instanceGroup;
     private String masterDomainName;
@@ -29,10 +30,17 @@ public class WorkerThread extends Thread {
         }
         SshClient sshClient = instanceGroup.createSshClient("ec2-user", privateKeyFile);
         try {
-            sshClient.executeCommand("./classpath.sh " + masterDomainName, IoUtil.closeProtectedStream(System.out));
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            sshClient.uploadFile(new File(JARNAME), "~/"+JARNAME);
+            sshClient.executeCommand("java -cp "+JARNAME + " system.Worker" + " "+ masterDomainName, System.out);
+        } catch (IOException ex) {
+            System.out.println("Unable to upload file.");
+            System.exit(1);
         }
+//        try {
+//            sshClient.executeCommand("./classpath.sh " + masterDomainName, IoUtil.closeProtectedStream(System.out));
+//        } catch (IOException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
     }
 }
