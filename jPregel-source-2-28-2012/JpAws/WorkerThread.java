@@ -22,7 +22,7 @@ public class WorkerThread extends Thread {
     @Override
     public void run() {
         try {
-            Thread.sleep(6000);
+            Thread.sleep(15000);
         } catch (InterruptedException ex) {
             Logger.getLogger(WorkerThread.class.getName()).log(Level.SEVERE, null, ex);
         }
