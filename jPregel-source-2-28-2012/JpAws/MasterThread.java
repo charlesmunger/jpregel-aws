@@ -83,7 +83,7 @@ public class MasterThread extends Thread {
             sshClient.executeCommand("java -cp " + JARNAME + ":./dist/lib/*"
                     + " -Djava.security.policy=policy"
                     //+ " -Djava.ext.dirs=dist/lib/ " 
-                    + " system.Master", null);
+                    + " system.Master", System.out);
         } catch (IOException ex) {
             System.out.println("Unable to upload file.");
             System.exit(1);
