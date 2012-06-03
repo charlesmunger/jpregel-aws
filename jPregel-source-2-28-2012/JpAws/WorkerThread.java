@@ -36,8 +36,26 @@ public class WorkerThread extends Thread {
                 System.exit(1);
             }
         }
+        File thisjar = new File(JARNAME);
+        File distjar = new File("dist/"+JARNAME);
+        if(thisjar.exists()) {
+            try {
+                sshClient.uploadFile(thisjar, "~/" + JARNAME);
+            } catch (IOException ex) {
+                System.err.println("Error uploading jar");
+                System.exit(1);
+            }
+        } else if(distjar.exists()) {
+            try {
+                sshClient.uploadFile(distjar, "~/" + JARNAME);
+            } catch (IOException ex) {
+                System.err.println("Error uploading distjar");
+                System.exit(1);
+            }
+        } else {
+            System.err.println("Didn't find jar in " + distjar.getAbsolutePath() + " or " + thisjar.getAbsolutePath());
+        }
         try {
-            sshClient.uploadFile(new File("./dist/" + JARNAME), "~/"+JARNAME);
             sshClient.uploadFile(jars, "~/jars.tar");
             sshClient.uploadFile(new File("key.AWSkey"), "~/key.AWSkey");
             sshClient.uploadFile(new File("policy"), "~/policy");
