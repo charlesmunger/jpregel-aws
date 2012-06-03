@@ -23,13 +23,11 @@ public class WorkerMachines implements Machine {
         
         AmazonEC2 ec2 = new AmazonEC2Client(PregelAuthenticator.get());
         System.out.println("EC2 is: "+ec2);
-        for (int i = 1; i <= numWorkers; i++) {
-            
-            InstanceGroup instanceGroup = new InstanceGroupImpl(ec2);
+        InstanceGroup instanceGroup = new InstanceGroupImpl(ec2);
             
             System.out.println(imageId);
             
-            RunInstancesRequest launchConfiguration = new RunInstancesRequest(Machine.AMIID, 1, 1)
+            RunInstancesRequest launchConfiguration = new RunInstancesRequest(Machine.AMIID, numWorkers, numWorkers)
                     .withKeyName(privateKeyName)
                     .withInstanceType("t1.micro").withSecurityGroupIds("quick-start-1");
                     System.out.println(launchConfiguration.toString());
@@ -38,7 +36,6 @@ public class WorkerMachines implements Machine {
             
             WorkerThread runWorker = new WorkerThread(instanceGroup, masterDomainName);
             runWorker.start();
-        }
 
         return null;
     }

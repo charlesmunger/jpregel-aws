@@ -55,7 +55,7 @@ public class Euclidean2DGridShortestPathClient
         Job[] jobs = { job };
         try
         {
-            boolean   isEc2Master = true;
+            boolean   isEc2Master = false;
             System.out.println("Euclidean2DGridShortestPathClient.main: about to invoke Client.run");
             Client.run( jobs, isEc2Master, numWorkers,Machine.AMIID,Machine.AMIID); //TODO fix this
         }
