@@ -15,6 +15,7 @@ import system.Vertex;
 import system.WorkerWriter;
 import JpAws.S3FileSys; 
 import JpAws.WorkerGraphFileIO;
+import java.io.*;
 
 
 
@@ -39,7 +40,7 @@ public class StandardWorkerOutputMaker implements WorkerWriter
             boolean isEc2 = fileSystem.getFileSystem() ; 
         	String jobDirectoryName = fileSystem.getJobDirectory() ; 
             int workerNum = worker.getWorkerNum(); 
-
+            (new File(jobDirectoryName+"/out")).mkdirs();
             
             FileOutputStream fileOutputStream = fileSystem.getWorkerOutputFileOutputStream( workerNum );
             DataOutputStream dataOutputStream = new DataOutputStream( fileOutputStream );
