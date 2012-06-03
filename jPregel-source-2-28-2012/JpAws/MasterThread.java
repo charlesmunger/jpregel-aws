@@ -50,7 +50,7 @@ public class MasterThread extends Thread {
             }
         }
         try {
-            sshClient.uploadFile(new File("./dist/" + JARNAME), "~/" + JARNAME);
+            sshClient.uploadFile(new File("./" + JARNAME), "~/" + JARNAME);
             sshClient.uploadFile(jars, "~/jars.tar");
             sshClient.uploadFile(new File("policy"), "~/policy");
             sshClient.uploadFile(new File("key.AWSkey"), "~/key.AWSkey");
