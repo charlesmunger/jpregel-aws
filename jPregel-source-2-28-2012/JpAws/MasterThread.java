@@ -35,7 +35,7 @@ public class MasterThread extends Thread {
      */
     public void run() {
         try {
-            Thread.sleep(60000);
+            Thread.sleep(6000);
         } catch (InterruptedException ex) {
             Logger.getLogger(MasterThread.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -50,7 +50,7 @@ public class MasterThread extends Thread {
             }
         }
         try {
-            sshClient.uploadFile(new File("./" + JARNAME), "~/" + JARNAME);
+            sshClient.uploadFile(new File(JARNAME), "~/" + JARNAME);
             sshClient.uploadFile(jars, "~/jars.tar");
             sshClient.uploadFile(new File("policy"), "~/policy");
             sshClient.uploadFile(new File("key.AWSkey"), "~/key.AWSkey");
