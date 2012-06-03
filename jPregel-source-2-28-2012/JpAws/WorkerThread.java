@@ -10,7 +10,6 @@ import java.util.logging.Logger;
 
 public class WorkerThread extends Thread {
     public static final String JARNAME = "jpregel-aws.jar";
-
     private InstanceGroup instanceGroup;
     private String masterDomainName;
     File privateKeyFile = new File("mungerkey.pem");
@@ -43,9 +42,10 @@ public class WorkerThread extends Thread {
             sshClient.uploadFile(new File("key.AWSkey"), "~/key.AWSkey");
             sshClient.uploadFile(new File("policy"), "~/policy");
             sshClient.executeCommand("tar -xvf jars.tar", null);
-            sshClient.executeCommand("java -cp "+JARNAME + 
-                    " -Djava.security.policy=policy" +
-                    " -Djava.ext.dirs=dist/lib/ " +"system.Worker" + " "+ masterDomainName, System.out);
+            sshClient.executeCommand("java -cp " + JARNAME + ":./dist/lib/*"
+                    + " -Djava.security.policy=policy"
+                    //+ " -Djava.ext.dirs=dist/lib/ " 
+                    + " system.Worker", System.out);
         } catch (IOException ex) {
             System.out.println("Unable to upload file.");
             System.exit(1);
