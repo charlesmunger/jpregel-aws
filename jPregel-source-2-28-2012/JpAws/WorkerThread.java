@@ -40,8 +40,11 @@ public class WorkerThread extends Thread {
         try {
             sshClient.uploadFile(new File("./dist/" + JARNAME), "~/"+JARNAME);
             sshClient.uploadFile(jars, "~/jars.tar");
+            sshClient.uploadFile(new File("policy"), "~/policy");
             sshClient.executeCommand("tar -xvf jars.tar", System.out);
-            sshClient.executeCommand("java -cp "+JARNAME + "-Djava.ext.dirs=dist/lib/ " +"system.Worker" + " "+ masterDomainName, System.out);
+            sshClient.executeCommand("java -cp "+JARNAME + 
+                    " -Djava.security.policy=policy" +
+                    " -Djava.ext.dirs=dist/lib/ " +"system.Worker" + " "+ masterDomainName, System.out);
         } catch (IOException ex) {
             System.out.println("Unable to upload file.");
             System.exit(1);
