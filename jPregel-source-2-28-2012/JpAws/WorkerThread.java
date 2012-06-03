@@ -61,10 +61,11 @@ public class WorkerThread extends Thread {
             sshClient.uploadFile(new File("key.AWSkey"), "~/key.AWSkey");
             sshClient.uploadFile(new File("policy"), "~/policy");
             sshClient.executeCommand("tar -xvf jars.tar", null);
-            sshClient.executeCommand("java -cp " + JARNAME + ":./dist/lib/*"
+            sshClient.executeCommand("nohup java -cp " + JARNAME + ":./dist/lib/*"
                     + " -Djava.security.policy=policy"
                     //+ " -Djava.ext.dirs=dist/lib/ " 
-                    + " system.Worker " + masterDomainName + "&", null);
+                    + " system.Worker " + masterDomainName + " &", null);
+            System.out.println("Returned!");
         } catch (IOException ex) {
             System.out.println("Unable to upload file.");
             System.exit(1);

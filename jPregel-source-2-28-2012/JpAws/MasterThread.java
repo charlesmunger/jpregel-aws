@@ -16,23 +16,24 @@ public class MasterThread extends Thread {
 
     public static final String JARNAME = "jpregel-aws.jar";
     private InstanceGroup instanceGroup;
-    private String publicDns;
+    private String jobDirectoryName;
     File privateKeyFile = new File("mungerkey.pem");
 
     /**
      * Creates a new MasterThread
      *
-     * @param instanceGroup The instance group to
-     * @param publicDns
+     * @param instanceGroup The instance group (with only one item) that the Master should be run on
+     * @param jobDIrectoryName The name of the job directory, for seeding initial files.
      */
-    public MasterThread(InstanceGroup instanceGroup, String publicDns) {
+    public MasterThread(InstanceGroup instanceGroup, String jobDirectoryName) {
         this.instanceGroup = instanceGroup;
-        this.publicDns = publicDns;
+        this.jobDirectoryName = jobDirectoryName;
     }
 
     /**
      * Connects via SSH and runs the classpath_external script.
      */
+    @Override
     public void run() {
         try {
             System.out.println("Waiting");
@@ -71,6 +72,8 @@ public class MasterThread extends Thread {
             System.err.println("Didn't find jar in " + distjar.getAbsolutePath() + " or " + thisjar.getAbsolutePath());
         }
         try {
+            sshClient.uploadFile(new File("1"), "~/1");
+            sshClient.executeCommand("mkdir "+jobDirectoryName +" ; "+"cd "+jobDirectoryName + " ; mkdir in ; cd ; mv 1 "+jobDirectoryName + "/in/1", null);
             sshClient.uploadFile(jars, "~/jars.tar");
             sshClient.uploadFile(new File("policy"), "~/policy");
             sshClient.uploadFile(new File("key.AWSkey"), "~/key.AWSkey");
