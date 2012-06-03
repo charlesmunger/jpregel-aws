@@ -44,7 +44,7 @@ public class TestMutabilityClient
         WorkerWriter workerWriter = new StandardWorkerOutputMaker();
         GraphMaker workerGraphMaker = new StandardWorkerGraphMaker();
         MasterGraphMaker reader = new StandardMasterGraphMaker();
-        Writer writer = new StandardMasterOutputMaker();
+        Writer writer = new StandardMasterOutputMaker(jobDirectoryName);
         Vertex vertexFactory = new TestMutabilityVertex();
         
         out.println("ShortestPathDevelopmentClient.main: "

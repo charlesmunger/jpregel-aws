@@ -26,12 +26,17 @@ import java.io.*;
  */
 public class StandardMasterOutputMaker implements Writer
 {
+    private final String jobName;
+    
+    public StandardMasterOutputMaker(String jobName) {
+        this.jobName = jobName;
+    }
     @Override
     public void write(FileSystem fileSystem, int numWorkers)
     {
         try
         {    	
-            (new File("output")).mkdir();
+            (new File(jobName+"/output")).mkdirs();
             // open Master file for output
         	int fis_read = 0 ;
             BufferedReader bufferedReader = null ; 

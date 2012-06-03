@@ -44,7 +44,7 @@ public class ShortestPathEc2Client extends Client
         WorkerWriter workerWriter = new StandardWorkerOutputMaker();
         GraphMaker workerGraphMaker = new StandardWorkerGraphMaker();
         MasterGraphMaker reader = new G1MasterGraphMaker();
-        Writer writer = new StandardMasterOutputMaker();
+        Writer writer = new StandardMasterOutputMaker(jobDirectoryName);
         
         Job job = new Job( jobName,
                 jobDirectoryName, 

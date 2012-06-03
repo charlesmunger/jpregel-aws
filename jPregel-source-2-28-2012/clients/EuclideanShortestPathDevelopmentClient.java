@@ -47,7 +47,7 @@ public class EuclideanShortestPathDevelopmentClient
         WorkerWriter workerWriter = new StandardWorkerOutputMaker();
         GraphMaker workerGraphMaker = new StandardWorkerGraphMaker();
         MasterGraphMaker reader = new StandardMasterGraphMaker();
-        Writer writer = new StandardMasterOutputMaker();
+        Writer writer = new StandardMasterOutputMaker(jobDirectoryName);
         
         out.println("ShortestPathDevelopmentClient.main: "
                 + "\n jobDirectoryName: " + jobDirectoryName
