@@ -8,17 +8,20 @@ import java.io.IOException;
 
 /**
  * This class is used for asynchronously running the classpath_external script.
+ *
  * @author charlesmunger
  */
 public class MasterThread extends Thread {
 
+    public static final String JARNAME = "jpregel-aws.jar";
     private InstanceGroup instanceGroup;
     private String publicDns;
-    File privateKeyFile = new File("/home/varsha/Desktop/varshap.pem");
+    File privateKeyFile = new File("mungerkey.pem");
 
     /**
-     * Creates a new MasterThread 
-     * @param instanceGroup The instance group to 
+     * Creates a new MasterThread
+     *
+     * @param instanceGroup The instance group to
      * @param publicDns
      */
     public MasterThread(InstanceGroup instanceGroup, String publicDns) {
@@ -27,15 +30,38 @@ public class MasterThread extends Thread {
     }
 
     /**
-     * Connects via SSH and runs the classpath_external script. 
+     * Connects via SSH and runs the classpath_external script.
      */
     public void run() {
-        SshClient sshClient = instanceGroup.createSshClient("ubuntu", privateKeyFile);
-        try {
-            sshClient.executeCommand("sh classpath_external.sh " + publicDns, IoUtil.closeProtectedStream(System.out));
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        SshClient sshClient = instanceGroup.createSshClient("ec2-user", privateKeyFile);
+        File jars = new File("jars.tar");
+        if (!jars.exists()) {
+            try {
+                Runtime.getRuntime().exec("tar -cvf jars.tar ./dist/lib");
+            } catch (IOException ex) {
+                System.out.println("Error tarring jars.");
+                System.exit(1);
+            }
         }
+        try {
+            sshClient.uploadFile(new File("./dist/" + JARNAME), "~/" + JARNAME);
+            sshClient.uploadFile(jars, "~/jars.tar");
+            sshClient.uploadFile(new File("policy"), "~/policy");
+            sshClient.executeCommand("tar -xvf jars.tar", System.out);
+            sshClient.executeCommand("java -cp " + JARNAME
+                    + " -Djava.security.policy=policy"
+                    + " -Djava.ext.dirs=dist/lib/ " + "system.Master", System.out);
+        } catch (IOException ex) {
+            System.out.println("Unable to upload file.");
+            System.exit(1);
+        }
+
+//        SshClient sshClient = instanceGroup.createSshClient("ubuntu", privateKeyFile);
+//        try {
+//            sshClient.executeCommand("sh classpath_external.sh " + publicDns, IoUtil.closeProtectedStream(System.out));
+//        } catch (IOException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
     }
 }
