@@ -2,7 +2,6 @@ package JpAws;
 
 import datameer.awstasks.aws.ec2.InstanceGroup;
 import datameer.awstasks.aws.ec2.ssh.SshClient;
-import datameer.awstasks.util.IoUtil;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
