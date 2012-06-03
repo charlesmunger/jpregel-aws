@@ -88,7 +88,7 @@ private static class Temp extends Thread {
                 (new Temp("java -cp " + JARNAME + ":./dist/lib/*"
                         + " -Djava.security.policy=policy"
                         //+ " -Djava.ext.dirs=dist/lib/ " 
-                        + " system.Worker", sshClient, i)).start();
+                        + " system.Worker " + masterDomainName, sshClient, i)).start();
             }
 //            sshClient.executeCommand("nohup java -cp " + JARNAME + ":./dist/lib/*"
 //                    + " -Djava.security.policy=policy"
