@@ -1,5 +1,6 @@
 package clients;
 
+import JpAws.Machine;
 import static java.lang.System.out;
 
 import java.rmi.RemoteException;
@@ -62,7 +63,7 @@ public class TestMutabilityClient
         try
         {
             boolean   isEc2Master = false;
-            Client.run( jobs, isEc2Master, numWorkers,null,null );//TODO fix me
+            Client.run( jobs, isEc2Master, numWorkers,Machine.AMIID,Machine.AMIID );//TODO fix me
         } 
         catch ( Exception exception )
         {

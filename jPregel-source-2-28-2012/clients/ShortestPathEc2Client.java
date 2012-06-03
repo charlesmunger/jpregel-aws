@@ -1,5 +1,6 @@
 package clients;
 
+import JpAws.Machine;
 import java.rmi.RemoteException;
 import vertex.ShortestPathVertex;
 import masterGraphMakers.G1MasterGraphMaker;
@@ -52,5 +53,5 @@ public class ShortestPathEc2Client extends Client
                 vertexFactory, numParts, workerIsMultithreaded, combiner, 
                 workerWriter, workerGraphMaker, reader, writer );
         Job[] jobs = { job };
-        Client.run( jobs, isEc2Master, numWorkers, imageIdMaster,imageIdWorker );    }
+        Client.run( jobs, isEc2Master, numWorkers, Machine.AMIID,Machine.AMIID );    }
 }

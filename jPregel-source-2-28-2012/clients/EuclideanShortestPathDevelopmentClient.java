@@ -1,5 +1,7 @@
 package clients;
 
+import JpAws.Machine;
+import JpAws.PregelAuthenticator;
 import static java.lang.System.out;
 
 import java.rmi.RemoteException;
@@ -64,7 +66,7 @@ public class EuclideanShortestPathDevelopmentClient
         try
         {
             boolean   isEc2Master = false;
-            Client.run( jobs, isEc2Master, numWorkers,null,null ); //TODO fix this
+            Client.run( jobs, isEc2Master, numWorkers,Machine.AMIID,Machine.AMIID); //TODO fix this
         } 
         catch ( Exception exception )
         {
