@@ -53,6 +53,8 @@ public class MasterThread extends Thread {
             sshClient.uploadFile(new File("./dist/" + JARNAME), "~/" + JARNAME);
             sshClient.uploadFile(jars, "~/jars.tar");
             sshClient.uploadFile(new File("policy"), "~/policy");
+            sshClient.uploadFile(new File("key.AWSkey"), "~/key.AWSkey");
+            sshClient.uploadFile(privateKeyFile, "~/"+privateKeyFile.getName());
             sshClient.executeCommand("tar -xvf jars.tar", null);
             sshClient.executeCommand("java -cp " + JARNAME
                     + " -Djava.security.policy=policy"
