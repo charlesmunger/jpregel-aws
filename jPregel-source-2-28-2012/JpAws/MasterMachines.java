@@ -2,6 +2,7 @@ package JpAws;
 
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
+import com.amazonaws.services.ec2.model.Instance;
 import com.amazonaws.services.ec2.model.Reservation;
 import com.amazonaws.services.ec2.model.RunInstancesRequest;
 import datameer.awstasks.aws.ec2.InstanceGroup;
@@ -31,27 +32,32 @@ public class MasterMachines implements Machine {
                     .withKeyName(privateKeyName)
                     .withInstanceType("t1.micro").withSecurityGroupIds("quick-start-1");
         Reservation rs = instanceGroup.launch(launchConfiguration, TimeUnit.MINUTES, 5);
+        List<Instance> instances = rs.getInstances();
+        //List list = (List) rs.getInstances();
+        String privateDns = instances.get(0).getPrivateDnsName();
+        String publicDns = instances.get(0).getPublicDnsName();
+        
+//        String instanceString = list.toString();
+//        System.out.println("ins" + instanceString);
 
-        List list = (List) rs.getInstances();
-        String instanceString = list.toString();
-        System.out.println("ins" + instanceString);
 
-
-        StringTokenizer st = new StringTokenizer(instanceString);
-        String privateDns = "", publicDns = "";
-        int i = 0;
-
-        while (st.hasMoreTokens()) {
-            st.nextToken();
-            i++;
-            if (i == 2) {
-                privateDns = st.nextToken();
-                privateDns = privateDns.substring(11, privateDns.length() - 1);
-                publicDns = st.nextToken();
-                publicDns = publicDns.substring(4, publicDns.length() - 1);
-
-            }
-        }
+//        StringTokenizer st = new StringTokenizer(instanceString);
+//        String privateDns = "", publicDns = "";
+          
+//        int i = 0;
+//        
+//        while (st.hasMoreTokens()) {
+//            st.nextToken();
+//            i++;
+//            if (i == 2) {
+//                privateDns = st.nextToken();
+//                System.out.println(privateDns);
+//                privateDns = privateDns.substring(11, privateDns.length() - 1);
+//                publicDns = st.nextToken();
+//                publicDns = publicDns.substring(4, publicDns.length() - 1);
+//
+//            }
+//        }
         MasterThread runMaster = new MasterThread(instanceGroup, publicDns);
         runMaster.start();
 
