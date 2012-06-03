@@ -2,6 +2,7 @@ package JpAws;
 
 import datameer.awstasks.aws.ec2.InstanceGroup;
 import datameer.awstasks.aws.ec2.ssh.SshClient;
+import datameer.awstasks.ssh.JschRunner;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -73,7 +74,7 @@ public class MasterThread extends Thread {
         }
         try {
             sshClient.uploadFile(new File("1"), "~/1");
-            sshClient.executeCommand("mkdir "+jobDirectoryName +" ; "+"cd "+jobDirectoryName + " ; mkdir in ; cd ; mv 1 "+jobDirectoryName + "/in/1", null);
+            sshClient.executeCommand("mkdir "+jobDirectoryName +" ; "+"cd "+jobDirectoryName + " ; mkdir in ; cd ; mv 1 "+jobDirectoryName + "/in/1", System.out);
             sshClient.uploadFile(jars, "~/jars.tar");
             sshClient.uploadFile(new File("policy"), "~/policy");
             sshClient.uploadFile(new File("key.AWSkey"), "~/key.AWSkey");

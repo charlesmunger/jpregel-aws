@@ -17,7 +17,15 @@ import java.util.concurrent.TimeUnit;
  * @author charlesmunger
  */
 public class MasterMachines implements Machine {
+    private final String jobName;
 
+    public MasterMachines(String jobName) {
+        this.jobName = jobName;
+    }
+    
+    private MasterMachines() {
+        this.jobName = null; //never happens
+    }
     @Override
     public String[] start(int numWorkers, String imageId) throws IOException {
         String privateKeyName = "mungerkey";

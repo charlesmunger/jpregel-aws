@@ -15,7 +15,7 @@ public class Client
     {
         System.out.println("Client.run: entered.");
         Cluster cluster = new Cluster();
-        ClientToMaster master = cluster.start( isEc2, numWorkers, imageIdMaster, imageIdWorker );
+        ClientToMaster master = cluster.start( isEc2, numWorkers, jobs[0].getJobDirectoryName());
         for ( Job job : jobs )
         {
             System.out.println("Client.run: begin processing job.");
