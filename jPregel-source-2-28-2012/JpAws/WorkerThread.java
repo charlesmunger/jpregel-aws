@@ -42,18 +42,19 @@ public class WorkerThread extends Thread {
             try {
                 sshClient.uploadFile(thisjar, "~/" + JARNAME);
             } catch (IOException ex) {
-                System.err.println("Error uploading jar");
+                System.out.println("Error uploading jar");
                 System.exit(1);
             }
         } else if(distjar.exists()) {
             try {
                 sshClient.uploadFile(distjar, "~/" + JARNAME);
             } catch (IOException ex) {
-                System.err.println("Error uploading distjar");
+                System.out.println("Error uploading distjar");
                 System.exit(1);
             }
         } else {
             System.err.println("Didn't find jar in " + distjar.getAbsolutePath() + " or " + thisjar.getAbsolutePath());
+            System.exit(1);
         }
         try {
             sshClient.uploadFile(jars, "~/jars.tar");
@@ -63,7 +64,7 @@ public class WorkerThread extends Thread {
             sshClient.executeCommand("java -cp " + JARNAME + ":./dist/lib/*"
                     + " -Djava.security.policy=policy"
                     //+ " -Djava.ext.dirs=dist/lib/ " 
-                    + " system.Worker", System.out);
+                    + " system.Worker " + masterDomainName, System.out);
         } catch (IOException ex) {
             System.out.println("Unable to upload file.");
             System.exit(1);
