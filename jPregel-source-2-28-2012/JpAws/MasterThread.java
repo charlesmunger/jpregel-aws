@@ -2,7 +2,6 @@ package JpAws;
 
 import datameer.awstasks.aws.ec2.InstanceGroup;
 import datameer.awstasks.aws.ec2.ssh.SshClient;
-import datameer.awstasks.ssh.JschRunner;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -16,6 +15,27 @@ import java.util.logging.Logger;
 public class MasterThread extends Thread {
 
     public static final String JARNAME = "jpregel-aws.jar";
+
+    private static class Temp extends Thread {
+        String command;
+        SshClient s;
+        private final int i;
+        public Temp(String command, SshClient s, int i) {
+            this.command = command;
+            this.s =s;
+            this.i = i;
+        }
+        
+        @Override
+        public void run() {
+            try {
+                int[] arr = {i};
+                s.executeCommand(command, null, arr);
+            } catch (IOException ex) {
+                Logger.getLogger(MasterThread.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
     private InstanceGroup instanceGroup;
     private String jobDirectoryName;
     File privateKeyFile = new File("mungerkey.pem");
@@ -80,6 +100,12 @@ public class MasterThread extends Thread {
             sshClient.uploadFile(new File("key.AWSkey"), "~/key.AWSkey");
             sshClient.uploadFile(privateKeyFile, "~/"+privateKeyFile.getName());
             sshClient.executeCommand("tar -xvf jars.tar", null);
+            for (int i = 0;i<instanceGroup.instanceCount();i++) {
+                (new Temp("java -cp " + JARNAME + ":./dist/lib/*"
+                    + " -Djava.security.policy=policy"
+                    //+ " -Djava.ext.dirs=dist/lib/ " 
+                    + " system.Master", sshClient, i)).start();
+            }
             sshClient.executeCommand("java -cp " + JARNAME + ":./dist/lib/*"
                     + " -Djava.security.policy=policy"
                     //+ " -Djava.ext.dirs=dist/lib/ " 
