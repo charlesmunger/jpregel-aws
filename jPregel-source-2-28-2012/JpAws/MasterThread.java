@@ -30,7 +30,7 @@ public class MasterThread extends Thread {
         public void run() {
             try {
                 int[] arr = {i};
-                s.executeCommand(command, null, arr);
+                s.executeCommand(command, System.out, arr);
             } catch (IOException ex) {
                 Logger.getLogger(MasterThread.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -106,10 +106,10 @@ public class MasterThread extends Thread {
                     //+ " -Djava.ext.dirs=dist/lib/ " 
                     + " system.Master", sshClient, i)).start();
             }
-            sshClient.executeCommand("java -cp " + JARNAME + ":./dist/lib/*"
-                    + " -Djava.security.policy=policy"
-                    //+ " -Djava.ext.dirs=dist/lib/ " 
-                    + " system.Master", System.out);
+//            sshClient.executeCommand("java -cp " + JARNAME + ":./dist/lib/*"
+//                    + " -Djava.security.policy=policy"
+//                    //+ " -Djava.ext.dirs=dist/lib/ " 
+//                    + " system.Master", System.out);
         } catch (IOException ex) {
             System.out.println("Unable to upload file.");
             System.exit(1);
