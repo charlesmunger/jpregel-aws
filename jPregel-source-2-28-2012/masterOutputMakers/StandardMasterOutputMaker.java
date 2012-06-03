@@ -17,6 +17,7 @@ import system.FileSystem;
 import system.Writer;
 import JpAws.S3FileSys; 
 import JpAws.S3MasterOutputMaker;
+import java.io.*;
 
 
 /**
@@ -30,6 +31,7 @@ public class StandardMasterOutputMaker implements Writer
     {
         try
         {    	
+            (new File("output")).mkdir();
             // open Master file for output
         	int fis_read = 0 ;
             BufferedReader bufferedReader = null ; 
