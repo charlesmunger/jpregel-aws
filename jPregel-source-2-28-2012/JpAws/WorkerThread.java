@@ -2,7 +2,6 @@ package JpAws;
 
 import datameer.awstasks.aws.ec2.InstanceGroup;
 import datameer.awstasks.aws.ec2.ssh.SshClient;
-import datameer.awstasks.util.IoUtil;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -30,7 +29,7 @@ public class WorkerThread extends Thread {
         }
         SshClient sshClient = instanceGroup.createSshClient("ec2-user", privateKeyFile);
         try {
-            sshClient.uploadFile(new File(JARNAME), "~/"+JARNAME);
+            sshClient.uploadFile(new File("./dist/" + JARNAME), "~/"+JARNAME);
             sshClient.executeCommand("java -cp "+JARNAME + " system.Worker" + " "+ masterDomainName, System.out);
         } catch (IOException ex) {
             System.out.println("Unable to upload file.");
