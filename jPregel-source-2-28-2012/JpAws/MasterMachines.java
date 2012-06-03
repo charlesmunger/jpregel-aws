@@ -20,11 +20,10 @@ public class MasterMachines implements Machine {
 
     @Override
     public String[] start(int numWorkers, String imageId) throws IOException {
-        //String accessKeyId = 
-        //String accessKeySecret = 
         String privateKeyName = "mungerkey";
 
         AmazonEC2 ec2 = new AmazonEC2Client(PregelAuthenticator.get());
+        
         InstanceGroup instanceGroup = new InstanceGroupImpl(ec2);
 
         RunInstancesRequest launchConfiguration = new RunInstancesRequest(Machine.AMIID, 1, 1)
@@ -38,27 +37,6 @@ public class MasterMachines implements Machine {
         String privateDns = instances.get(0).getPrivateDnsName();
         String publicDns = instances.get(0).getPublicDnsName();
         
-//        String instanceString = list.toString();
-//        System.out.println("ins" + instanceString);
-
-
-//        StringTokenizer st = new StringTokenizer(instanceString);
-//        String privateDns = "", publicDns = "";
-          
-//        int i = 0;
-//        
-//        while (st.hasMoreTokens()) {
-//            st.nextToken();
-//            i++;
-//            if (i == 2) {
-//                privateDns = st.nextToken();
-//                System.out.println(privateDns);
-//                privateDns = privateDns.substring(11, privateDns.length() - 1);
-//                publicDns = st.nextToken();
-//                publicDns = publicDns.substring(4, publicDns.length() - 1);
-//
-//            }
-//        }
         MasterThread runMaster = new MasterThread(instanceGroup, publicDns);
         runMaster.start();
 
