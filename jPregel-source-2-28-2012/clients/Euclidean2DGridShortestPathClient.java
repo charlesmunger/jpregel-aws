@@ -25,7 +25,7 @@ public class Euclidean2DGridShortestPathClient
     {
         String  jobName               = "Euclidean 2D Grid Shortest Path";
         String  jobDirectoryName      = args[0];
-        int     numWorkers            = 4;
+        int     numWorkers            = 1;
         boolean workerIsMultithreaded = false;
         boolean combiningMessages     = false;
         int     numParts = numWorkers * (( workerIsMultithreaded) ? 2 : 1 ) * 1; // numWorkers * ComputeThrads/Worker * Parts/ComputeThread
