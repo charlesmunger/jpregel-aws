@@ -1,5 +1,6 @@
 package system;
 
+import JpAws.Machine;
 import static java.lang.System.out;
 import JpAws.MasterMachines;
 
@@ -50,7 +51,7 @@ public class Cluster {
             master = new LocalMaster(numWorkers);
             System.out.println("Cluster.start: workers constructed: " + numWorkers);
         }
-        master.makeWorkers(numWorkers, domainNames[ PUBLIC_DOMAIN_NAME], imageIdWorker);
+        master.makeWorkers(numWorkers, domainNames[ PUBLIC_DOMAIN_NAME], Machine.AMIID);
         return master;
     }
 

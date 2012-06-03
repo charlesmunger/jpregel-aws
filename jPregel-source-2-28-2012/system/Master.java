@@ -109,7 +109,7 @@ public class Master extends ServiceImpl implements ClientToMaster {
 
     @Override
     public synchronized void makeWorkers(int numWorkers, String masterDomainName, String imageIdWorker) throws RemoteException {
-        System.out.println("Master.makeWorkers: entered: numWorkers: " + numWorkers);
+        System.out.println("Master.makeWorkers: entered: numWorkers: " + numWorkers + " workerimage: "+imageIdWorker);
         numUnfinishedWorkers += numWorkers;
         //Machine.startWorkers( masterDomainName, numWorkers, null );
 
