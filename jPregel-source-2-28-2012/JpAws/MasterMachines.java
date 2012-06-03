@@ -45,7 +45,7 @@ public class MasterMachines implements Machine {
         String privateDns = instances.get(0).getPrivateDnsName();
         String publicDns = instances.get(0).getPublicDnsName();
         
-        MasterThread runMaster = new MasterThread(instanceGroup, publicDns);
+        MasterThread runMaster = new MasterThread(instanceGroup, jobName);
         runMaster.start();
 
         System.out.println("Public DNS: " + publicDns);
