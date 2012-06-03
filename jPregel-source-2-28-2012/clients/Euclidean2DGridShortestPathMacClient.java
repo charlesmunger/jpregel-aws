@@ -35,7 +35,7 @@ public class Euclidean2DGridShortestPathMacClient
     {
         String  jobName               = "Euclidean 2D Grid Shortest Path";
         String  jobDirectoryName      = args[0];
-        int     numWorkers            = 4;
+        int     numWorkers            = 1;
         boolean workerIsMultithreaded = true;
         boolean combiningMessages     = true;
         int     numParts = numWorkers * 2 * 1; // numWorkers * ComputeThrads/Worker * Parts/ComputeThread
