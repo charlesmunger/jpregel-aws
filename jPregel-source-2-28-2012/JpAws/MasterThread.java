@@ -35,7 +35,7 @@ public class MasterThread extends Thread {
      */
     public void run() {
         try {
-            Thread.sleep(6000);
+            Thread.sleep(30000);
         } catch (InterruptedException ex) {
             Logger.getLogger(MasterThread.class.getName()).log(Level.SEVERE, null, ex);
         }
