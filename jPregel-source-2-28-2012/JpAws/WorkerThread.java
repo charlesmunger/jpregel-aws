@@ -28,8 +28,19 @@ public class WorkerThread extends Thread {
             Logger.getLogger(WorkerThread.class.getName()).log(Level.SEVERE, null, ex);
         }
         SshClient sshClient = instanceGroup.createSshClient("ec2-user", privateKeyFile);
+        File jars = new File("jars.tar");
+        if(!jars.exists()) {
+            try {
+                Runtime.getRuntime().exec("tar -cvf jars.tar ./dist/lib");
+            } catch (IOException ex) {
+                System.out.println("Error tarring jars.");
+                System.exit(1);
+            }
+        }
         try {
             sshClient.uploadFile(new File("./dist/" + JARNAME), "~/"+JARNAME);
+            sshClient.uploadFile(jars, "~/jars.tar");
+            sshClient.executeCommand("tar -xvf jars.tar", System.out);
             sshClient.executeCommand("java -cp "+JARNAME + " system.Worker" + " "+ masterDomainName, System.out);
         } catch (IOException ex) {
             System.out.println("Unable to upload file.");
