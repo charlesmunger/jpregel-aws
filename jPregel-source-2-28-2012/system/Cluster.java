@@ -22,13 +22,11 @@ public class Cluster {
     private ClientToMaster master;
 
     public synchronized ClientToMaster start(boolean isEc2, int numWorkers, String imageIdMaster, String imageIdWorker) throws RemoteException {
-
-        ClientToMaster master = null;
         String[] domainNames = {null, null};
         if (isEc2) {
             try {
                 MasterMachines masterMachines = new MasterMachines();
-                domainNames = masterMachines.start(numWorkers, imageIdMaster);
+                domainNames = masterMachines.start(numWorkers, Machine.AMIID);
 
             } catch (IOException e) {
                 // TODO Auto-generated catch block

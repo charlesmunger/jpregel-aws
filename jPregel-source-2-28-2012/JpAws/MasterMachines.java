@@ -9,7 +9,6 @@ import datameer.awstasks.aws.ec2.InstanceGroup;
 import datameer.awstasks.aws.ec2.InstanceGroupImpl;
 import java.io.IOException;
 import java.util.List;
-import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -28,9 +27,11 @@ public class MasterMachines implements Machine {
         AmazonEC2 ec2 = new AmazonEC2Client(PregelAuthenticator.get());
         InstanceGroup instanceGroup = new InstanceGroupImpl(ec2);
 
-        RunInstancesRequest launchConfiguration = new RunInstancesRequest(imageId, 1, 1)
+        RunInstancesRequest launchConfiguration = new RunInstancesRequest(Machine.AMIID, 1, 1)
                     .withKeyName(privateKeyName)
                     .withInstanceType("t1.micro").withSecurityGroupIds("quick-start-1");
+                    System.out.println(launchConfiguration.toString());
+
         Reservation rs = instanceGroup.launch(launchConfiguration, TimeUnit.MINUTES, 5);
         List<Instance> instances = rs.getInstances();
         //List list = (List) rs.getInstances();
@@ -61,8 +62,8 @@ public class MasterMachines implements Machine {
         MasterThread runMaster = new MasterThread(instanceGroup, publicDns);
         runMaster.start();
 
-        System.out.println("here" + publicDns);
-        System.out.println("here" + privateDns);
+        System.out.println("Public DNS: " + publicDns);
+        System.out.println("Private DNS: " + privateDns);
 
         String[] Dns = {publicDns, privateDns};
 
