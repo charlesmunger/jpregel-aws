@@ -22,7 +22,7 @@ public class WorkerMachines implements Machine {
         String privateKeyName = "mungerkey";
         
         AmazonEC2 ec2 = new AmazonEC2Client(PregelAuthenticator.get());
-        
+        System.out.println("EC2 is: "+ec2);
         for (int i = 1; i <= numWorkers; i++) {
             
             InstanceGroup instanceGroup = new InstanceGroupImpl(ec2);
