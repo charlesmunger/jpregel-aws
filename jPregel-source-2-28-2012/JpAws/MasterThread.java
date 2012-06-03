@@ -2,6 +2,7 @@ package JpAws;
 
 import datameer.awstasks.aws.ec2.InstanceGroup;
 import datameer.awstasks.aws.ec2.ssh.SshClient;
+import datameer.awstasks.ssh.JschRunner;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -15,30 +16,6 @@ import java.util.logging.Logger;
 public class MasterThread extends Thread {
 
     public static final String JARNAME = "jpregel-aws.jar";
-
-    private static class Temp extends Thread {
-
-        String command;
-        SshClient s;
-        private final int i;
-
-        public Temp(String command, SshClient s, int i) {
-            this.command = command;
-            this.s = s;
-            this.i = i;
-        }
-
-        @Override
-        public void run() {
-            try {
-                int[] arr = {i};
-                System.out.println("Executing on " + i);
-                s.executeCommand(command, System.out, arr);
-            } catch (IOException ex) {
-                Logger.getLogger(MasterThread.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }
     private InstanceGroup instanceGroup;
     private String jobDirectoryName;
     File privateKeyFile = new File("mungerkey.pem");
@@ -46,10 +23,8 @@ public class MasterThread extends Thread {
     /**
      * Creates a new MasterThread
      *
-     * @param instanceGroup The instance group (with only one item) that the
-     * Master should be run on
-     * @param jobDIrectoryName The name of the job directory, for seeding
-     * initial files.
+     * @param instanceGroup The instance group (with only one item) that the Master should be run on
+     * @param jobDIrectoryName The name of the job directory, for seeding initial files.
      */
     public MasterThread(InstanceGroup instanceGroup, String jobDirectoryName) {
         this.instanceGroup = instanceGroup;
@@ -79,15 +54,15 @@ public class MasterThread extends Thread {
             }
         }
         File thisjar = new File(JARNAME);
-        File distjar = new File("dist/" + JARNAME);
-        if (thisjar.exists()) {
+        File distjar = new File("dist/"+JARNAME);
+        if(thisjar.exists()) {
             try {
                 sshClient.uploadFile(thisjar, "~/" + JARNAME);
             } catch (IOException ex) {
                 System.err.println("Error uploading jar");
                 System.exit(1);
             }
-        } else if (distjar.exists()) {
+        } else if(distjar.exists()) {
             try {
                 sshClient.uploadFile(distjar, "~/" + JARNAME);
             } catch (IOException ex) {
@@ -99,22 +74,16 @@ public class MasterThread extends Thread {
         }
         try {
             sshClient.uploadFile(new File("1"), "~/1");
-            sshClient.executeCommand("mkdir " + jobDirectoryName + " ; " + "cd " + jobDirectoryName + " ; mkdir in ; cd ; mv 1 " + jobDirectoryName + "/in/1", null);
+            sshClient.executeCommand("mkdir "+jobDirectoryName +" ; "+"cd "+jobDirectoryName + " ; mkdir in ; cd ; mv 1 "+jobDirectoryName + "/in/1", null);
             sshClient.uploadFile(jars, "~/jars.tar");
             sshClient.uploadFile(new File("policy"), "~/policy");
             sshClient.uploadFile(new File("key.AWSkey"), "~/key.AWSkey");
-            sshClient.uploadFile(privateKeyFile, "~/" + privateKeyFile.getName());
+            sshClient.uploadFile(privateKeyFile, "~/"+privateKeyFile.getName());
             sshClient.executeCommand("tar -xvf jars.tar", null);
-            for (int i = 0; i < instanceGroup.instanceCount(); i++) {
-                (new Temp("java -cp " + JARNAME + ":./dist/lib/*"
-                        + " -Djava.security.policy=policy"
-                        //+ " -Djava.ext.dirs=dist/lib/ " 
-                        + " system.Master", sshClient, i)).start();
-            }
-//            sshClient.executeCommand("java -cp " + JARNAME + ":./dist/lib/*"
-//                    + " -Djava.security.policy=policy"
-//                    //+ " -Djava.ext.dirs=dist/lib/ " 
-//                    + " system.Master", System.out);
+            sshClient.executeCommand("java -cp " + JARNAME + ":./dist/lib/*"
+                    + " -Djava.security.policy=policy"
+                    //+ " -Djava.ext.dirs=dist/lib/ " 
+                    + " system.Master", System.out);
         } catch (IOException ex) {
             System.out.println("Unable to upload file.");
             System.exit(1);

@@ -13,6 +13,29 @@ public class WorkerThread extends Thread {
     private InstanceGroup instanceGroup;
     private String masterDomainName;
     File privateKeyFile = new File("mungerkey.pem");
+private static class Temp extends Thread {
+
+        String command;
+        SshClient s;
+        private final int i;
+
+        public Temp(String command, SshClient s, int i) {
+            this.command = command;
+            this.s = s;
+            this.i = i;
+        }
+
+        @Override
+        public void run() {
+            try {
+                int[] arr = {i};
+                System.out.println("Executing on " + i);
+                s.executeCommand(command, System.out, arr);
+            } catch (IOException ex) {
+                Logger.getLogger(MasterThread.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
 
     public WorkerThread(InstanceGroup instanceGroup, String masterDomainName) {
         this.instanceGroup = instanceGroup;
@@ -61,10 +84,16 @@ public class WorkerThread extends Thread {
             sshClient.uploadFile(new File("key.AWSkey"), "~/key.AWSkey");
             sshClient.uploadFile(new File("policy"), "~/policy");
             sshClient.executeCommand("tar -xvf jars.tar", null);
-            sshClient.executeCommand("nohup java -cp " + JARNAME + ":./dist/lib/*"
-                    + " -Djava.security.policy=policy"
-                    //+ " -Djava.ext.dirs=dist/lib/ " 
-                    + " system.Worker " + masterDomainName + " &", null);
+            for (int i = 0; i < instanceGroup.instanceCount(); i++) {
+                (new Temp("java -cp " + JARNAME + ":./dist/lib/*"
+                        + " -Djava.security.policy=policy"
+                        //+ " -Djava.ext.dirs=dist/lib/ " 
+                        + " system.Worker", sshClient, i)).start();
+            }
+//            sshClient.executeCommand("nohup java -cp " + JARNAME + ":./dist/lib/*"
+//                    + " -Djava.security.policy=policy"
+//                    //+ " -Djava.ext.dirs=dist/lib/ " 
+//                    + " system.Worker " + masterDomainName + " &", null);
             System.out.println("Returned!");
         } catch (IOException ex) {
             System.out.println("Unable to upload file.");
