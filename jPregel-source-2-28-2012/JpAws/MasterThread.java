@@ -5,6 +5,8 @@ import datameer.awstasks.aws.ec2.ssh.SshClient;
 import datameer.awstasks.util.IoUtil;
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This class is used for asynchronously running the classpath_external script.
@@ -33,6 +35,11 @@ public class MasterThread extends Thread {
      * Connects via SSH and runs the classpath_external script.
      */
     public void run() {
+        try {
+            Thread.sleep(60000);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(MasterThread.class.getName()).log(Level.SEVERE, null, ex);
+        }
         SshClient sshClient = instanceGroup.createSshClient("ec2-user", privateKeyFile);
         File jars = new File("jars.tar");
         if (!jars.exists()) {
