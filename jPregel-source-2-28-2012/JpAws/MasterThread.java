@@ -35,7 +35,9 @@ public class MasterThread extends Thread {
      */
     public void run() {
         try {
+            System.out.println("Waiting");
             Thread.sleep(30000);
+            System.out.println("Waking");
         } catch (InterruptedException ex) {
             Logger.getLogger(MasterThread.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -49,8 +51,26 @@ public class MasterThread extends Thread {
                 System.exit(1);
             }
         }
+        File thisjar = new File(JARNAME);
+        File distjar = new File("dist/"+JARNAME);
+        if(thisjar.exists()) {
+            try {
+                sshClient.uploadFile(thisjar, "~/" + JARNAME);
+            } catch (IOException ex) {
+                System.err.println("Error uploading jar");
+                System.exit(1);
+            }
+        } else if(distjar.exists()) {
+            try {
+                sshClient.uploadFile(distjar, "~/" + JARNAME);
+            } catch (IOException ex) {
+                System.err.println("Error uploading distjar");
+                System.exit(1);
+            }
+        } else {
+            System.err.println("Didn't find jar in " + distjar.getAbsolutePath() + " or " + thisjar.getAbsolutePath());
+        }
         try {
-            sshClient.uploadFile(new File(JARNAME), "~/" + JARNAME);
             sshClient.uploadFile(jars, "~/jars.tar");
             sshClient.uploadFile(new File("policy"), "~/policy");
             sshClient.uploadFile(new File("key.AWSkey"), "~/key.AWSkey");
