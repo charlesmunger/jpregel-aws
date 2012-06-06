@@ -3,11 +3,15 @@ package JpAws;
 import java.io.IOException;
 
 /**
- *
+ * This interface is for use by the cluster in starting and stopping individual EC2 instances.
  * @author charlesmunger
  */
 public interface Machine {
 
+    /**
+     * This is the AMI-ID for the machine to initialize as masters and workers. 
+     * Currently, it uses the standard Amazon Linux image.
+     */
     public static final String AMIID = "ami-e565ba8c";
 
     /**

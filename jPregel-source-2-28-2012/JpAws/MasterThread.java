@@ -2,7 +2,6 @@ package JpAws;
 
 import datameer.awstasks.aws.ec2.InstanceGroup;
 import datameer.awstasks.aws.ec2.ssh.SshClient;
-import datameer.awstasks.ssh.JschRunner;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -15,6 +14,9 @@ import java.util.logging.Logger;
  */
 public class MasterThread extends Thread {
 
+    /**
+     * This specifies the filename of the jar containing the main class for this project.
+     */
     public static final String JARNAME = "jpregel-aws.jar";
     private InstanceGroup instanceGroup;
     private String jobDirectoryName;
@@ -24,7 +26,8 @@ public class MasterThread extends Thread {
      * Creates a new MasterThread
      *
      * @param instanceGroup The instance group (with only one item) that the Master should be run on
-     * @param jobDIrectoryName The name of the job directory, for seeding initial files.
+     * @param jobDirectoryName  The name of the S3 bucket to store the files needed by and created
+     * by the computation. 
      */
     public MasterThread(InstanceGroup instanceGroup, String jobDirectoryName) {
         this.instanceGroup = instanceGroup;
@@ -88,13 +91,5 @@ public class MasterThread extends Thread {
             System.out.println("Unable to upload file.");
             System.exit(1);
         }
-
-//        SshClient sshClient = instanceGroup.createSshClient("ubuntu", privateKeyFile);
-//        try {
-//            sshClient.executeCommand("sh classpath_external.sh " + publicDns, IoUtil.closeProtectedStream(System.out));
-//        } catch (IOException e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//        }
     }
 }

@@ -8,6 +8,7 @@ import java.security.NoSuchAlgorithmException;
 import org.jets3t.service.S3Service;
 import org.jets3t.service.S3ServiceException;
 import org.jets3t.service.ServiceException;
+import org.jets3t.service.impl.rest.httpclient.RestS3Service;
 import org.jets3t.service.model.S3Object;
 
 public class S3MasterOutputMaker implements S3FileSystem {
@@ -23,12 +24,11 @@ public class S3MasterOutputMaker implements S3FileSystem {
 
     @Override
     public BufferedReader FileInput(String jobDirectoryName) {
-
-        S3Service s3Service = S3Authentication.S3Identification();
         String workerNumber = Integer.toString(workerNum);
         BufferedReader reader = null;
         String bucketName = jobDirectoryName + "/out";
         try {
+            S3Service s3Service = new RestS3Service(PregelAuthenticator.get());
             S3Object objectComplete = s3Service.getObject(bucketName, workerNumber);
             reader = new BufferedReader(new InputStreamReader(objectComplete.getDataInputStream()));
         } catch (ServiceException e) {
@@ -45,7 +45,7 @@ public class S3MasterOutputMaker implements S3FileSystem {
         File fileData = new File(fileName);
         try {
             S3Object fileObject = new S3Object(fileData);
-            S3Service s3Service = S3Authentication.S3Identification();
+            S3Service s3Service = new RestS3Service(PregelAuthenticator.get());
             s3Service.putObject(bucketName, fileObject);
         } catch (S3ServiceException e) {
             e.printStackTrace();

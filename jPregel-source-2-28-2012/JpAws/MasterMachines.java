@@ -21,8 +21,13 @@ public class MasterMachines implements Machine {
     private final String jobName;
     private InstanceGroup instanceGroup;
 
-    public MasterMachines(String jobName) {
-        this.jobName = jobName;
+    /**
+     * Creates a new MasterMachines object. 
+     * @param jobDIrectoryName The name of the S3 bucket to store the files needed by and created
+     * by the computation. 
+     */
+    public MasterMachines(String jobDIrectoryName) {
+        this.jobName = jobDIrectoryName;
     }
     
     private MasterMachines() {
