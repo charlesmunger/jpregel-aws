@@ -17,7 +17,9 @@ import java.util.concurrent.TimeUnit;
  * @author charlesmunger
  */
 public class MasterMachines implements Machine {
+    private final AmazonEC2 ec2 = new AmazonEC2Client(PregelAuthenticator.get());
     private final String jobName;
+    private InstanceGroup instanceGroup;
 
     public MasterMachines(String jobName) {
         this.jobName = jobName;
@@ -26,13 +28,12 @@ public class MasterMachines implements Machine {
     private MasterMachines() {
         this.jobName = null; //never happens
     }
+    
     @Override
     public String[] start(int numWorkers, String imageId) throws IOException {
         String privateKeyName = "mungerkey";
-
-        AmazonEC2 ec2 = new AmazonEC2Client(PregelAuthenticator.get());
         
-        InstanceGroup instanceGroup = new InstanceGroupImpl(ec2);
+         instanceGroup = new InstanceGroupImpl(ec2);
 
         RunInstancesRequest launchConfiguration = new RunInstancesRequest(Machine.AMIID, 1, 1)
                     .withKeyName(privateKeyName)
@@ -58,6 +59,6 @@ public class MasterMachines implements Machine {
 
     @Override
     public void Stop() throws IOException {
-        //TODO make this useful
+        instanceGroup.terminate();
     }
 }

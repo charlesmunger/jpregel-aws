@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 public class WorkerMachines implements Machine {
 
     private String masterDomainName;
+    private InstanceGroup instanceGroup;
 
     public WorkerMachines(String masterDomainName) {
         this.masterDomainName = masterDomainName;
@@ -20,28 +21,24 @@ public class WorkerMachines implements Machine {
     @Override
     public String[] start(int numWorkers, String imageId) throws IOException {
         String privateKeyName = "mungerkey";
-        
+
         AmazonEC2 ec2 = new AmazonEC2Client(PregelAuthenticator.get());
-        System.out.println("EC2 is: "+ec2);
-        InstanceGroup instanceGroup = new InstanceGroupImpl(ec2);
-            
-            System.out.println(imageId);
-            
-            RunInstancesRequest launchConfiguration = new RunInstancesRequest(Machine.AMIID, numWorkers, numWorkers)
-                    .withKeyName(privateKeyName)
-                    .withInstanceType("t1.micro").withSecurityGroupIds("quick-start-1");
-                    System.out.println(launchConfiguration.toString());
-            
-            Reservation rs = instanceGroup.launch(launchConfiguration, TimeUnit.MINUTES, 5);
-            
-            WorkerThread runWorker = new WorkerThread(instanceGroup, masterDomainName);
-            runWorker.start();
+        System.out.println("EC2 is: " + ec2);
+        instanceGroup = new InstanceGroupImpl(ec2);
+
+        RunInstancesRequest launchConfiguration = new RunInstancesRequest(Machine.AMIID, numWorkers, numWorkers).withKeyName(privateKeyName).withInstanceType("t1.micro").withSecurityGroupIds("quick-start-1");
+        System.out.println(launchConfiguration.toString());
+
+        Reservation rs = instanceGroup.launch(launchConfiguration, TimeUnit.MINUTES, 5);
+
+        WorkerThread runWorker = new WorkerThread(instanceGroup, masterDomainName);
+        runWorker.start();
 
         return null;
     }
 
     @Override
     public void Stop() throws IOException {
-        //TODO make this useful
+        instanceGroup.terminate();
     }
 }
