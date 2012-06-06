@@ -8,7 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * This class is used for asynchronously running the classpath_external script.
+ * This class is used for asynchronously deploying and running the Master class.
  *
  * @author charlesmunger
  */
@@ -35,7 +35,7 @@ public class MasterThread extends Thread {
     }
 
     /**
-     * Connects via SSH and runs the classpath_external script.
+     * Connects via SSH and runs the Master.
      */
     @Override
     public void run() {

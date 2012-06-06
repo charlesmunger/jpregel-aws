@@ -50,7 +50,7 @@ public class Cluster {
             master = new LocalMaster(numWorkers);
             System.out.println("Cluster.start: workers constructed: " + numWorkers);
         }
-        master.makeWorkers(numWorkers, domainNames[ PUBLIC_DOMAIN_NAME], Machine.AMIID);
+        master.makeWorkers(numWorkers, domainNames[ PRIVATE_DOMAIN_NAME], Machine.AMIID);
         return master;
     }
 
