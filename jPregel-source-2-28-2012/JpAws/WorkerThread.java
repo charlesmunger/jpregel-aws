@@ -13,6 +13,7 @@ public class WorkerThread extends Thread {
     private InstanceGroup instanceGroup;
     private String masterDomainName;
     File privateKeyFile = new File("mungerkey.pem");
+    //this is ugly, and I want to remove it as soon as pull requests are approved on AWS-TASKS. 
 private static class Temp extends Thread {
 
         String command;
