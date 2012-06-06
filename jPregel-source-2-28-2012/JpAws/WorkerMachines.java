@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 public class WorkerMachines implements Machine {
+    public static final String MASTER_SECURITY_GROUP = "quick-start-1";
 
     private String masterDomainName;
     private InstanceGroup instanceGroup;
@@ -23,10 +24,9 @@ public class WorkerMachines implements Machine {
         String privateKeyName = "mungerkey";
 
         AmazonEC2 ec2 = new AmazonEC2Client(PregelAuthenticator.get());
-        System.out.println("EC2 is: " + ec2);
         instanceGroup = new InstanceGroupImpl(ec2);
 
-        RunInstancesRequest launchConfiguration = new RunInstancesRequest(Machine.AMIID, numWorkers, numWorkers).withKeyName(privateKeyName).withInstanceType("t1.micro").withSecurityGroupIds("quick-start-1");
+        RunInstancesRequest launchConfiguration = new RunInstancesRequest(Machine.AMIID, numWorkers, numWorkers).withKeyName(privateKeyName).withInstanceType("t1.micro").withSecurityGroupIds(MASTER_SECURITY_GROUP);
         System.out.println(launchConfiguration.toString());
 
         Reservation rs = instanceGroup.launch(launchConfiguration, TimeUnit.MINUTES, 5);
