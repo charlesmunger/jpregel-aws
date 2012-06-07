@@ -85,16 +85,16 @@ private static class Temp extends Thread {
             sshClient.uploadFile(new File("key.AWSkey"), "~/key.AWSkey");
             sshClient.uploadFile(new File("policy"), "~/policy");
             sshClient.executeCommand("tar -xvf jars.tar", null);
-            for (int i = 0; i < instanceGroup.instanceCount(); i++) {
-                (new Temp("java -cp " + JARNAME + ":./dist/lib/*"
-                        + " -Djava.security.policy=policy"
-                        //+ " -Djava.ext.dirs=dist/lib/ " 
-                        + " system.Worker " + masterDomainName, sshClient, i)).start();
-            }
-//            sshClient.executeCommand("nohup java -cp " + JARNAME + ":./dist/lib/*"
-//                    + " -Djava.security.policy=policy"
-//                    //+ " -Djava.ext.dirs=dist/lib/ " 
-//                    + " system.Worker " + masterDomainName + " &", null);
+//            for (int i = 0; i < instanceGroup.instanceCount(); i++) {
+//                (new Temp("java -cp " + JARNAME + ":./dist/lib/*"
+//                        + " -Djava.security.policy=policy"
+//                        //+ " -Djava.ext.dirs=dist/lib/ " 
+//                        + " system.Worker " + masterDomainName, sshClient, i)).start();
+//            }
+            sshClient.executeCommand("java -cp " + JARNAME + ":./dist/lib/*"
+                    + " -Djava.security.policy=policy"
+                    //+ " -Djava.ext.dirs=dist/lib/ " 
+                    + " system.Worker " + masterDomainName, null);
             System.out.println("Returned!");
         } catch (IOException ex) {
             System.out.println("Unable to upload file.");
