@@ -71,7 +71,7 @@ public class G1MasterGraphMaker implements MasterGraphMaker {
             try {
                 fileOutputStream = fileSystem.getWorkerInputFileOutputStream(fileNum);
             } catch (FileNotFoundException ex) {
-                System.out.println("Error getting input file stream: " + ex.getMessage());
+                System.out.println("Error getting output file stream: " + ex.getMessage());
                 System.exit(1);
             }
             DataOutputStream dataOutputStream = new DataOutputStream(fileOutputStream);

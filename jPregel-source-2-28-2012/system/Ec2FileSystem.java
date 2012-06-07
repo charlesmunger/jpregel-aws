@@ -1,5 +1,6 @@
 package system;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -8,9 +9,11 @@ import java.io.FileOutputStream;
  *
  * @author Pete Cappello
  */
-public class Ec2FileSystem extends FileSystem
-{
-    Ec2FileSystem( String jobDirectoryName , boolean isEc2 ) { super( jobDirectoryName, isEc2 ); }
+public class Ec2FileSystem extends FileSystem {
+
+    Ec2FileSystem(String jobDirectoryName, boolean isEc2) {
+        super(jobDirectoryName, isEc2);
+    }
 
     @Override
     public FileInputStream getFileInputStream() throws FileNotFoundException {
@@ -19,7 +22,8 @@ public class Ec2FileSystem extends FileSystem
 
     @Override
     public FileOutputStream getFileOutputStream() throws FileNotFoundException {
-    	return new FileOutputStream( jobDirectoryName + "/" + "output/output" );
+        (new File(jobDirectoryName+"/output/")).mkdirs();
+        return new FileOutputStream(jobDirectoryName + "/" + "output/output");
     }
 
     @Override
@@ -29,8 +33,8 @@ public class Ec2FileSystem extends FileSystem
 
     @Override
     public FileOutputStream getWorkerInputFileOutputStream(int WorkerNum) throws FileNotFoundException {
-
-    	return new FileOutputStream( jobDirectoryName + "/in/" + WorkerNum );
+        (new File(jobDirectoryName + "/in/")).mkdirs();
+        return new FileOutputStream(jobDirectoryName + "/in/" + WorkerNum);
     }
 
     @Override
@@ -40,22 +44,18 @@ public class Ec2FileSystem extends FileSystem
 
     @Override
     public FileOutputStream getWorkerOutputFileOutputStream(int WorkerNum) throws FileNotFoundException {
-
-    	String fileName = jobDirectoryName + "/out/" + WorkerNum;
-        return new FileOutputStream( fileName );
+        (new File(jobDirectoryName + "/out/")).mkdirs();
+        String fileName = jobDirectoryName + "/out/" + WorkerNum;
+        return new FileOutputStream(fileName);
     }
 
-	@Override
-	public boolean getFileSystem() {	
-		return isEc2 ;
-	}
+    @Override
+    public boolean getFileSystem() {
+        return isEc2;
+    }
 
-	@Override
-	public String getJobDirectory() {
-		return jobDirectoryName;
-	}
-	
-	
-	
-	
+    @Override
+    public String getJobDirectory() {
+        return jobDirectoryName;
+    }
 }
