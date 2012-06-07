@@ -4,8 +4,6 @@ import datameer.awstasks.aws.ec2.InstanceGroup;
 import datameer.awstasks.aws.ec2.ssh.SshClient;
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * This class is used for asynchronously deploying and running the Master class.
@@ -19,19 +17,14 @@ public class MasterThread extends Thread {
      */
     public static final String JARNAME = "jpregel-aws.jar";
     private InstanceGroup instanceGroup;
-    private String jobDirectoryName;
-    File privateKeyFile = new File("mungerkey.pem");
-
+    
     /**
      * Creates a new MasterThread
      *
      * @param instanceGroup The instance group (with only one item) that the Master should be run on
-     * @param jobDirectoryName  The name of the S3 bucket to store the files needed by and created
-     * by the computation. 
      */
-    public MasterThread(InstanceGroup instanceGroup, String jobDirectoryName) {
+    public MasterThread(InstanceGroup instanceGroup) {
         this.instanceGroup = instanceGroup;
-        this.jobDirectoryName = jobDirectoryName;
     }
 
     /**
@@ -39,14 +32,15 @@ public class MasterThread extends Thread {
      */
     @Override
     public void run() {
+        File privateKeyFile = PregelAuthenticator.get().getPrivateKey();
         try {
             System.out.println("Waiting");
             Thread.sleep(30000);
             System.out.println("Waking");
         } catch (InterruptedException ex) {
-            Logger.getLogger(MasterThread.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Waiting interrupted.");
         }
-        SshClient sshClient = instanceGroup.createSshClient("ec2-user", privateKeyFile);
+        SshClient sshClient = instanceGroup.createSshClient("ec2-user", PregelAuthenticator.get().getMasterPrivateKey());
         File jars = new File("jars.tar");
         if (!jars.exists()) {
             try {
@@ -76,10 +70,6 @@ public class MasterThread extends Thread {
             System.err.println("Didn't find jar in " + distjar.getAbsolutePath() + " or " + thisjar.getAbsolutePath());
         }
         try {
-            //sshClient.uploadFile(new File("1"), "~/1");
-            //sshClient.executeCommand("mkdir "+jobDirectoryName +" ; "+"cd "+jobDirectoryName + " ; mkdir in ; cd ; mv 1 "+jobDirectoryName + "/in/1", null);
-            //sshClient.executeCommand("mkdir "+jobDirectoryName +" ; "+"cd "+jobDirectoryName + " ; mkdir in ; cd ;", null);
-            
             sshClient.uploadFile(jars, "~/jars.tar");
             sshClient.uploadFile(new File("policy"), "~/policy");
             sshClient.uploadFile(new File("key.AWSkey"), "~/key.AWSkey");
@@ -87,7 +77,6 @@ public class MasterThread extends Thread {
             sshClient.executeCommand("tar -xvf jars.tar", null);
             sshClient.executeCommand("java -cp " + JARNAME + ":./dist/lib/*"
                     + " -Djava.security.policy=policy"
-                    //+ " -Djava.ext.dirs=dist/lib/ " 
                     + " system.Master", System.out);
         } catch (IOException ex) {
             System.out.println("Unable to upload file.");

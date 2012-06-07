@@ -26,7 +26,7 @@ public class Cluster {
         this.jobName = jobName;
         if (isEc2) {
             try {
-                MasterMachines masterMachines = new MasterMachines(jobName);
+                MasterMachines masterMachines = new MasterMachines();
                 domainNames = masterMachines.start(numWorkers, Machine.AMIID);
 
             } catch (IOException e) {
@@ -57,7 +57,7 @@ public class Cluster {
     public void stop(boolean isEc2) {
         if (isEc2) {
             try {
-                MasterMachines masterMachines = new MasterMachines(jobName);
+                MasterMachines masterMachines = new MasterMachines();
                 masterMachines.Stop();
 
             } catch (IOException e) {

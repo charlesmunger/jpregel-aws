@@ -18,7 +18,7 @@ public class WorkerThread extends Thread {
     public static final String JARNAME = "jpregel-aws.jar";
     private InstanceGroup instanceGroup;
     private String masterDomainName;
-    File privateKeyFile = new File("mungerkey.pem");
+    File privateKeyFile = PregelAuthenticator.get().getPrivateKey();
 
     /**
      * Creates a new worker thread to start a group of workers.

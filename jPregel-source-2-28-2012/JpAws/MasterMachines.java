@@ -18,40 +18,24 @@ import java.util.concurrent.TimeUnit;
  */
 public class MasterMachines implements Machine {
     private final AmazonEC2 ec2 = new AmazonEC2Client(PregelAuthenticator.get());
-    private final String jobName;
     private InstanceGroup instanceGroup;
 
-    /**
-     * Creates a new MasterMachines object. 
-     * @param jobDIrectoryName The name of the S3 bucket to store the files needed by and created
-     * by the computation. 
-     */
-    public MasterMachines(String jobDIrectoryName) {
-        this.jobName = jobDIrectoryName;
-    }
-    
-    private MasterMachines() {
-        this.jobName = null; //never happens
-    }
-    
     @Override
     public String[] start(int numWorkers, String imageId) throws IOException {
-        String privateKeyName = "mungerkey";
         
          instanceGroup = new InstanceGroupImpl(ec2);
 
         RunInstancesRequest launchConfiguration = new RunInstancesRequest(Machine.AMIID, 1, 1)
-                    .withKeyName(privateKeyName)
+                    .withKeyName(PregelAuthenticator.get().getMasterPrivateKeyName())
                     .withInstanceType("t1.micro").withSecurityGroupIds("quick-start-1");
                     System.out.println(launchConfiguration.toString());
 
         Reservation rs = instanceGroup.launch(launchConfiguration, TimeUnit.MINUTES, 5);
         List<Instance> instances = rs.getInstances();
-        //List list = (List) rs.getInstances();
         String privateDns = instances.get(0).getPrivateDnsName();
         String publicDns = instances.get(0).getPublicDnsName();
         
-        MasterThread runMaster = new MasterThread(instanceGroup, jobName);
+        MasterThread runMaster = new MasterThread(instanceGroup);
         runMaster.start();
 
         System.out.println("Public DNS: " + publicDns);

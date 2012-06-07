@@ -80,4 +80,36 @@ public class PregelAuthenticator extends org.jets3t.service.security.AWSCredenti
     public Object clone() {
         throw new UnsupportedOperationException("Cannot be Cloned");
     }
+    
+    /**
+     * Returns a pointer to the worker private key file, stored in privatekey.pem
+     * @return The private key file. 
+     */
+    public File getPrivateKey() {
+        return new File("privatekey.pem");
+    }
+    
+    /**
+     * Returns the key used for SSH access to the Master instance.
+     * @return the private key file, stored in masterkey.pem
+     */
+    public File getMasterPrivateKey() {
+        return new File("masterkey.pem");
+    }
+    
+    /**
+     * Returns the name of the Master instance's keypair, as created via the AWS webUI.
+     * @return The name of the key pair. 
+     */
+    public String getMasterPrivateKeyName() {
+        return "masterkey";
+    }
+    
+    /**
+     * Returns the name of the Worker instances' keypair, as created via the AWS webUI.
+     * @return The name of the key pair.
+     */
+    public String getPrivateKeyName() {
+        return "privatekey";
+    }
 }
