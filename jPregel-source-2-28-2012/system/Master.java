@@ -240,16 +240,16 @@ public class Master extends ServiceImpl implements ClientToMaster {
     public void shutdown() {        
         // shutdown all Worker Services
         out.println("Master.shutdown: notifying Worker Services to shutdown.");
-        barrierComputation(new ShutdownWorker());
-        out.println("Master.shutdown: Worker Services shutdown.");
-
-        // shutdown Master
-        out.println("Master.shutdown: shutting down.");
+        //barrierComputation(new ShutdownWorker());
         try {
             workerMachines.Stop();
         } catch (IOException ex) {
             System.out.println("Exception shutting down workers. Check webUI for zombie instances.");
         }
+        out.println("Master.shutdown: Worker Services shutdown.");
+
+        // shutdown Master
+        out.println("Master.shutdown: shutting down.");
     }
 
     /* _____________________________

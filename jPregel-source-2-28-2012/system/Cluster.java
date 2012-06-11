@@ -32,6 +32,7 @@ public class Cluster {
                 e.printStackTrace();
             }
             try {
+                //TODO evalute this wait
                 wait(80000); // wait for Master to start
             } catch (InterruptedException ignore) {
             }
@@ -56,6 +57,7 @@ public class Cluster {
         if (isEc2) {
             try {
                 master.shutdown();
+                System.out.println("Terminating Master instance");
                 masterMachines.Stop();
             } catch (IOException e) {
                 // TODO Auto-generated catch block
