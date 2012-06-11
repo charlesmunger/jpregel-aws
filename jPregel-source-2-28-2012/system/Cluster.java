@@ -1,11 +1,8 @@
 package system;
 
-import JpAws.Machine;
-import static java.lang.System.out;
 import JpAws.MasterMachines;
-
-
 import java.io.IOException;
+import static java.lang.System.out;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 
