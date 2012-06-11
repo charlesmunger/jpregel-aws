@@ -126,7 +126,7 @@ public class Master extends ServiceImpl implements ClientToMaster {
 
         try {
             //TODO reevaluate this time
-            wait(90000); //wait for Master to start 
+            //wait(90000); //wait for Master to start 
 
         } catch (InterruptedException ignore) {
         }
