@@ -124,12 +124,12 @@ public class Master extends ServiceImpl implements ClientToMaster {
             e.printStackTrace();
         }
 
-        try {
+        //try {
             //TODO reevaluate this time
             //wait(90000); //wait for Master to start 
 
-        } catch (InterruptedException ignore) {
-        }
+        //} catch (InterruptedException ignore) {
+        //}
         out.println("Master.makeWorkers: waiting for Worker registration to complete");
 
 
