@@ -24,6 +24,8 @@ import jicosfoundation.ServiceName;
 import system.commands.CommandComplete;
 
 import JpAws.WorkerMachines;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import system.commands.InputFileProcessingComplete;
 import system.commands.ReadWorkerInputFile;
 import system.commands.WriteWorkerOutputFile;
@@ -99,6 +101,7 @@ public class Master extends ServiceImpl implements ClientToMaster {
         registry.bind(SERVICE_NAME, master);
         out.println("Master: Ready.");
     }
+    private WorkerMachines workerMachines;
 
     Master() throws RemoteException {
         // Establish Master as a Jicos Service
@@ -114,8 +117,7 @@ public class Master extends ServiceImpl implements ClientToMaster {
         //Machine.startWorkers( masterDomainName, numWorkers, null );
 
         try {
-
-            WorkerMachines workerMachines = new WorkerMachines(masterDomainName);
+            workerMachines = new WorkerMachines(masterDomainName);
             workerMachines.start(numWorkers);
         } catch (IOException e) {
             // TODO Auto-generated catch block
@@ -234,7 +236,8 @@ public class Master extends ServiceImpl implements ClientToMaster {
         return jobRunData;
     }
 
-    public void shutdown() {
+    @Override
+    public void shutdown() {        
         // shutdown all Worker Services
         out.println("Master.shutdown: notifying Worker Services to shutdown.");
         barrierComputation(new ShutdownWorker());
@@ -242,6 +245,11 @@ public class Master extends ServiceImpl implements ClientToMaster {
 
         // shutdown Master
         out.println("Master.shutdown: shutting down.");
+        try {
+            workerMachines.Stop();
+        } catch (IOException ex) {
+            System.out.println("Exception shutting down workers. Check webUI for zombie instances.");
+        }
     }
 
     /* _____________________________

@@ -20,13 +20,11 @@ public class Cluster {
     private static final int PUBLIC_DOMAIN_NAME = 0;
     private static final int PRIVATE_DOMAIN_NAME = 1;
     private ClientToMaster master;
-    private String jobName = null;
+    private MasterMachines masterMachines =new MasterMachines();
     public synchronized ClientToMaster start(boolean isEc2, int numWorkers, String jobName) throws RemoteException {
         String[] domainNames = {null, null};
-        this.jobName = jobName;
         if (isEc2) {
             try {
-                MasterMachines masterMachines = new MasterMachines();
                 domainNames = masterMachines.start(numWorkers);
 
             } catch (IOException e) {
@@ -57,9 +55,8 @@ public class Cluster {
     public void stop(boolean isEc2) {
         if (isEc2) {
             try {
-                MasterMachines masterMachines = new MasterMachines();
+                master.shutdown();
                 masterMachines.Stop();
-
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
