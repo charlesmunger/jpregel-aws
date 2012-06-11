@@ -51,5 +51,5 @@ public class ShortestPathEc2Client extends Client
                 vertexFactory, numParts, workerIsMultithreaded, combiner, 
                 workerWriter, workerGraphMaker, reader, writer );
         Job[] jobs = { job };
-        Client.run( jobs, isEc2Master, numWorkers, Machine.AMIID,Machine.AMIID );    }
+        Client.run( jobs, isEc2Master, numWorkers);    }
 }

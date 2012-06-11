@@ -108,21 +108,22 @@ public class Master extends ServiceImpl implements ClientToMaster {
     }
 
     @Override
-    public synchronized void makeWorkers(int numWorkers, String masterDomainName, String imageIdWorker) throws RemoteException {
-        System.out.println("Master.makeWorkers: entered: numWorkers: " + numWorkers + " workerimage: "+imageIdWorker);
+    public synchronized void makeWorkers(int numWorkers, String masterDomainName) throws RemoteException {
+        System.out.println("Master.makeWorkers: entered: numWorkers: " + numWorkers);
         numUnfinishedWorkers += numWorkers;
         //Machine.startWorkers( masterDomainName, numWorkers, null );
 
         try {
 
             WorkerMachines workerMachines = new WorkerMachines(masterDomainName);
-            workerMachines.start(numWorkers, imageIdWorker);
+            workerMachines.start(numWorkers);
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
         try {
+            //TODO reevaluate this time
             wait(90000); //wait for Master to start 
 
         } catch (InterruptedException ignore) {

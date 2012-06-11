@@ -21,7 +21,7 @@ public class MasterMachines implements Machine {
     private InstanceGroup instanceGroup;
 
     @Override
-    public String[] start(int numWorkers, String imageId) throws IOException {
+    public String[] start(int numWorkers) throws IOException {
         
          instanceGroup = new InstanceGroupImpl(ec2);
 

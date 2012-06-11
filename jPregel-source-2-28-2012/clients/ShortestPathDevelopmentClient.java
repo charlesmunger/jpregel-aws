@@ -54,7 +54,7 @@ public class ShortestPathDevelopmentClient {
         Job[] jobs = {job};
         try {
             boolean isEc2Master = false;
-            Client.run(jobs, isEc2Master, numWorkers, Machine.AMIID, Machine.AMIID);//TODO fix this
+            Client.run(jobs, isEc2Master, numWorkers);//TODO fix this
         } catch (Exception exception) {
             exception.printStackTrace();
             System.exit(1);

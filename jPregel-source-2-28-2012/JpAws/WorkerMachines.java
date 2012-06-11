@@ -19,7 +19,7 @@ public class WorkerMachines implements Machine {
     }
 
     @Override
-    public String[] start(int numWorkers, String imageId) throws IOException {
+    public String[] start(int numWorkers) throws IOException {
         AmazonEC2 ec2 = new AmazonEC2Client(PregelAuthenticator.get());
         instanceGroup = new InstanceGroupImpl(ec2);
 

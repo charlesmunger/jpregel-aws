@@ -23,7 +23,7 @@ public interface Machine {
      * private.
      * @throws IOException
      */
-    public String[] start(int numWorkers, String imageId) throws IOException;
+    public String[] start(int numWorkers) throws IOException;
 
     /**
      * Stops the machine.

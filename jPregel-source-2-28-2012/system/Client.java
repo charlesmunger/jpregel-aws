@@ -10,7 +10,7 @@ import java.rmi.RemoteException;
  */
 public class Client
 {
-    public static void run( Job[] jobs, boolean isEc2, int numWorkers , String imageIdMaster , String imageIdWorker ) 
+    public static void run( Job[] jobs, boolean isEc2, int numWorkers) 
             throws RemoteException
     {
         System.out.println("Client.run: entered.");

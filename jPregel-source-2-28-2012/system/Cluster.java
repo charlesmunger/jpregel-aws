@@ -27,7 +27,7 @@ public class Cluster {
         if (isEc2) {
             try {
                 MasterMachines masterMachines = new MasterMachines();
-                domainNames = masterMachines.start(numWorkers, Machine.AMIID);
+                domainNames = masterMachines.start(numWorkers);
 
             } catch (IOException e) {
                 // TODO Auto-generated catch block
@@ -50,7 +50,7 @@ public class Cluster {
             master = new LocalMaster(numWorkers);
             System.out.println("Cluster.start: workers constructed: " + numWorkers);
         }
-        master.makeWorkers(numWorkers, domainNames[ PRIVATE_DOMAIN_NAME], Machine.AMIID);
+        master.makeWorkers(numWorkers, domainNames[ PRIVATE_DOMAIN_NAME]);
         return master;
     }
 
