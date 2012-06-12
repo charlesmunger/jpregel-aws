@@ -35,7 +35,7 @@ public class MasterThread extends Thread {
         File privateKeyFile = PregelAuthenticator.get().getPrivateKey();
         try {
             System.out.println("Waiting");
-            Thread.sleep(30000);
+            Thread.sleep(15000);
             System.out.println("Waking");
         } catch (InterruptedException ex) {
             System.out.println("Waiting interrupted.");

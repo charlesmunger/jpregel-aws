@@ -221,7 +221,7 @@ public class Master extends ServiceImpl implements ClientToMaster {
     public void shutdown() {        
         // shutdown all Worker Services
         out.println("Master.shutdown: notifying Worker Services to shutdown.");
-        barrierComputation(new ShutdownWorker());
+        //barrierComputation(new ShutdownWorker());
         try {
             workerMachines.Stop();
         } catch (IOException ex) {
