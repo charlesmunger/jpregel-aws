@@ -75,12 +75,16 @@ public class MasterThread extends Thread {
             sshClient.uploadFile(new File("key.AWSkey"), "~/key.AWSkey");
             sshClient.uploadFile(privateKeyFile, "~/"+privateKeyFile.getName());
             sshClient.executeCommand("tar -xvf jars.tar", null);
-            sshClient.executeCommand("java -cp " + JARNAME + ":./dist/lib/*"
-                    + " -Djava.security.policy=policy"
-                    + " system.Master", System.out);
         } catch (IOException ex) {
             System.out.println("Unable to upload file.");
             System.exit(1);
+        }
+        try {
+            sshClient.executeCommand("java -cp " + JARNAME + ":./dist/lib/*"
+                        + " -Djava.security.policy=policy"
+                        + " system.Master", System.out);
+        } catch (IOException ex) {
+            System.out.println("Master disconnected");
         }
     }
 }
