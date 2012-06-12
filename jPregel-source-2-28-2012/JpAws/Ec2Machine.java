@@ -16,13 +16,6 @@ public abstract class Ec2Machine implements Machine {
     
     @Override
     public void Stop() throws IOException {
-        new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                instanceGroup.terminate();
-                System.out.println("Terminated machine.");
-            }
-        }).start();
+        instanceGroup.terminate();
     }
 }
