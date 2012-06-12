@@ -76,7 +76,7 @@ public class MasterThread extends Thread {
             sshClient.uploadFile(privateKeyFile, "~/"+privateKeyFile.getName());
             sshClient.executeCommand("tar -zxvf jars.tar", null);
         } catch (IOException ex) {
-            System.out.println("Unable to upload file.");
+            System.out.println("Unable to upload file." + ex.getLocalizedMessage());
             System.exit(1);
         }
         try {
@@ -84,7 +84,7 @@ public class MasterThread extends Thread {
                         + " -Djava.security.policy=policy"
                         + " system.Master", System.out);
         } catch (IOException ex) {
-            System.out.println("Master disconnected");
+            System.out.println("Master disconnected "+ex.getLocalizedMessage());
         }
     }
 }
