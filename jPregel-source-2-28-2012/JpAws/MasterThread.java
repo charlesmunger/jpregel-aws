@@ -33,14 +33,6 @@ public class MasterThread extends Thread {
     @Override
     public void run() {
         File privateKeyFile = PregelAuthenticator.get().getPrivateKey();
-        try {
-            System.out.println("Waiting");
-            Thread.sleep(15000);
-            System.out.println("Waking");
-        } catch (InterruptedException ex) {
-            System.out.println("Waiting interrupted.");
-        }
-        SshClient sshClient = instanceGroup.createSshClient("ec2-user", PregelAuthenticator.get().getMasterPrivateKey());
         File jars = new File("jars.tar");
         if (!jars.exists()) {
             try {
@@ -50,6 +42,14 @@ public class MasterThread extends Thread {
                 System.exit(1);
             }
         }
+        try {
+            System.out.println("Waiting");
+            Thread.sleep(30000);
+            System.out.println("Waking");
+        } catch (InterruptedException ex) {
+            System.out.println("Waiting interrupted.");
+        }
+        SshClient sshClient = instanceGroup.createSshClient("ec2-user", PregelAuthenticator.get().getMasterPrivateKey());
         File thisjar = new File(JARNAME);
         File distjar = new File("dist/"+JARNAME);
         if(thisjar.exists()) {

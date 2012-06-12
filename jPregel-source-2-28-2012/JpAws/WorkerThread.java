@@ -36,12 +36,6 @@ public class WorkerThread extends Thread {
      */
     @Override
     public void run() {
-        try {
-            Thread.sleep(15000);
-        } catch (InterruptedException ex) {
-            System.out.println("Waiting interrupted");
-        }
-        SshClient sshClient = instanceGroup.createSshClient("ec2-user", privateKeyFile, false);
         File jars = new File("jars.tar");
         if (!jars.exists()) {
             try {
@@ -51,6 +45,12 @@ public class WorkerThread extends Thread {
                 System.exit(1);
             }
         }
+        try {
+            Thread.sleep(30000);
+        } catch (InterruptedException ex) {
+            System.out.println("Waiting interrupted");
+        }
+        SshClient sshClient = instanceGroup.createSshClient("ec2-user", privateKeyFile, false);
         File thisjar = new File(JARNAME);
         File distjar = new File("dist/" + JARNAME);
         if (thisjar.exists()) {
@@ -78,7 +78,7 @@ public class WorkerThread extends Thread {
             sshClient.executeCommand("tar -zxvf jars.tar", null);
             System.out.println("Returned!");
         } catch (IOException ex) {
-            System.out.println("Unable to upload file.");
+            System.out.println("Unable to upload file." + ex.getLocalizedMessage());
             System.exit(1);
         }
         try {
