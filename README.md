@@ -16,3 +16,5 @@ To deploy this code:
 Specify a Main file with ant:
 
 ant run -propertyfile nbproject/configs/ShortestPath.properties -Dapplication.args="foobucket 10 10 true true"
+
+This project is licensed under the MIT license, which is provided in license.txt.
