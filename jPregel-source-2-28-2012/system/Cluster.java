@@ -49,6 +49,23 @@ public class Cluster {
                         System.out.println("Waiting interrupted, trying again immediately");
                     }
                     continue;
+                } catch (RemoteException r) {
+                    if (i > 80000) {
+                        System.out.println("Master not up in time. Aborting");
+                        try {
+                            masterMachines.Stop();
+                        } catch (IOException ex1) {
+                            System.out.println("Failed terminating Master instance. Check webUI for zombie instances.");
+                        }
+                        System.exit(1);
+                    }
+                    System.out.println("Master not up yet. Trying again in 5 seconds...");
+                    try {
+                        wait(5000);
+                    } catch (InterruptedException ex1) {
+                        System.out.println("Waiting interrupted, trying again immediately");
+                    }
+                    continue;
                 } catch (MalformedURLException ex) {
                     System.out.println("Bad master URL. " + ex.getLocalizedMessage());
                     try {
