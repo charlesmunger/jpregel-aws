@@ -24,14 +24,11 @@ import jicosfoundation.ServiceName;
 import system.commands.CommandComplete;
 
 import JpAws.WorkerMachines;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import system.commands.InputFileProcessingComplete;
 import system.commands.ReadWorkerInputFile;
 import system.commands.WriteWorkerOutputFile;
 import system.commands.SetWorkerJob;
 import system.commands.SetWorkerMap;
-import system.commands.ShutdownWorker;
 import system.commands.StartSuperStep;
 import system.commands.SuperStepComplete;
 import system.commands.WorkerJobSet;
@@ -124,15 +121,7 @@ public class Master extends ServiceImpl implements ClientToMaster {
             e.printStackTrace();
         }
 
-        //try {
-            //TODO reevaluate this time
-            //wait(90000); //wait for Master to start 
-
-        //} catch (InterruptedException ignore) {
-        //}
         out.println("Master.makeWorkers: waiting for Worker registration to complete");
-
-
 
         // wait for all workers to Register before proceeding
         try {
