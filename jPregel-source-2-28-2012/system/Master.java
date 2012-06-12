@@ -24,15 +24,7 @@ import jicosfoundation.ServiceName;
 import system.commands.CommandComplete;
 
 import JpAws.WorkerMachines;
-import system.commands.InputFileProcessingComplete;
-import system.commands.ReadWorkerInputFile;
-import system.commands.WriteWorkerOutputFile;
-import system.commands.SetWorkerJob;
-import system.commands.SetWorkerMap;
-import system.commands.StartSuperStep;
-import system.commands.SuperStepComplete;
-import system.commands.WorkerJobSet;
-import system.commands.WorkerMapSet;
+import system.commands.*;
 
 /**
  * Master is decoupled from MasterJob type: 
@@ -229,7 +221,7 @@ public class Master extends ServiceImpl implements ClientToMaster {
     public void shutdown() {        
         // shutdown all Worker Services
         out.println("Master.shutdown: notifying Worker Services to shutdown.");
-        //barrierComputation(new ShutdownWorker());
+        barrierComputation(new ShutdownWorker());
         try {
             workerMachines.Stop();
         } catch (IOException ex) {
