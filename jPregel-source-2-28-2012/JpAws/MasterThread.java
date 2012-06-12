@@ -44,7 +44,7 @@ public class MasterThread extends Thread {
         File jars = new File("jars.tar");
         if (!jars.exists()) {
             try {
-                Runtime.getRuntime().exec("tar -cvf jars.tar ./dist/lib");
+                Runtime.getRuntime().exec("tar -zcvf jars.tar ./dist/lib");
             } catch (IOException ex) {
                 System.out.println("Error tarring jars.");
                 System.exit(1);
@@ -74,7 +74,7 @@ public class MasterThread extends Thread {
             sshClient.uploadFile(new File("policy"), "~/policy");
             sshClient.uploadFile(new File("key.AWSkey"), "~/key.AWSkey");
             sshClient.uploadFile(privateKeyFile, "~/"+privateKeyFile.getName());
-            sshClient.executeCommand("tar -xvf jars.tar", null);
+            sshClient.executeCommand("tar -zxvf jars.tar", null);
         } catch (IOException ex) {
             System.out.println("Unable to upload file.");
             System.exit(1);

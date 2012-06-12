@@ -4,8 +4,6 @@ import datameer.awstasks.aws.ec2.InstanceGroup;
 import datameer.awstasks.aws.ec2.ssh.SshClient;
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * This class is used to asynchronously start a group of workers.
@@ -47,7 +45,7 @@ public class WorkerThread extends Thread {
         File jars = new File("jars.tar");
         if (!jars.exists()) {
             try {
-                Runtime.getRuntime().exec("tar -cvf jars.tar ./dist/lib");
+                Runtime.getRuntime().exec("tar -zcvf jars.tar ./dist/lib");
             } catch (IOException ex) {
                 System.out.println("Error tarring jars.");
                 System.exit(1);
@@ -77,7 +75,7 @@ public class WorkerThread extends Thread {
             sshClient.uploadFile(jars, "~/jars.tar");
             sshClient.uploadFile(new File("key.AWSkey"), "~/key.AWSkey");
             sshClient.uploadFile(new File("policy"), "~/policy");
-            sshClient.executeCommand("tar -xvf jars.tar", null);
+            sshClient.executeCommand("tar -zxvf jars.tar", null);
             System.out.println("Returned!");
         } catch (IOException ex) {
             System.out.println("Unable to upload file.");
