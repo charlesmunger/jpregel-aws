@@ -5,7 +5,6 @@ import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.Instance;
 import com.amazonaws.services.ec2.model.Reservation;
 import com.amazonaws.services.ec2.model.RunInstancesRequest;
-import datameer.awstasks.aws.ec2.InstanceGroup;
 import datameer.awstasks.aws.ec2.InstanceGroupImpl;
 import java.io.IOException;
 import java.util.List;
@@ -16,9 +15,8 @@ import java.util.concurrent.TimeUnit;
  *
  * @author charlesmunger
  */
-public class MasterMachines implements Machine {
+public class MasterMachines extends Ec2Machine {
     private final AmazonEC2 ec2 = new AmazonEC2Client(PregelAuthenticator.get());
-    private InstanceGroup instanceGroup;
 
     @Override
     public String[] start(int numWorkers) throws IOException {
@@ -44,10 +42,5 @@ public class MasterMachines implements Machine {
         String[] Dns = {publicDns, privateDns};
 
         return Dns;
-    }
-
-    @Override
-    public void Stop() throws IOException {
-        instanceGroup.terminate();
     }
 }
