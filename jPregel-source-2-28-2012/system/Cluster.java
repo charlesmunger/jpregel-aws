@@ -33,7 +33,7 @@ public class Cluster {
                 try {
                     master = (ClientToMaster) Naming.lookup(url);
                 } catch (NotBoundException ex) {
-                    if (i > 80000) {
+                    if (i > 120000) {
                         System.out.println("Master not up in time. Aborting");
                         try {
                             masterMachines.Stop();
@@ -50,7 +50,7 @@ public class Cluster {
                     }
                     continue;
                 } catch (RemoteException r) {
-                    if (i > 80000) {
+                    if (i > 120000) {
                         System.out.println("Master not up in time. Aborting");
                         try {
                             masterMachines.Stop();

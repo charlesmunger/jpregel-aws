@@ -25,7 +25,7 @@ public class MasterMachines extends Ec2Machine {
 
         RunInstancesRequest launchConfiguration = new RunInstancesRequest(Machine.AMIID, 1, 1)
                     .withKeyName(PregelAuthenticator.get().getMasterPrivateKeyName())
-                    .withInstanceType("t1.micro").withSecurityGroupIds("quick-start-1");
+                    .withInstanceType("t1.micro").withSecurityGroupIds("quicklaunch-1");
                     System.out.println(launchConfiguration.toString());
 
         Reservation rs = instanceGroup.launch(launchConfiguration, TimeUnit.MINUTES, 5);

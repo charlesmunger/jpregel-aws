@@ -77,7 +77,7 @@ public class S3FileSys {
      *  Fetches the output of a given worker from the designated S3 bucket. 
      * @param jobDirectoryName The S3 bucket to fetch from
      * @param workerNum The name of the file to fetch
-     * @return Returns a reader poined at a local copy of the file 
+     * @return Returns a reader pointed at a local copy of the file 
      * @throws ServiceException Error connecting to S3, or file not found
      */
     public static BufferedReader WorkerFileInput(String jobDirectoryName, int workerNum) throws ServiceException {
