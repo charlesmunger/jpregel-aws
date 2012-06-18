@@ -24,7 +24,7 @@ public class StandardMasterOutputMaker implements Writer
     {
         try
         {    	
-            (new File(jobName+"/output")).mkdirs();
+            //(new File(jobName+"/output")).mkdirs();
             // open Master file for output
         	int fis_read = 0 ;
             BufferedReader bufferedReader = null ; 
