@@ -22,8 +22,8 @@ public class Ec2FileSystem extends FileSystem {
 
     @Override
     public FileOutputStream getFileOutputStream() throws FileNotFoundException {
-        (new File(jobDirectoryName+"/output/")).mkdirs();
-        return new FileOutputStream(jobDirectoryName + "/" + "output/output");
+        (new File(jobDirectoryName)).mkdirs();
+        return new FileOutputStream(jobDirectoryName + "/output");
     }
 
     @Override
