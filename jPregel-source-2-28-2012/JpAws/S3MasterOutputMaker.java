@@ -22,16 +22,16 @@ public class S3MasterOutputMaker implements S3FileSystem {
     @Override
     public BufferedReader FileInput(String jobDirectoryName) {
         String workerNumber = Integer.toString(workerNum);
-        String bucketName = jobDirectoryName + "/out";
-        S3ObjectInputStream objectContent = s3.getObject(bucketName, workerNumber).getObjectContent();
+        String bucketName = jobDirectoryName;
+        S3ObjectInputStream objectContent = s3.getObject(bucketName,"out/"+workerNumber).getObjectContent();
         return new BufferedReader(new InputStreamReader(objectContent));
     }
 
     @Override
     public void UploadFilesOntoS3(String jobDirectoryName) {
-        String bucketName = jobDirectoryName + "/" + "output";
+        String bucketName = jobDirectoryName;
         String fileName = bucketName + "/" + "output";
         File fileData = new File(fileName);
-        s3.putObject(bucketName, fileName, fileData);
+        s3.putObject(bucketName, "output", fileData);
     }
 }

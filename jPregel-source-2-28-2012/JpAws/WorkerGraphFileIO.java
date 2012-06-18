@@ -38,9 +38,8 @@ public class WorkerGraphFileIO implements S3FileSystem {
     @Override
     public BufferedReader FileInput(String jobDirectoryName) {
         String workerNumber = Integer.toString(workerNum);
-        BufferedReader reader = null;
-        String bucketName = jobDirectoryName + "/in";
-        S3ObjectInputStream objectContent = s3.getObject(bucketName, workerNumber).getObjectContent();
+        String bucketName = jobDirectoryName;
+        S3ObjectInputStream objectContent = s3.getObject(bucketName,"in/"+workerNumber).getObjectContent();
         return new BufferedReader(new InputStreamReader(objectContent));
     }
 
@@ -52,9 +51,9 @@ public class WorkerGraphFileIO implements S3FileSystem {
      */
     @Override
     public void UploadFilesOntoS3(String jobDirectoryName) {
-        String bucketName = jobDirectoryName + "/" + "out";
-        String fileName = bucketName + "/" + workerNum;
+        String bucketName = jobDirectoryName;
+        String fileName = bucketName + "/" + "out" + "/" + workerNum;
         File fileData = new File(fileName);
-        s3.putObject(bucketName, fileName, fileData);
+        s3.putObject(bucketName, "out" + "/" + workerNum, fileData);
     }
 }

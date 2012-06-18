@@ -27,8 +27,8 @@ public class S3MasterInputMaker implements S3FileSystem {
     @Override
     public void UploadFilesOntoS3(String jobDirectoryName) {
         String bucketName = jobDirectoryName;
-        String fileName = "/" + "in" + "/" + fileNum;
-        File fileData = new File(bucketName + fileName);
+        String fileName = "in" + "/" + fileNum;
+        File fileData = new File(bucketName +"/"+ fileName);
         s3.putObject(bucketName, fileName, fileData);
     }
 }
