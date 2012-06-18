@@ -4,6 +4,7 @@
  */
 package JpAws;
 
+import com.amazonaws.auth.BasicAWSCredentials;
 import java.io.*;
 
 /**
@@ -11,7 +12,7 @@ import java.io.*;
  * services and instances created by the user. 
  * @author Charles Munger
  */
-public class PregelAuthenticator extends org.jets3t.service.security.AWSCredentials implements com.amazonaws.auth.AWSCredentials {
+public class PregelAuthenticator extends BasicAWSCredentials implements com.amazonaws.auth.AWSCredentials {
 
     private static PregelAuthenticator singleton = null;
     
@@ -36,25 +37,6 @@ public class PregelAuthenticator extends org.jets3t.service.security.AWSCredenti
     
     private PregelAuthenticator(String AccessKeyID, String SecretKeyID) {
         super(AccessKeyID,SecretKeyID);
-    }
-
-    /**
-     * Returns the Access key for S3 and EC2 instance management. 
-     * @return The Access Key 
-     */
-    @Override
-    public String getAWSAccessKeyId() {
-        System.out.println("Accessing: "+ super.getAccessKey());
-        return super.getAccessKey();
-    }
-
-    /**
-     * Returns the Secret key (needed for modification of files on S3, and managing instances on EC2).
-     * @return The secret key. 
-     */
-    @Override
-    public String getAWSSecretKey() {
-        return super.getSecretKey();
     }
 
     /**

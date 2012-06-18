@@ -3,21 +3,14 @@
  * !! Do not System.exit(1) on file reading exception. Throw an exception.
  */
 package workerGraphMakers;
-import static java.lang.System.err;
-import static java.lang.System.exit;
-
+import JpAws.WorkerGraphFileIO;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import system.Combiner;
-import system.FileSystem;
-import system.GraphMaker;
-import system.Vertex;
-import system.Worker;
-import system.WorkerJob;
-import JpAws.S3FileSys; 
-import JpAws.WorkerGraphFileIO;
+import static java.lang.System.err;
+import static java.lang.System.exit;
+import system.*;
 /**
  *
  * @author Pete Cappello

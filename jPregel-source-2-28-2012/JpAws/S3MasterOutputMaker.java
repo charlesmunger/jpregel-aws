@@ -1,18 +1,15 @@
 package JpAws;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.security.NoSuchAlgorithmException;
-import org.jets3t.service.S3Service;
-import org.jets3t.service.S3ServiceException;
-import org.jets3t.service.ServiceException;
-import org.jets3t.service.impl.rest.httpclient.RestS3Service;
-import org.jets3t.service.model.S3Object;
 
 public class S3MasterOutputMaker implements S3FileSystem {
 
+    private AmazonS3 s3 = new AmazonS3Client(PregelAuthenticator.get());
     private int workerNum;
 
     public S3MasterOutputMaker(int workerNum) {
@@ -25,34 +22,16 @@ public class S3MasterOutputMaker implements S3FileSystem {
     @Override
     public BufferedReader FileInput(String jobDirectoryName) {
         String workerNumber = Integer.toString(workerNum);
-        BufferedReader reader = null;
         String bucketName = jobDirectoryName + "/out";
-        try {
-            S3Service s3Service = new RestS3Service(PregelAuthenticator.get());
-            S3Object objectComplete = s3Service.getObject(bucketName, workerNumber);
-            reader = new BufferedReader(new InputStreamReader(objectComplete.getDataInputStream()));
-        } catch (ServiceException e) {
-            e.printStackTrace();
-        }
-        return reader;
+        S3ObjectInputStream objectContent = s3.getObject(bucketName, workerNumber).getObjectContent();
+        return new BufferedReader(new InputStreamReader(objectContent));
     }
 
     @Override
     public void UploadFilesOntoS3(String jobDirectoryName) {
-
         String bucketName = jobDirectoryName + "/" + "output";
         String fileName = bucketName + "/" + "output";
         File fileData = new File(fileName);
-        try {
-            S3Object fileObject = new S3Object(fileData);
-            S3Service s3Service = new RestS3Service(PregelAuthenticator.get());
-            s3Service.putObject(bucketName, fileObject);
-        } catch (S3ServiceException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
+        s3.putObject(bucketName, fileName, fileData);
     }
 }

@@ -99,7 +99,6 @@ public class G1MasterGraphMaker implements MasterGraphMaker {
                 } catch (IOException ex) {
                     System.out.println("Error writing lines to file: " + ex.getLocalizedMessage());
                 }
-
                 vertexNum++;
             }
             try {
@@ -112,22 +111,12 @@ public class G1MasterGraphMaker implements MasterGraphMaker {
             if (isEc2) {
                 S3MasterInputMaker masterFileMaker = new S3MasterInputMaker(fileNum);
                 masterFileMaker.UploadFilesOntoS3(jobDirectoryName);
-                //System.out.println(" I have uploaded IN/ worker files the files onto S3 : G1MasterGraphMaker.read() " + jobDirectoryName + fileNum) ; 
             }
-            // close output file
-
-        }   // for ending
+        }   
         try {
-            // System.out.println(" I print this one, G1Graphmaker.read()1 : " ) ; 
             bufferedReader.close();
-            //System.out.println(" I print this one, G1Graphmaker.read()2 : " ) ; 
-            //System.out.println(" I print this one, G1Graphmaker.read()3 : " ) ; 
-            //System.out.println("exiting the make function of G1MasterGraphMaker") ;  
         } catch (IOException ex) {
             System.out.println("Error closing bufferedReader: " + ex.getMessage());
         }
-
-
-
     }
 }

@@ -1,21 +1,11 @@
 package workerOutputMakers;
 
-import static java.lang.System.err;
-import static java.lang.System.exit;
-
-import java.io.BufferedWriter;
-import java.io.DataOutputStream;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import system.FileSystem;
-import system.Worker;
-
-import system.Part;
-import system.Vertex;
-import system.WorkerWriter;
-import JpAws.S3FileSys; 
 import JpAws.WorkerGraphFileIO;
 import java.io.*;
+import static java.lang.System.err;
+import static java.lang.System.exit;
+import system.FileSystem;
+import system.*;
 
 
 
