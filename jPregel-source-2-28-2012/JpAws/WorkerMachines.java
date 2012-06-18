@@ -15,7 +15,7 @@ public class WorkerMachines extends Ec2Machine {
     /**
      * This string represents the identifier of the EC2 security group to associate machines with.
      */
-    public static final String WORKER_SECURITY_GROUP = "quicklaunch-1";
+    public static final String WORKER_SECURITY_GROUP = "quick-start-1";
 
     private String masterDomainName;
 
