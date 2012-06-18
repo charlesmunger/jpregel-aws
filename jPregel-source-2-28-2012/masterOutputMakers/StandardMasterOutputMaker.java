@@ -4,8 +4,6 @@ import JpAws.S3MasterOutputMaker;
 import java.io.*;
 import static java.lang.System.err;
 import static java.lang.System.exit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import system.FileSystem;
 import system.Writer;
 
