@@ -38,7 +38,7 @@ public class Euclidean2DGridShortestPathClient
         WorkerWriter workerWriter   = new StandardWorkerOutputMaker();
         GraphMaker workerGraphMaker = new GridWorkerGraphMaker();
         MasterGraphMaker reader     = new GridMasterGraphMaker();
-        Writer writer               = new StandardMasterOutputMaker(jobDirectoryName);
+        Writer writer               = new StandardMasterOutputMaker();
         
         out.println("Euclidean2DGridShortestPathClient.main: "
                 + "\n jobDirectoryName: " + jobDirectoryName

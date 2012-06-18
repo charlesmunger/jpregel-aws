@@ -36,7 +36,7 @@ public class ShortestPathDevelopmentClient {
         WorkerWriter workerWriter = new StandardWorkerOutputMaker();
         GraphMaker workerGraphMaker = new StandardWorkerGraphMaker();
         MasterGraphMaker reader = new G1MasterGraphMaker();
-        Writer writer = new StandardMasterOutputMaker(jobDirectoryName);
+        Writer writer = new StandardMasterOutputMaker();
 
         out.println("ShortestPathDevelopmentClient.main: "
                 + "\n jobDirectoryName: " + jobDirectoryName
