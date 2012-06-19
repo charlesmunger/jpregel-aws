@@ -2,9 +2,7 @@ package JpAws;
 
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
-import com.amazonaws.services.ec2.model.Instance;
-import com.amazonaws.services.ec2.model.Reservation;
-import com.amazonaws.services.ec2.model.RunInstancesRequest;
+import com.amazonaws.services.ec2.model.*;
 import datameer.awstasks.aws.ec2.InstanceGroupImpl;
 import java.io.IOException;
 import java.util.List;
@@ -21,8 +19,9 @@ public class MasterMachines extends Ec2Machine {
     @Override
     public String[] start(int numWorkers) throws IOException {
         
-         instanceGroup = new InstanceGroupImpl(ec2);
-
+        instanceGroup = new InstanceGroupImpl(ec2);
+        DescribeSecurityGroupsResult describeSecurityGroups = ec2.describeSecurityGroups(new DescribeSecurityGroupsRequest().withGroupIds(Ec2Machine.SECURITY_GROUP));
+        System.out.println(describeSecurityGroups);
         RunInstancesRequest launchConfiguration = new RunInstancesRequest(Machine.AMIID, 1, 1)
                     .withKeyName(PregelAuthenticator.get().getMasterPrivateKeyName())
                     .withInstanceType("t1.micro").withSecurityGroupIds("quick-start-1");

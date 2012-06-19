@@ -13,7 +13,7 @@ import java.io.IOException;
  */
 public abstract class Ec2Machine implements Machine {
     protected InstanceGroup instanceGroup;
-    
+    public static final String SECURITY_GROUP = "jpregelgroup";
     @Override
     public void Stop() throws IOException {
         instanceGroup.terminate();
