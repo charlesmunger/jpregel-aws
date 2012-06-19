@@ -25,8 +25,7 @@ public class ShortestPathEc2Client extends Client {
         int numWorkers = Integer.parseInt(args[2]);
         boolean workerIsMultithreaded = Boolean.parseBoolean(args[3]);
         boolean isEc2Master = true;
-        boolean combiningMessages = Boolean.parseBoolean(args[4]);;   
-        System.out.println("Testing 123");
+        boolean combiningMessages = Boolean.parseBoolean(args[4]);
         Combiner combiner = null;
         if (combiningMessages) {
             combiner = new IntegerMinCombiner();
