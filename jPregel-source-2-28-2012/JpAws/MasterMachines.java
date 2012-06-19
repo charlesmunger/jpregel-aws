@@ -24,10 +24,12 @@ public class MasterMachines extends Ec2Machine {
         instanceGroup = new InstanceGroupImpl(ec2);
         CreateSecurityGroupResult createSecurityGroup;
         DescribeSecurityGroupsResult describeSecurityGroups = null;
+        final DescribeSecurityGroupsRequest req = new DescribeSecurityGroupsRequest().withGroupNames(Ec2Machine.SECURITY_GROUP);;
         try {
-             describeSecurityGroups = ec2.describeSecurityGroups(new DescribeSecurityGroupsRequest().withGroupNames(Ec2Machine.SECURITY_GROUP));
-        } catch(AmazonServiceException e) { 
-             createSecurityGroup = ec2.createSecurityGroup(new CreateSecurityGroupRequest(Ec2Machine.SECURITY_GROUP, "Created programatically by jpregel-aws"));
+            describeSecurityGroups = ec2.describeSecurityGroups(req);
+        } catch (AmazonServiceException e) {
+            createSecurityGroup = ec2.createSecurityGroup(new CreateSecurityGroupRequest(Ec2Machine.SECURITY_GROUP, "Created programatically by jpregel-aws"));
+            describeSecurityGroups = ec2.describeSecurityGroups(req);
         }
         List<IpPermission> ipPermissions = describeSecurityGroups.getSecurityGroups().get(0).getIpPermissions();
         IpPermission p = new IpPermission();
