@@ -12,11 +12,6 @@ import java.util.concurrent.TimeUnit;
  * @author charlesmunger
  */
 public class WorkerMachines extends Ec2Machine {
-    /**
-     * This string represents the identifier of the EC2 security group to associate machines with.
-     */
-    public static final String WORKER_SECURITY_GROUP = "quick-start-1";
-
     private String masterDomainName;
 
     /**
@@ -37,7 +32,7 @@ public class WorkerMachines extends Ec2Machine {
         RunInstancesRequest launchConfiguration = new RunInstancesRequest(Machine.AMIID, numWorkers, numWorkers)
                 .withKeyName(PregelAuthenticator.get().getPrivateKeyName())
                 .withInstanceType("t1.micro")
-                .withSecurityGroupIds(WORKER_SECURITY_GROUP);
+                .withSecurityGroupIds(Ec2Machine.SECURITY_GROUP);
         System.out.println(launchConfiguration.toString());
         
         instanceGroup.launch(launchConfiguration, TimeUnit.MINUTES, 5);
