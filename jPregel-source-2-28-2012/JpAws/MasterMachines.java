@@ -20,7 +20,7 @@ public class MasterMachines extends Ec2Machine {
     public String[] start(int numWorkers) throws IOException {
         
         instanceGroup = new InstanceGroupImpl(ec2);
-        DescribeSecurityGroupsResult describeSecurityGroups = ec2.describeSecurityGroups(new DescribeSecurityGroupsRequest().withGroupIds(Ec2Machine.SECURITY_GROUP));
+        DescribeSecurityGroupsResult describeSecurityGroups = ec2.describeSecurityGroups(new DescribeSecurityGroupsRequest().withGroupNames(Ec2Machine.SECURITY_GROUP));
         System.out.println(describeSecurityGroups);
         RunInstancesRequest launchConfiguration = new RunInstancesRequest(Machine.AMIID, 1, 1)
                     .withKeyName(PregelAuthenticator.get().getMasterPrivateKeyName())
