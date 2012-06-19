@@ -73,8 +73,8 @@ public class WorkerThread extends Thread {
         }
         try {
             sshClient.uploadFile(jars, "~/jars.tar");
-            sshClient.uploadFile(new File("key.AWSkey"), "~/key.AWSkey");
-            sshClient.uploadFile(new File("policy"), "~/policy");
+            //sshClient.uploadFile(new File("key.AWSkey"), "~/key.AWSkey");
+            //sshClient.uploadFile(new File("policy"), "~/policy");
             sshClient.executeCommand("tar -zxvf jars.tar", null);
             System.out.println("Returned!");
         } catch (IOException ex) {
