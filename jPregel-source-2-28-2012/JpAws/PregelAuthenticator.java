@@ -6,15 +6,16 @@ package JpAws;
 
 import com.amazonaws.auth.BasicAWSCredentials;
 import java.io.*;
-
+import org.apache.http.annotation.Immutable;
 /**
  * This class provides a single access point for all credentials and keys used for accessing Amazon's 
  * services and instances created by the user. 
  * @author Charles Munger
  */
-public class PregelAuthenticator extends BasicAWSCredentials implements com.amazonaws.auth.AWSCredentials {
+@Immutable
+public class PregelAuthenticator extends BasicAWSCredentials {
 
-    private static PregelAuthenticator singleton = null;
+    private static final PregelAuthenticator singleton = load(new File("key.AWSkey"));
     
     private static PregelAuthenticator load(File f) {
         BufferedReader ir = null;
@@ -44,14 +45,7 @@ public class PregelAuthenticator extends BasicAWSCredentials implements com.amaz
      * @return An object that can be passed to jets3t and the AWS SDK.
      */
     public static PregelAuthenticator get() {
-        update();
         return singleton;
-    }
-
-    private static void update() {
-        if (singleton == null) {
-            singleton = load(new File("key.AWSkey"));
-        }
     }
     
     /**

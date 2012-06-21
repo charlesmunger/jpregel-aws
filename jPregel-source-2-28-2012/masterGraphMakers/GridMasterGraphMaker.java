@@ -12,19 +12,8 @@
  */
 package masterGraphMakers;
 
-import static java.lang.System.err;
-import static java.lang.System.exit;
-import static java.lang.System.out;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
+import static java.lang.System.*;
 import system.FileSystem;
 import system.MasterGraphMaker;
 
@@ -32,67 +21,60 @@ import system.MasterGraphMaker;
  *
  * @author Pete Cappello
  */
-public class GridMasterGraphMaker implements MasterGraphMaker
-{
+public class GridMasterGraphMaker implements MasterGraphMaker {
 
     @Override
-    public void make(FileSystem fileSystem, int numWorkers) 
-    {
-        try
-        {
+    public void make(FileSystem fileSystem, int numWorkers) {
+        try {
             // make file
             FileInputStream fileInputStream = fileSystem.getFileInputStream();
-            DataInputStream dataInputStream = new DataInputStream( fileInputStream );
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader( dataInputStream ) );
+            DataInputStream dataInputStream = new DataInputStream(fileInputStream);
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(dataInputStream));
             String line;
-            if ( ( line = bufferedReader.readLine() ) == null )
-            {
-                err.println( "GridMasterGraphMaker: Error: input file has no lines." );
-                exit( 1 );
+            if ((line = bufferedReader.readLine()) == null) {
+                err.println("GridMasterGraphMaker: Error: input file has no lines.");
+                exit(1);
             }
-            
-            int N = Integer.parseInt( line );
-            int sqrtNumWorkers = (int) Math.sqrt( numWorkers );
+
+            int N = Integer.parseInt(line);
+            int sqrtNumWorkers = (int) Math.sqrt(numWorkers);
             int blockSize = N / sqrtNumWorkers;
             System.out.println("GridMasterGraphMaker.make: N: " + N + " sqrtNumWorkers: " + sqrtNumWorkers + " blockSize: " + blockSize);
-            
-            for ( int row = 0; row < sqrtNumWorkers; row++ )
-            for ( int col = 0; col < sqrtNumWorkers; col++ )
-            {
-                int fileNum = row * sqrtNumWorkers + col + 1; // fileNum = 0, 1, ... , numWorkers - 1
-                                
-                // open file for output in "in" directory
-                FileOutputStream fileOutputStream = fileSystem.getWorkerInputFileOutputStream( fileNum );
-                DataOutputStream dataOutputStream = new DataOutputStream( fileOutputStream );
-                BufferedWriter bufferedWriter = new BufferedWriter( new OutputStreamWriter( dataOutputStream ) );
-                
-                // line = "N blockSize row col" as described in preamble
-                StringBuffer stringBuffer = new StringBuffer();
-                stringBuffer.append( N ).append( ' ' );
-                stringBuffer.append( blockSize ).append( ' ' );
-                stringBuffer.append( row  * blockSize).append( ' ' );
-                stringBuffer.append( col  * blockSize);
-                
-                line = new String( stringBuffer );
-                out.println("GridMasterGraphMaker: line: " + line );
-                bufferedWriter.write( line );
-                                
-                // close output file
-                bufferedWriter.close();
-                dataOutputStream.close();
-                fileOutputStream.close();
+
+            for (int row = 0; row < sqrtNumWorkers; row++) {
+                for (int col = 0; col < sqrtNumWorkers; col++) {
+                    int fileNum = row * sqrtNumWorkers + col + 1; // fileNum = 0, 1, ... , numWorkers - 1
+
+                    // open file for output in "in" directory
+                    FileOutputStream fileOutputStream = fileSystem.getWorkerInputFileOutputStream(fileNum);
+                    DataOutputStream dataOutputStream = new DataOutputStream(fileOutputStream);
+                    BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(dataOutputStream));
+
+                    // line = "N blockSize row col" as described in preamble
+                    StringBuffer stringBuffer = new StringBuffer();
+                    stringBuffer.append(N).append(' ');
+                    stringBuffer.append(blockSize).append(' ');
+                    stringBuffer.append(row * blockSize).append(' ');
+                    stringBuffer.append(col * blockSize);
+
+                    line = new String(stringBuffer);
+                    out.println("GridMasterGraphMaker: line: " + line);
+                    bufferedWriter.write(line);
+
+                    // close output file
+                    bufferedWriter.close();
+                    dataOutputStream.close();
+                    fileOutputStream.close();
+                }
             }
             bufferedReader.close();
             dataInputStream.close();
             fileInputStream.close();
-            out.println("GridMasterGraphMaker: complete." );
-        }
-        catch ( Exception exception )
-        {
-            err.println( "GridMasterGraphMaker.read: Error: " + exception.getMessage() );
+            out.println("GridMasterGraphMaker: complete.");
+        } catch (Exception exception) {
+            err.println("GridMasterGraphMaker.read: Error: " + exception.getMessage());
             exception.printStackTrace();
-            exit( 1 );
+            exit(1);
         }
     }
 }
-
