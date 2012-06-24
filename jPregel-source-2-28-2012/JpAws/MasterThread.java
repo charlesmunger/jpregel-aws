@@ -80,7 +80,7 @@ public class MasterThread extends Thread {
             System.exit(1);
         }
         try {
-            sshClient.executeCommand("java -cp " + JARNAME + ":./dist/lib/*"
+            sshClient.executeCommand("java -server -cp " + JARNAME + ":./dist/lib/*"
                         + " -Djava.security.policy=policy"
                         + " system.Master", System.out);
         } catch (IOException ex) {

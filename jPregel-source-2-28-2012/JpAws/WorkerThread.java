@@ -82,7 +82,7 @@ public class WorkerThread extends Thread {
             System.exit(1);
         }
         try {
-            sshClient.executeCommand("java -cp " + JARNAME + ":./dist/lib/*"
+            sshClient.executeCommand("java -server -cp " + JARNAME + ":./dist/lib/*"
                         + " -Djava.security.policy=policy"
                         + " system.Worker " + masterDomainName, null);
         } catch (IOException ex) {
