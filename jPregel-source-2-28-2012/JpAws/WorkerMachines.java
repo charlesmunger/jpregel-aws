@@ -31,7 +31,7 @@ public class WorkerMachines extends Ec2Machine {
 
         RunInstancesRequest launchConfiguration = new RunInstancesRequest(Machine.AMIID, numWorkers, numWorkers)
                 .withKeyName(PregelAuthenticator.get().getPrivateKeyName())
-                .withInstanceType("t1.micro")
+                .withInstanceType("m1.small")
                 .withSecurityGroupIds(Ec2Machine.SECURITY_GROUP);
         System.out.println(launchConfiguration.toString());
         
