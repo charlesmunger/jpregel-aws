@@ -42,7 +42,7 @@ public class PregelAuthenticator extends BasicAWSCredentials {
 
     /**
      * Returns this system's authenticator. 
-     * @return An object that can be passed to jets3t and the AWS SDK.
+     * @return An object that can be passed on to the AWS SDK.
      */
     public static PregelAuthenticator get() {
         return singleton;
@@ -61,7 +61,7 @@ public class PregelAuthenticator extends BasicAWSCredentials {
      * Returns a pointer to the worker private key file, stored in privatekey.pem
      * @return The private key file. 
      */
-    public File getPrivateKey() {
+    public static File getPrivateKey() {
         return new File("privatekey.pem");
     }
     
@@ -69,7 +69,7 @@ public class PregelAuthenticator extends BasicAWSCredentials {
      * Returns the key used for SSH access to the Master instance.
      * @return the private key file, stored in masterkey.pem
      */
-    public File getMasterPrivateKey() {
+    public static File getMasterPrivateKey() {
         return new File("masterkey.pem");
     }
     
@@ -77,7 +77,7 @@ public class PregelAuthenticator extends BasicAWSCredentials {
      * Returns the name of the Master instance's keypair, as created via the AWS webUI.
      * @return The name of the key pair. 
      */
-    public String getMasterPrivateKeyName() {
+    public static String getMasterPrivateKeyName() {
         return "masterkey";
     }
     
@@ -85,7 +85,7 @@ public class PregelAuthenticator extends BasicAWSCredentials {
      * Returns the name of the Worker instances' keypair, as created via the AWS webUI.
      * @return The name of the key pair.
      */
-    public String getPrivateKeyName() {
+    public static String getPrivateKeyName() {
         return "privatekey";
     }
 }

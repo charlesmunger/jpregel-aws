@@ -16,7 +16,7 @@ public class MasterThread extends Thread {
      * This specifies the filename of the jar containing the main class for this project.
      */
     public static final String JARNAME = "jpregel-aws.jar";
-    private InstanceGroup instanceGroup;
+    private final InstanceGroup instanceGroup;
     
     /**
      * Creates a new MasterThread
@@ -32,7 +32,7 @@ public class MasterThread extends Thread {
      */
     @Override
     public void run() {
-        File privateKeyFile = PregelAuthenticator.get().getPrivateKey();
+        File privateKeyFile = PregelAuthenticator.getPrivateKey();
         File jars = new File("jars.tar");
         if (!jars.exists()) {
             try {
@@ -49,17 +49,9 @@ public class MasterThread extends Thread {
         } catch (InterruptedException ex) {
             System.out.println("Waiting interrupted.");
         }
-        SshClient sshClient = instanceGroup.createSshClient("ec2-user", PregelAuthenticator.get().getMasterPrivateKey());
-        File thisjar = new File(JARNAME);
+        SshClient sshClient = instanceGroup.createSshClient("ec2-user", PregelAuthenticator.getMasterPrivateKey());
         File distjar = new File("dist/"+JARNAME);
-        if(thisjar.exists()) {
-            try {
-                sshClient.uploadFile(thisjar, "~/" + JARNAME);
-            } catch (IOException ex) {
-                System.err.println("Error uploading jar");
-                System.exit(1);
-            }
-        } else if(distjar.exists()) {
+        if(distjar.exists()) {
             try {
                 sshClient.uploadFile(distjar, "~/" + JARNAME);
             } catch (IOException ex) {
@@ -67,12 +59,10 @@ public class MasterThread extends Thread {
                 System.exit(1);
             }
         } else {
-            System.err.println("Didn't find jar in " + distjar.getAbsolutePath() + " or " + thisjar.getAbsolutePath());
+            System.err.println("Didn't find jar in " + distjar.getAbsolutePath());
         }
         try {
             sshClient.uploadFile(jars, "~/jars.tar");
-            //sshClient.uploadFile(new File("policy"), "~/policy");
-            //sshClient.uploadFile(new File("key.AWSkey"), "~/key.AWSkey");
             sshClient.uploadFile(privateKeyFile, "~/"+privateKeyFile.getName());
             sshClient.executeCommand("tar -zxvf jars.tar", null);
         } catch (IOException ex) {

@@ -18,7 +18,7 @@ public class WorkerThread extends Thread {
     public static final String JARNAME = "jpregel-aws.jar";
     private InstanceGroup instanceGroup;
     private String masterDomainName;
-    File privateKeyFile = PregelAuthenticator.get().getPrivateKey();
+    File privateKeyFile = PregelAuthenticator.getPrivateKey();
 
     /**
      * Creates a new worker thread to start a group of workers.
@@ -38,15 +38,12 @@ public class WorkerThread extends Thread {
     public void run() {
         File jars = new File("jars.tar");
         if (!jars.exists()) {
-            try {
-                Runtime.getRuntime().exec("tar -zcvf jars.tar ./dist/lib");
-            } catch (IOException ex) {
-                System.out.println("Error tarring jars.");
-                System.exit(1);
-            }
+            System.out.println("Error fetching jars file - " + jars.getAbsolutePath());
         }
         try {
+            System.out.println("Waiting");
             Thread.sleep(30000);
+            System.out.println("Waking");
         } catch (InterruptedException ex) {
             System.out.println("Waiting interrupted");
         }
@@ -73,10 +70,7 @@ public class WorkerThread extends Thread {
         }
         try {
             sshClient.uploadFile(jars, "~/jars.tar");
-            //sshClient.uploadFile(new File("key.AWSkey"), "~/key.AWSkey");
-            //sshClient.uploadFile(new File("policy"), "~/policy");
             sshClient.executeCommand("tar -zxvf jars.tar", null);
-            System.out.println("Returned!");
         } catch (IOException ex) {
             System.out.println("Unable to upload file." + ex.getLocalizedMessage());
             System.exit(1);
