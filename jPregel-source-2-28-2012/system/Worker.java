@@ -122,7 +122,7 @@ public final class Worker extends ServiceImpl
             numAvailableProcessors = 1;
         }
            
-        System.out.println("Worker() . constructor , available processors" +numAvailableProcessors ) ; 
+        System.out.println("Worker.constructor: Available processors: " +numAvailableProcessors ) ; 
         computeThreads = new ComputeThread[ numAvailableProcessors ];
         for ( int i = 0; i < numAvailableProcessors; i++ )
         {

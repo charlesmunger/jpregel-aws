@@ -1,5 +1,6 @@
 package system;
 
+import JpAws.Ec2Cluster;
 import static java.lang.System.out;
 
 import java.rmi.RemoteException;
@@ -13,9 +14,10 @@ public class Client
     public static void run( Job[] jobs, boolean isEc2, int numWorkers) 
             throws RemoteException
     {
-        System.out.println("Client.run: entered.");
-        Cluster cluster = new Cluster();
-        ClientToMaster master = cluster.start( isEc2, numWorkers, jobs[0].getJobDirectoryName());
+        out.println("Client.run: Entered.");
+        Cluster cluster = isEc2 ? new Ec2Cluster() : new LocalCluster();
+        System.out.println("Client.run: Cluster object constructed.");
+        ClientToMaster master = cluster.start( numWorkers );
         for ( Job job : jobs )
         {
             System.out.println("Client.run: begin processing job.");
@@ -23,6 +25,6 @@ public class Client
             job.processMasterOutputFile();
             out.print( jobRunData );
         }
-        cluster.stop( isEc2 );
+        cluster.stop();
     }
 }

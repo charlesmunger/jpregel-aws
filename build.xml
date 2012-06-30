@@ -7,8 +7,8 @@
 <!-- the Compile on Save feature is turned off for the project. -->
 <!-- You can turn off the Compile on Save (or Deploy on Save) setting -->
 <!-- in the project's Project Properties dialog box.-->
-<project name="jpregel-aws" default="default" basedir=".">
-    <description>Builds, tests, and runs the project jpregel-aws.</description>
+<project name="jPregel-aws" default="default" basedir=".">
+    <description>Builds, tests, and runs the project jPregel-aws.</description>
     <import file="nbproject/build-impl.xml"/>
     <!--
 
@@ -59,7 +59,7 @@
 
     An example of overriding the target for project execution could look like this:
 
-        <target name="run" depends="jpregel-aws-impl.jar">
+        <target name="run" depends="jPregel-aws-impl.jar">
             <exec dir="bin" executable="launcher.exe">
                 <arg file="${dist.jar}"/>
             </exec>
@@ -71,35 +71,4 @@
     nbproject/build-impl.xml file. 
 
     -->
-    
-    <property name="jPregel-aws.dist" value="/Users/cappello/GitHubProjects/jpregel-aws/dist"/>
-    <property name="java.class.path"  value="/Users/cappello/GitHubProjects/jpregel-aws/build/classes/"/>
-    
-    <target name="runShortestPathDevelopmentClient" >
-        <java classname="clients.ShortestPathDevelopmentClient">
-            <arg value="/Users/cappello/NetBeansProjects/jpregel/jobs/ShortestPath/test3"/>
-            <arg value="2"/>    <!-- number of workers -->
-            <arg value="true"/> <!-- "true": multithreaded workers; "": singly-threaded workers -->
-            <arg value="true"/> <!-- "true": combining messages; "": not combining messages -->
-            <classpath>
-                <pathelement location="$(jicosfoundation.dist)/jicosfoundation.jar"/>
-                <pathelement location="${jPregel-aws.dist}/jPregel-aws.jar"/>
-                <pathelement path="${java.class.path}"/>
-            </classpath>      
-        </java> 
-    </target>
-    
-    <target name="runEuclideanShortestPathDevelopmentClient" >
-        <java classname="clients.EuclideanShortestPathDevelopmentClient">
-            <arg value="/Users/cappello/NetBeansProjects/jpregel/jobs/EuclideanShortestPath/test"/>
-            <arg value="2"/>    <!-- number of workers -->
-            <arg value="true"/> <!-- "true": multithreaded workers; "": singly-threaded workers -->
-            <arg value="true"/> <!-- "true": combining messages; "": not combining messages -->
-            <classpath>
-                <pathelement location="$(jicosfoundation.dist)/jicosfoundation.jar"/>
-                <pathelement location="${jPregel-aws.dist}/jPregel-aws.jar"/>
-                <pathelement path="${java.class.path}"/>
-            </classpath>      
-       </java> 
-    </target>
 </project>
