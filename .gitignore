@@ -11,3 +11,4 @@ nb-configuration.xml
 *.ear
 *.pem
 .DS_STORE
+log.log
