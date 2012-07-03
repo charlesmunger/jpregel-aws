@@ -9,3 +9,5 @@ nb-configuration.xml
 # Package Files #
 *.war
 *.ear
+*.pem
+.DS_STORE
