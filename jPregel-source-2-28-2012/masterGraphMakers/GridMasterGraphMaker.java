@@ -25,7 +25,8 @@ public class GridMasterGraphMaker implements MasterGraphMaker {
 
     @Override
     public void make(FileSystem fileSystem, int numWorkers) {
-        try {
+        try 
+        {
             // make file
             FileInputStream fileInputStream = fileSystem.getFileInputStream();
             DataInputStream dataInputStream = new DataInputStream(fileInputStream);

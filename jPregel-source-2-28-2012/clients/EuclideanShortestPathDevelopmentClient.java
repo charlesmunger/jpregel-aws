@@ -1,7 +1,5 @@
 package clients;
 
-import JpAws.Machine;
-import JpAws.PregelAuthenticator;
 import static java.lang.System.out;
 
 import java.rmi.RemoteException;
@@ -17,7 +15,7 @@ import system.Vertex;
 import system.WorkerWriter;
 import system.Writer;
 import system.aggregators.IntegerSumAggregator;
-import system.combiners.DoubleMinCombiner;
+import system.combiners.FloatMinCombiner;
 import workerGraphMakers.StandardWorkerGraphMaker;
 import workerOutputMakers.StandardWorkerOutputMaker;
 
@@ -41,7 +39,8 @@ public class EuclideanShortestPathDevelopmentClient
         Combiner combiner = null;
         if ( combiningMessages )
         {
-            combiner = new DoubleMinCombiner();
+//            combiner = new DoubleMinCombiner();
+            combiner = new FloatMinCombiner();
         }
         Vertex vertexFactory = new EuclideanShortestPathVertex();
         WorkerWriter workerWriter = new StandardWorkerOutputMaker();

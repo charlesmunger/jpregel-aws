@@ -6,16 +6,7 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 import masterGraphMakers.GridMasterGraphMaker;
 import masterOutputMakers.StandardMasterOutputMaker;
-import system.ClientToMaster;
-import system.Combiner;
-import system.GraphMaker;
-import system.Job;
-import system.JobRunData;
-import system.Master;
-import system.MasterGraphMaker;
-import system.Vertex;
-import system.WorkerWriter;
-import system.Writer;
+import system.*;
 import system.aggregators.IntegerSumAggregator;
 import system.combiners.FloatMinCombiner;
 import vertex.EuclideanShortestPathVertex;
@@ -35,10 +26,10 @@ public class Euclidean2DGridShortestPathMacClient
     {
         String  jobName               = "Euclidean 2D Grid Shortest Path";
         String  jobDirectoryName      = args[0];
-        int     numWorkers            = 1;
+        int     numWorkers            = 2; // should be n * n 
         boolean workerIsMultithreaded = true;
         boolean combiningMessages     = true;
-        int     numParts = numWorkers * 2 * 1; // numWorkers * ComputeThrads/Worker * Parts/ComputeThread
+        int     numParts = numWorkers * 2 * 2; // numWorkers * ComputeThrads/Worker * Parts/ComputeThread
         Combiner combiner = null;
         if ( combiningMessages )
         {
@@ -64,23 +55,35 @@ public class Euclidean2DGridShortestPathMacClient
                 workerGraphMaker, reader, writer 
                 );
         job.setProblemAggregator( new IntegerSumAggregator() );
+        Job[] jobs = { job };
         try
         {
-            // get reference to Master
-            ClientToMaster master = getMaster();
-            boolean isEc2Master = false;
-            master.setWorkerMap();
-            JobRunData jobRunData = master.run( job, isEc2Master );
-            job.processMasterOutputFile();
-            out.print( jobRunData );
-            master.shutdown();
+            boolean   isEc2Master = false;
+            Client.run( jobs, isEc2Master, numWorkers); //TODO fix this
         } 
         catch ( Exception exception )
         {
-            //exception.printStackTrace();
+            exception.printStackTrace();
             System.exit(1);
         }
         System.exit( 0 );
+//        try
+//        {
+//            // get reference to Master
+//            ClientToMaster master = getMaster();
+//            boolean isEc2Master = false;
+//            master.setWorkerMap();
+//            JobRunData jobRunData = master.run( job, isEc2Master );
+//            job.processMasterOutputFile();
+//            out.print( jobRunData );
+//            master.shutdown();
+//        } 
+//        catch ( Exception exception )
+//        {
+//            //exception.printStackTrace();
+//            System.exit(1);
+//        }
+//        System.exit( 0 );
     }
     
     static ClientToMaster getMaster()

@@ -72,8 +72,7 @@
 
     -->
     
-    <property name="jPregel-aws.dist" value="/Users/cappello/GitHubProjects/jpregel-aws/dist"/>
-    <property name="java.class.path"  value="/Users/cappello/GitHubProjects/jpregel-aws/build/classes/"/>
+    <property name="project-home" value="/Users/cappello/GitHubProjects"/>
     
     <target name="runShortestPathDevelopmentClient" >
         <java classname="clients.ShortestPathDevelopmentClient">
@@ -83,8 +82,8 @@
             <arg value="true"/> <!-- "true": combining messages; "": not combining messages -->
             <classpath>
                 <pathelement location="$(jicosfoundation.dist)/jicosfoundation.jar"/>
-                <pathelement location="${jPregel-aws.dist}/jPregel-aws.jar"/>
-                <pathelement path="${java.class.path}"/>
+                <pathelement location="${project-home}/jpregel-aws/dist/jPregel-aws.jar"/>
+                <pathelement path="${project-home}/jpregel-aws/build/classes/"/>
             </classpath>      
         </java> 
     </target>
@@ -97,9 +96,25 @@
             <arg value="true"/> <!-- "true": combining messages; "": not combining messages -->
             <classpath>
                 <pathelement location="$(jicosfoundation.dist)/jicosfoundation.jar"/>
-                <pathelement location="${jPregel-aws.dist}/jPregel-aws.jar"/>
-                <pathelement path="${java.class.path}"/>
+                <pathelement location="${project-home}/jpregel-aws/dist/jPregel-aws.jar"/>
+                <pathelement path="${project-home}/jpregel-aws/build/classes/"/>
             </classpath>      
        </java> 
     </target>
+    
+    <target name="runShortestPathEuclidean2DGridClientMac" >
+        <java classname="clients.Euclidean2DGridShortestPathMacClient" fork="true" >
+            <arg value="/Users/cappello/NetBeansProjects/jpregel/jobs/Euclidean2DGridShortestPath/test"/>
+            <arg value="2"/>    <!-- number of workers -->
+            <arg value="true"/> <!-- "true": multithreaded workers; "": singly-threaded workers -->
+            <arg value="true"/> <!-- "true": combining messages; "": not combining messages -->
+            <classpath>
+                <pathelement location="$(jicosfoundation.dist)/jicosfoundation.jar"/>
+                <pathelement location="${project-home}/jpregel-aws/dist/jPregel-aws.jar"/>
+                <pathelement path="${project-home}/jpregel-aws/build/classes/"/>
+            </classpath>
+            <jvmarg value="-Djava.security.policy=policy"/>
+        </java>
+    </target>
+    
 </project>

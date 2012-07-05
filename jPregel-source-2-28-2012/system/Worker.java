@@ -1,6 +1,10 @@
 /*
  * To do:
- * 1. Is it worthwhile to send the Master the Worker numbers, thereby allowing
+ * -  Currently, when vertices are added during graph construction, a message
+ *    is sent for each vertex added (as opposed to batching all such requests
+ *    destined for the same worker). Is this best?
+ * 
+ * -  Is it worthwhile to send the Master the Worker numbers, thereby allowing
  *    the Master to avoid sending start super step commands to workers that
  *    have no active parts? Probably not worth the effort.
  */
@@ -161,8 +165,10 @@ public final class Worker extends ServiceImpl
         return ( partId % numWorkers ) + 1;
     }
       
-    synchronized public void addVertex( Vertex vertex, int partId, String stringVertex )
+//    synchronized public void addVertex( Vertex vertex, int partId, String stringVertex )
+    synchronized public void addVertex( Vertex vertex, String stringVertex )
     {
+        int partId = workerJob.getPartId( vertex.getVertexId() );
         int workerNum = getWorkerNum( partId );
         if ( myWorkerNum == workerNum )
         {

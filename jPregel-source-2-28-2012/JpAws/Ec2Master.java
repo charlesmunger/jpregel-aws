@@ -12,7 +12,7 @@ import system.Master;
 
 /**
  *
- * @author Pete Cappello
+ * @author Charles Munger
  */
 public class Ec2Master extends Master
 {
