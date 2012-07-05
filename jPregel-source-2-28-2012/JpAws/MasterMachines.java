@@ -22,13 +22,12 @@ public class MasterMachines extends Ec2Machine {
     public String[] start(int numWorkers) throws IOException {
         
         instanceGroup = new InstanceGroupImpl(ec2);
-        CreateSecurityGroupResult createSecurityGroup;
         DescribeSecurityGroupsResult describeSecurityGroups = null;
-        final DescribeSecurityGroupsRequest req = new DescribeSecurityGroupsRequest().withGroupNames(Ec2Machine.SECURITY_GROUP);;
+        final DescribeSecurityGroupsRequest req = new DescribeSecurityGroupsRequest().withGroupNames(Ec2Machine.SECURITY_GROUP);
         try {
             describeSecurityGroups = ec2.describeSecurityGroups(req);
         } catch (AmazonServiceException e) {
-            createSecurityGroup = ec2.createSecurityGroup(new CreateSecurityGroupRequest(Ec2Machine.SECURITY_GROUP, "Created programatically by jpregel-aws"));
+            ec2.createSecurityGroup(new CreateSecurityGroupRequest(Ec2Machine.SECURITY_GROUP, "Created programatically by jpregel-aws"));
             describeSecurityGroups = ec2.describeSecurityGroups(req);
         }
         List<IpPermission> ipPermissions = describeSecurityGroups.getSecurityGroups().get(0).getIpPermissions();
@@ -41,7 +40,7 @@ public class MasterMachines extends Ec2Machine {
             ec2.authorizeSecurityGroupIngress(new AuthorizeSecurityGroupIngressRequest(Ec2Machine.SECURITY_GROUP, Collections.singletonList(p)));
         }
         RunInstancesRequest launchConfiguration = new RunInstancesRequest(Machine.AMIID, 1, 1)
-                    .withKeyName(PregelAuthenticator.get().getMasterPrivateKeyName())
+                    .withKeyName(PregelAuthenticator.getMasterPrivateKeyName())
                     .withInstanceType("m1.small").withSecurityGroupIds(Ec2Machine.SECURITY_GROUP);
                     System.out.println(launchConfiguration.toString());
 
