@@ -82,7 +82,7 @@ public class MasterThread extends Thread {
         try {
             sshClient.executeCommand("java -server -cp " + JARNAME + ":./dist/lib/*"
                         + " -Djava.security.policy=policy"
-                        + " system.Master", System.out);
+                        + " JpAws.Ec2Master", System.out);
         } catch (IOException ex) {
             System.out.println("Master disconnected "+ex.getLocalizedMessage());
         }
