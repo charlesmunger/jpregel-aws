@@ -29,7 +29,7 @@ public class Euclidean2DGridShortestPathMacClient
         int     numWorkers            = 2; // should be n * n 
         boolean workerIsMultithreaded = true;
         boolean combiningMessages     = true;
-        int     numParts = numWorkers * 2 * 2; // numWorkers * ComputeThrads/Worker * Parts/ComputeThread
+        int     numParts = numWorkers * 2 * 2; // numWorkers * ComputeThreads/Worker * Parts/ComputeThread
         Combiner combiner = null;
         if ( combiningMessages )
         {
@@ -58,7 +58,7 @@ public class Euclidean2DGridShortestPathMacClient
         Job[] jobs = { job };
         try
         {
-            boolean   isEc2Master = false;
+            boolean   isEc2Master = true;
             Client.run( jobs, isEc2Master, numWorkers); //TODO fix this
         } 
         catch ( Exception exception )
