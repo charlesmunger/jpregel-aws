@@ -94,7 +94,8 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         super.setDepartments(departments);
     }
 
-    public void makeWorkers(int numWorkers, String masterDomainName) throws RemoteException 
+    @Override
+    public synchronized void makeWorkers(int numWorkers, String masterDomainName) throws RemoteException 
     {
         System.out.println("Master.makeWorkers: entered: numWorkers: " + numWorkers);
         numUnfinishedWorkers += numWorkers;
