@@ -27,9 +27,6 @@ import JpAws.WorkerMachines;
 import system.commands.*;
 
 /**
- * Master is decoupled from MasterJob type: 
- * It is designed to handle all MasterJob subclasses.
- * 
  * Master.run is decoupled from its file system: It receives a FileSystem 
  * that hides the differences between a local file system & S3.
  * 
@@ -53,10 +50,11 @@ import system.commands.*;
  * 
  * @author Pete Cappello
  */
-public class Master extends ServiceImpl implements ClientToMaster {
-
+abstract public class Master extends ServiceImpl implements ClientToMaster 
+{
     // constants
     public static final RemoteExceptionHandler REMOTE_EXCEPTION_HANDLER = new DefaultRemoteExceptionHandler();
+    
     // ServiceImpl attributes
     static public String SERVICE_NAME = "Master";
     static public int PORT = 2048;
@@ -71,28 +69,25 @@ public class Master extends ServiceImpl implements ClientToMaster {
             SuperStepComplete.class
         }
     };
+    
     // Master attributes
     private Map<Integer, Service> integerToWorkerMap = new HashMap<Integer, Service>();
     protected AtomicInteger numRegisteredWorkers = new AtomicInteger();
+    
     // computation control
     protected int numUnfinishedWorkers;
     protected boolean commandExeutionIsComplete;
     protected boolean thereIsANextStep;
+    
     // graph state
     protected Aggregator stepAggregator;
     protected Aggregator problemAggregator;
     protected int numVertices;
 
-    public static void main(String[] args) throws RemoteException, AlreadyBoundException {
-        System.setSecurityManager(new RMISecurityManager());
-        Registry registry = LocateRegistry.createRegistry(Master.PORT);
-        ClientToMaster master = new Master();
-        registry.bind(SERVICE_NAME, master);
-        out.println("Master: Ready.");
-    }
-    private WorkerMachines workerMachines;
+    
 
-    Master() throws RemoteException {
+    public Master() throws RemoteException 
+    {
         // Establish Master as a Jicos Service
         super(command2DepartmentArray);
         super.setService(this);
@@ -100,44 +95,45 @@ public class Master extends ServiceImpl implements ClientToMaster {
     }
 
     @Override
-    public synchronized void makeWorkers(int numWorkers, String masterDomainName) throws RemoteException {
+    public synchronized void makeWorkers(int numWorkers, String masterDomainName) throws RemoteException 
+    {
         System.out.println("Master.makeWorkers: entered: numWorkers: " + numWorkers);
         numUnfinishedWorkers += numWorkers;
         //Machine.startWorkers( masterDomainName, numWorkers, null );
 
-        try {
-            workerMachines = new WorkerMachines(masterDomainName);
-            workerMachines.start(numWorkers);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        constructWorkers(numWorkers, masterDomainName);
 
         out.println("Master.makeWorkers: waiting for Worker registration to complete");
 
         // wait for all workers to Register before proceeding
-        try {
-            if (numUnfinishedWorkers > 0 && !commandExeutionIsComplete) {
+        try 
+        {
+            if (numUnfinishedWorkers > 0 && !commandExeutionIsComplete) 
+            {
                 System.out.println("Master.makeWorkers: about to wait: numUnfinishedWorkers: " + numUnfinishedWorkers);
                 wait(); // until numUnfinishedWorkers == 0
             }
-        } catch (InterruptedException ignore) {
-        }
+        } 
+        catch (InterruptedException ignore) {}
 
         // broadcaast to workers: set your integerToWorkerMap
 //        Command command = new SetWorkerMap( integerToWorkerMap );
 //        barrierComputation( command );
         setWorkerMap();
     }
+    
+    abstract public void constructWorkers(int numWorkers, String masterDomainName) throws RemoteException;
 
-    public synchronized void setWorkerMap() {
+    public synchronized void setWorkerMap() 
+    {
         // broadcaast to workers: set your integerToWorkerMap
         Command command = new SetWorkerMap(integerToWorkerMap);
         barrierComputation(command);
     }
 
     @Override
-    public void exceptionHandler(Exception exception) {
+    public void exceptionHandler(Exception exception) 
+    {
         exception.printStackTrace();
         System.exit(1);
     }
@@ -218,20 +214,21 @@ public class Master extends ServiceImpl implements ClientToMaster {
     }
 
     @Override
-    public void shutdown() {        
-        // shutdown all Worker Services
-        out.println("Master.shutdown: notifying Worker Services to shutdown.");
-        //barrierComputation(new ShutdownWorker());
-        try {
-            workerMachines.Stop();
-        } catch (IOException ex) {
-            System.out.println("Exception shutting down workers. Check webUI for zombie instances.");
-        }
-        out.println("Master.shutdown: Worker Services shutdown.");
-
-        // shutdown Master
-        out.println("Master.shutdown: shutting down.");
-    }
+    abstract public void shutdown(); 
+//    {        
+//        // shutdown all Worker Services
+//        out.println("Master.shutdown: notifying Worker Services to shutdown.");
+//        //barrierComputation(new ShutdownWorker());
+//        try {
+//            workerMachines.Stop();
+//        } catch (IOException ex) {
+//            System.out.println("Exception shutting down workers. Check webUI for zombie instances.");
+//        }
+//        out.println("Master.shutdown: Worker Services shutdown.");
+//
+//        // shutdown Master
+//        out.println("Master.shutdown: shutting down.");
+//    }
 
     /* _____________________________
      *  

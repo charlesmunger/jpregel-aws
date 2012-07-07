@@ -21,7 +21,7 @@ public class Job implements Serializable
     private final Combiner combiner;
     private       Aggregator stepAggregator    = new NullAggregator();
     private       Aggregator problemAggregator = new NullAggregator();
-    private final Vertex   vertexFactory;
+    protected final Vertex   vertexFactory;
     private final WorkerWriter workerWriter;
     private final GraphMaker workerGraphMaker;
     private final MasterGraphMaker masterGraphMaker;
@@ -70,6 +70,8 @@ public class Job implements Serializable
     
     public Combiner getCombiner()      { return combiner; }
     
+    public int      getNumParts()      { return numParts; }
+    
     public Vertex   getVertexFactory() { return vertexFactory; }
     
     public void setProblemAggregator( Aggregator problemAggregator ) { this.problemAggregator = problemAggregator; }
@@ -82,8 +84,6 @@ public class Job implements Serializable
     String           getJobName()               { return jobName; }
     
     String           getJobDirectoryName()      { return jobDirectoryName; }
-    
-    int              getNumParts()              { return numParts; }
         
     boolean          getWorkerIsMultithreaded() { return workerIsMultithreaded; }
 
