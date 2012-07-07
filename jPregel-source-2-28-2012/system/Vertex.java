@@ -10,7 +10,7 @@ import java.util.Map;
  * Implementation of topology mutations:
  * - Refactor code to work with stepToInboxMap instead of superstepToMessageQMap.
  * - Put AddEdge messageQ in Inbox.
- * - Design and implement Vertex AddEdge conflict "handler". Use combiner concept. where feasible.
+ * - Design and implement Vertex AddEdge conflict "handler". Use combiner concept, where feasible.
  * - Put RemoveEdge messageQ in Inbox.
  * - Design and implement Vertex RemoveEdge conflict "handler". Use combiner concept, where feasible.
  * - Put AddVertex messageQ in Inbox. This is tricky, since the Vertex typically does not exist. If it does, it is a conflict. 
@@ -36,7 +36,10 @@ import java.util.Map;
  */
 abstract public class Vertex<OutEdgeType, MessageValueType> implements java.io.Serializable
 {
-//    static public  Vertex make( String line, Combiner combiner ) { return null; }   
+//    static public  Vertex make( String line, Combiner combiner ) { return null; }
+//    static private   int  numParts;
+//    static protected int  getNumParts() { return numParts; }
+//    static public    void setNumParts( int nParts ) { numParts = nParts; }
             
     private final Object vertexId;
     private final Combiner combiner;
@@ -117,7 +120,13 @@ abstract public class Vertex<OutEdgeType, MessageValueType> implements java.io.S
     
     synchronized public int getOutEdgeMapSize() { return outEdgeMap.size(); }
     
-    public int getPartId( int partitionSize ) { return vertexId.hashCode() % partitionSize; }
+//    public int getPartId( int partitionSize ) { return vertexId.hashCode() % partitionSize; }
+    public int getPartId( Object vertexId, int numParts ) 
+    { 
+//        System.out.println("Vertex.getPartId: vertexId.hashCode() % numParts: " + (vertexId.hashCode() % numParts));
+        return vertexId.hashCode() % numParts; 
+    }
+//    public int getPartId() { return vertexId.hashCode() % numParts; }
     
     synchronized protected long getSuperStep() { return superStep; }
     

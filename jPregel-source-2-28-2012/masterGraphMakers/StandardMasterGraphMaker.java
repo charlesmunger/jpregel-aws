@@ -35,7 +35,7 @@ public class StandardMasterGraphMaker implements MasterGraphMaker
             String line;
             if ( ( line = bufferedReader.readLine() ) == null )
             {
-                err.println( "SimpleFileReader: Error: input file has no lines." );
+                err.println( "StandardMasterGraphMaker: Error: input file has no lines." );
                 exit( 1 );
             }
             int numV = Integer.parseInt( line );
@@ -76,7 +76,7 @@ public class StandardMasterGraphMaker implements MasterGraphMaker
         }
         catch ( Exception exception )
         {
-            err.println( "SimpleFileReader.read: Error: " + exception.getMessage() );
+            err.println( "StandardMasterGraphMaker.read: Error: " + exception.getMessage() );
             exit( 1 );
         }
     }

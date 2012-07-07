@@ -11,6 +11,7 @@
  */
 package workerGraphMakers;
 
+import JpAws.WorkerGraphFileIO;
 import java.awt.geom.Point2D;
 import static java.lang.System.exit;
 import static java.lang.System.out;
@@ -45,12 +46,34 @@ public class GridWorkerGraphMaker implements GraphMaker
         Combiner combiner     = workerJob.getCombiner();
         Vertex vertexFactory  = workerJob.getVertexFactory();
         int numVertices = 0;
+        
+        FileInputStream fileInputStream = null;
+        DataInputStream dataInputStream = null;
+        BufferedReader bufferedReader   = null;
+        
         try
         {
+            boolean isEc2 = fileSystem.getFileSystem() ; 
+            if (isEc2) 
+            {
+                String jobDirectoryName = fileSystem.getJobDirectory() ; 
+                WorkerGraphFileIO workerGraph = new WorkerGraphFileIO(workerNum) ; 
+                bufferedReader = workerGraph.FileInput(jobDirectoryName) ; 
+                //bufferedReader = S3FileSystem.WorkerFileInput(jobDirectoryName, workerNum) ;       
+            }
+            else 
+            {
+                // read file
+//                fis_read = 1  ; 
+                fileInputStream = fileSystem.getWorkerInputFileInputStream( workerNum );
+                dataInputStream = new DataInputStream( fileInputStream );
+                bufferedReader   = new BufferedReader(new InputStreamReader( dataInputStream ));  
+            } 
             // read file
-            FileInputStream fileInputStream = fileSystem.getWorkerInputFileInputStream( workerNum );
-            DataInputStream dataInputStream = new DataInputStream( fileInputStream );
-            BufferedReader bufferedReader   = new BufferedReader(new InputStreamReader( dataInputStream ));
+//            FileInputStream fileInputStream = fileSystem.getWorkerInputFileInputStream( workerNum );
+//            DataInputStream dataInputStream = new DataInputStream( fileInputStream );
+//            BufferedReader bufferedReader   = new BufferedReader(new InputStreamReader( dataInputStream ));
+            
             String line = bufferedReader.readLine();
             out.println(" Worker: " + workerNum + " input line: " + line);
             
@@ -64,7 +87,7 @@ public class GridWorkerGraphMaker implements GraphMaker
             out.println("workerNum: " + workerNum + ", R: " + row );
             int col       = getToken( stringTokenizer );            
             out.println("workerNum: " + workerNum + ", C: " + col );
-            
+                        
             // construct vertices & their out edges
             for ( int rowOffset = 0; rowOffset < blockSize; rowOffset++ )
             for ( int colOffset = 0; colOffset < blockSize; colOffset++ )
@@ -99,17 +122,18 @@ public class GridWorkerGraphMaker implements GraphMaker
                     outEdgeMap.put( target, target );
                     stringVertex.append( x ).append( " ").append( y ).append( " ");
                 } 
-//                out.println("GridWorkerGraphMaker.makeGraph: stringVertex: " + stringVertex );
                 Vertex vertex = new EuclideanShortestPathVertex( vertexId, outEdgeMap, combiner );
                 
-//                worker.addVertex( vertex, workerJob.getPartId( vertex ) );
                 String vertexString = new String( stringVertex );
-//                out.println("GridWorkerGraphMaker.makeGraph: vertexString: " + vertexString);
-                worker.addVertex( vertex, workerJob.getPartId( vertex ), vertexString );
-//                out.println("GridWorkerGraphMaker.makeGraph: COMPLETE rowOffset: " + rowOffset
-//                        + " colOffset: " + colOffset);
+//                worker.addVertex( vertex, workerJob.getPartId( vertex ), vertexString );
+                worker.addVertex( vertex, vertexString );
             }
-            dataInputStream.close();
+            bufferedReader.close();
+            if ( ! isEc2 )
+            { 
+                dataInputStream.close();
+                fileInputStream.close(); 
+            } 
         }
         catch ( Exception exception )
         {

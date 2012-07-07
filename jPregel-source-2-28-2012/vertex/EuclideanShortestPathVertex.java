@@ -122,10 +122,21 @@ public class EuclideanShortestPathVertex extends Vertex<Point2D.Float, Float>
         return new String( stringBuffer );
     }
     
+    /*
+     * Would prefer to map square subgrids to a part.
+     */
+    public int getPartId( Object vertexId, int numParts )
+    {
+        int row = (int) ((Point2D.Float) vertexId).getX();
+//        int partId = row % numParts; // DEBUG
+//        System.out.println(" EuclideanShortestPathVertex.getPartId: row: " + row + " partId: " + partId);
+        return row % numParts;
+    }
+    
     boolean isSource()
     {
         Point2D.Float vertex = (Point2D.Float) getVertexId();
-        return ( vertex.getX() == 0.0 && vertex.getY() == 0.0 ) ? true : false; 
+        return vertex.getX() == 0.0 && vertex.getY() == 0.0; 
     }
     
     private float distance( Point2D.Float targetVertexId )
