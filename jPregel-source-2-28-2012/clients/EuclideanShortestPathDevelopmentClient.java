@@ -39,7 +39,6 @@ public class EuclideanShortestPathDevelopmentClient
         Combiner combiner = null;
         if ( combiningMessages )
         {
-//            combiner = new DoubleMinCombiner();
             combiner = new FloatMinCombiner();
         }
         Vertex vertexFactory = new EuclideanShortestPathVertex();

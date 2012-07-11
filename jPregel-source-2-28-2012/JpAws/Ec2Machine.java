@@ -12,8 +12,8 @@ import java.io.IOException;
  *
  * @author charlesmunger
  */
-public abstract class Ec2Machine implements Machine {
-
+public abstract class Ec2Machine implements Machine 
+{
     /**
      * This is used to manage the group of instances composing the machine
      */
@@ -24,7 +24,5 @@ public abstract class Ec2Machine implements Machine {
     public static final String SECURITY_GROUP = "jpregelgroup";
 
     @Override
-    public void Stop() throws IOException {
-        instanceGroup.terminate();
-    }
+    public void Stop() throws IOException { instanceGroup.terminate(); }
 }

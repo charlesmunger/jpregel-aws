@@ -1,18 +1,10 @@
 package masterGraphMakers;
 
+import JpAws.S3MasterInputMaker;
+import java.io.*;
 import static java.lang.System.err;
 import static java.lang.System.exit;
-import static java.lang.System.out;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import system.FileSystem;
 import system.MasterGraphMaker;
 
@@ -28,10 +20,24 @@ public class StandardMasterGraphMaker implements MasterGraphMaker
     {
         try
         {
-            // make file
-            FileInputStream fileInputStream = fileSystem.getFileInputStream();
-            DataInputStream dataInputStream = new DataInputStream( fileInputStream );
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader( dataInputStream ) );
+            // read master file
+            FileInputStream fileInputStream = null;
+            DataInputStream dataInputStream = null;
+            BufferedReader bufferedReader = null;
+            
+            boolean isEc2 = fileSystem.getFileSystem();
+            if ( isEc2 ) 
+            {
+                String jobDirectoryName = fileSystem.getJobDirectory();
+                S3MasterInputMaker masterFileMaker = new S3MasterInputMaker();
+                bufferedReader = masterFileMaker.FileInput(jobDirectoryName);
+            } 
+            else // use local file system
+            {
+                fileInputStream = fileSystem.getFileInputStream();
+                dataInputStream = new DataInputStream(fileInputStream);
+                bufferedReader = new BufferedReader(new InputStreamReader(dataInputStream));
+            }
             String line;
             if ( ( line = bufferedReader.readLine() ) == null )
             {
@@ -39,8 +45,9 @@ public class StandardMasterGraphMaker implements MasterGraphMaker
                 exit( 1 );
             }
             int numV = Integer.parseInt( line );
-            int fileNum;
-            for ( fileNum = 1; fileNum <= numWorkers; fileNum++ )
+            
+            // make worker input files
+            for ( int fileNum = 1; fileNum <= numWorkers; fileNum++ )
             {
                 // open file for output in "in" directory
                 FileOutputStream fileOutputStream = fileSystem.getWorkerInputFileOutputStream( fileNum );
@@ -71,12 +78,16 @@ public class StandardMasterGraphMaker implements MasterGraphMaker
                 fileOutputStream.close();
             }
             bufferedReader.close();
-            dataInputStream.close();
-            fileInputStream.close();
+            if ( ! isEc2 ) 
+            {
+                fileInputStream.close();
+                dataInputStream.close();
+            }
         }
         catch ( Exception exception )
         {
-            err.println( "StandardMasterGraphMaker.read: Error: " + exception.getMessage() );
+            err.println( "StandardMasterGraphMaker.make: " + exception.getMessage() );
+            exception.printStackTrace();
             exit( 1 );
         }
     }
