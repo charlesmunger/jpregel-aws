@@ -32,9 +32,10 @@ public class EuclideanShortestPathDevelopmentClient
     {
         String  jobName               = "Euclidean Shortest Path";
         String  jobDirectoryName      = args[0];
-        int     numWorkers            = Integer.parseInt(     args[1] );
-        boolean workerIsMultithreaded = Boolean.parseBoolean( args[2] );
-        boolean combiningMessages     = Boolean.parseBoolean( args[3] );
+        boolean isEc2Master           = Boolean.parseBoolean( args[1] );
+        int     numWorkers            = Integer.parseInt(     args[2] );
+        boolean workerIsMultithreaded = Boolean.parseBoolean( args[3] );
+        boolean combiningMessages     = Boolean.parseBoolean( args[4] );
         int     numParts = numWorkers * 2 * 2; // numWorkers * ComputeThrads/Worker * Parts/ComputeThread
         Combiner combiner = null;
         if ( combiningMessages )
@@ -63,7 +64,6 @@ public class EuclideanShortestPathDevelopmentClient
         Job[] jobs = { job };
         try
         {
-            boolean   isEc2Master = false;
             Client.run( jobs, isEc2Master, numWorkers); //TODO fix this
         } 
         catch ( Exception exception )
