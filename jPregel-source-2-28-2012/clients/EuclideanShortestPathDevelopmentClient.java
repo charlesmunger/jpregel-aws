@@ -32,7 +32,7 @@ public class EuclideanShortestPathDevelopmentClient
     {
         String  jobName               = "Euclidean Shortest Path";
         String  jobDirectoryName      = args[0];
-        boolean isEc2Master           = Boolean.parseBoolean( args[1] );
+        boolean isEc2Run              = Boolean.parseBoolean( args[1] );
         int     numWorkers            = Integer.parseInt(     args[2] );
         boolean workerIsMultithreaded = Boolean.parseBoolean( args[3] );
         boolean combiningMessages     = Boolean.parseBoolean( args[4] );
@@ -48,8 +48,9 @@ public class EuclideanShortestPathDevelopmentClient
         MasterGraphMaker reader = new StandardMasterGraphMaker();
         Writer writer = new StandardMasterOutputMaker();
         
-        out.println("ShortestPathDevelopmentClient.main: "
+        out.println("EuclideanShortestPathClient.main: "
                 + "\n jobDirectoryName: " + jobDirectoryName
+                + "\n isEc2 run: " + isEc2Run
                 + "\n numParts: " + numParts
                 + "\n numWorkers: " + numWorkers
                 + "\n workerIsMultithreaded: " + workerIsMultithreaded
@@ -64,7 +65,7 @@ public class EuclideanShortestPathDevelopmentClient
         Job[] jobs = { job };
         try
         {
-            Client.run( jobs, isEc2Master, numWorkers); //TODO fix this
+            Client.run( jobs, isEc2Run, numWorkers); //TODO fix this
         } 
         catch ( Exception exception )
         {
