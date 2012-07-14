@@ -6,6 +6,8 @@ import static java.lang.System.out;
 import java.rmi.RemoteException;
 
 /**
+ * To do:
+ * 1. Simplify run interface: Job[] to Job;
  *
  * @author Pete Cappello
  */

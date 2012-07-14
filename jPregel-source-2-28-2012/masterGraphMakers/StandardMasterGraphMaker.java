@@ -23,7 +23,7 @@ public class StandardMasterGraphMaker implements MasterGraphMaker
             // read master file
             FileInputStream fileInputStream = null;
             DataInputStream dataInputStream = null;
-            BufferedReader bufferedReader = null;
+            BufferedReader bufferedReader   = null;
             
             boolean isEc2 = fileSystem.getFileSystem();
             if ( isEc2 ) 

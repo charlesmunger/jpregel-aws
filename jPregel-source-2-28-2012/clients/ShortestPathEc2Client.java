@@ -13,12 +13,13 @@ import workerOutputMakers.StandardWorkerOutputMaker;
  *
  * @author Pete Cappello
  */
-public class ShortestPathEc2Client extends Client {
-
+public class ShortestPathEc2Client extends Client 
+{
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws RemoteException {
+    public static void main(String[] args) throws RemoteException 
+    {
         String jobName = "ShortestPath";
         String jobDirectoryName = args[0];
         int numParts = Integer.parseInt(args[1]);
@@ -27,7 +28,8 @@ public class ShortestPathEc2Client extends Client {
         boolean isEc2Master = true;
         boolean combiningMessages = Boolean.parseBoolean(args[4]);
         Combiner combiner = null;
-        if (combiningMessages) {
+        if (combiningMessages) 
+        {
             combiner = new IntegerMinCombiner();
         }
         Vertex vertexFactory = new ShortestPathVertex();

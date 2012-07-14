@@ -155,7 +155,9 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         numUnfinishedWorkers = integerToWorkerMap.size();
         commandExeutionIsComplete = false;
         Command command = new SetWorkerJob(workerJob, isEc2);
+        System.out.println("Master.run: about to broadcast SetWorkerJob command.");
         broadcast(command, this);
+        System.out.println("Master.run: finished broadcast of SetWorkerJob command.");
         // while workers SetWorkerJob, read Job input file, write Worker input files
         job.readJobInputFile(fileSystem, integerToWorkerMap.size());
 
