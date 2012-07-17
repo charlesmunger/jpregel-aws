@@ -56,14 +56,13 @@ public class TestMutabilityClient
                 );
         
         Job job = new Job( jobName,
-                jobDirectoryName, 
-                vertexFactory, numParts, workerIsMultithreaded, combiner, 
-                workerWriter, workerGraphMaker, reader, writer );
-        Job[] jobs = { job };
+                  jobDirectoryName, 
+                  vertexFactory, numParts, workerIsMultithreaded, combiner, 
+                  workerWriter, workerGraphMaker, reader, writer );
         try
         {
-            boolean   isEc2Master = false;
-            Client.run( jobs, isEc2Master, numWorkers);//TODO fix me
+            boolean isEc2Master = false;
+            Client.run( job, isEc2Master, numWorkers);//TODO fix me
         } 
         catch ( Exception exception )
         {

@@ -52,12 +52,11 @@ public class Euclidean2DGridShortestPathClient
                            workerIsMultithreaded, combiner, workerWriter, 
                            workerGraphMaker, reader, writer );
         job.setProblemAggregator( new IntegerSumAggregator() );
-        Job[] jobs = { job };
         try
         {
             boolean   isEc2Master = false;
             System.out.println("Euclidean2DGridShortestPathClient.main: about to invoke Client.run");
-            Client.run( jobs, isEc2Master, numWorkers); //TODO fix this
+            Client.run( job, isEc2Master, numWorkers); //TODO fix this
         }
         catch ( Exception exception )
         {

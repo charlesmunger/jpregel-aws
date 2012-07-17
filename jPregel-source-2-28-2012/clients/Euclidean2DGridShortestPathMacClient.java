@@ -55,11 +55,10 @@ public class Euclidean2DGridShortestPathMacClient
                 workerGraphMaker, reader, writer 
                 );
         job.setProblemAggregator( new IntegerSumAggregator() );
-        Job[] jobs = { job };
         try
         {
             boolean   isEc2Master = true;
-            Client.run( jobs, isEc2Master, numWorkers); //TODO fix this
+            Client.run( job, isEc2Master, numWorkers); //TODO fix this
         } 
         catch ( Exception exception )
         {

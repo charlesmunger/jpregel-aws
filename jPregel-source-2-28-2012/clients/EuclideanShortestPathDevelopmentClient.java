@@ -62,10 +62,9 @@ public class EuclideanShortestPathDevelopmentClient
                 vertexFactory, numParts, workerIsMultithreaded, combiner, workerWriter, 
                 workerGraphMaker, reader, writer );
         job.setProblemAggregator( new IntegerSumAggregator() );
-        Job[] jobs = { job };
         try
         {
-            Client.run( jobs, isEc2Run, numWorkers); //TODO fix this
+            Client.run( job, isEc2Run, numWorkers); //TODO fix this
         } 
         catch ( Exception exception )
         {

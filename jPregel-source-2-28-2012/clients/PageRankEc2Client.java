@@ -45,8 +45,7 @@ public class PageRankEc2Client extends Client {
                 jobDirectoryName, 
                 vertexFactory, numParts, workerIsMultithreaded, combiner, 
                 workerWriter, workerGraphMaker, reader, writer );
-        Job[] jobs = { job };
-        Client.run( jobs, isEc2Master, numWorkers);    }
+        Client.run( job, isEc2Master, numWorkers);    }
 	
 	
 	

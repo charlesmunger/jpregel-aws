@@ -46,15 +46,14 @@ public class ShortestPathDevelopmentClient {
                 + "\n combining messages: " + combiningMessages);
 
         Job job = new Job(jobName,
-                jobDirectoryName,
-                vertexFactory, numParts, workerIsMultithreaded, combiner, workerWriter,
-                workerGraphMaker, reader, writer);
+                  jobDirectoryName,
+                  vertexFactory, numParts, workerIsMultithreaded, combiner, workerWriter,
+                  workerGraphMaker, reader, writer);
         job.setProblemAggregator(new IntegerSumAggregator());
         job.setStepAggregator(new IntegerSumAggregator());
-        Job[] jobs = {job};
         try {
             boolean isEc2Master = false;
-            Client.run(jobs, isEc2Master, numWorkers);//TODO fix this
+            Client.run(job, isEc2Master, numWorkers);//TODO fix this
         } catch (Exception exception) {
             exception.printStackTrace();
             System.exit(1);

@@ -1,31 +1,29 @@
 package system;
 
 import JpAws.Ec2Cluster;
-import static java.lang.System.out;
-
 import java.rmi.RemoteException;
 
 /**
- * To do:
- * 1. Simplify run interface: Job[] to Job;
- *
  * @author Pete Cappello
  */
 public class Client
 {
-    public static void run( Job[] jobs, boolean isEc2, int numWorkers) 
-            throws RemoteException
+    public static void run( Job job, boolean isEc2, int numWorkers) throws RemoteException
     {
-        out.println("Client.run: Entered.");
+        System.out.println("Client.run: Entered.");
         Cluster cluster = isEc2 ? new Ec2Cluster() : new LocalCluster();
         System.out.println("Client.run: Cluster object constructed.");
         ClientToMaster master = cluster.start( numWorkers );
-        for ( Job job : jobs )
+        System.out.println("Client.run: begin processing job.");
+        try
         {
-            System.out.println("Client.run: begin processing job.");
             JobRunData jobRunData = master.run( job, isEc2 );
             job.processMasterOutputFile();
-            out.print( jobRunData );
+            System.out.println( jobRunData );
+        }
+        catch ( Exception exception )
+        {
+            exception.printStackTrace();
         }
         cluster.stop();
     }
