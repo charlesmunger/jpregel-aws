@@ -1,4 +1,4 @@
-package system;
+ package system;
 
 import static java.lang.System.out;
 import java.util.Collection;
@@ -18,10 +18,8 @@ public final class Part
     private final WorkerJob workerJob;
     
     private Map<Object, Vertex> vertexIdToVertexMap = Collections.synchronizedMap( new HashMap<Object, Vertex>() );   
-    private boolean isActive; // when at least 1 of its Vertex objects isActive
+    private SuperStepToActiveSetMap superstepToActiveSetMap = new SuperStepToActiveSetMap();
     private ComputeThread computeThread;
-    
-    
     
     Part( int partId, Worker worker )
     {
@@ -50,7 +48,7 @@ public final class Part
             {
                 vertex.setInput( computeInput );
                 vertex.compute();
-//                vertex.removeMessageQ( vertex.getSuperStep() ); // MessageQ is garbage
+                vertex.removeMessageQ( vertex.getSuperStep() ); // MessageQ is garbage
                 outputStepAggregator.aggregate(    vertex.getOutputStepAggregator()    );
                 outputProblemAggregator.aggregate( vertex.getOutputProblemAggregator() );
                 if ( vertex.isNextStepActive() )

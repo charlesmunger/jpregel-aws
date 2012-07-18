@@ -26,7 +26,7 @@ public class Euclidean2DGridShortestPathMacClient
     {
         String  jobName               = "Euclidean 2D Grid Shortest Path";
         String  jobDirectoryName      = args[0];
-        int     numWorkers            = 2; // should be n * n 
+        int     numWorkers            = 4; // should be n * n 
         boolean workerIsMultithreaded = true;
         boolean combiningMessages     = true;
         int     numParts = numWorkers * 2 * 2; // numWorkers * ComputeThreads/Worker * Parts/ComputeThread
@@ -57,7 +57,7 @@ public class Euclidean2DGridShortestPathMacClient
         job.setProblemAggregator( new IntegerSumAggregator() );
         try
         {
-            boolean   isEc2Master = true;
+            boolean   isEc2Master = false;
             Client.run( job, isEc2Master, numWorkers); //TODO fix this
         } 
         catch ( Exception exception )

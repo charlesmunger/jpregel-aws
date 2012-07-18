@@ -7,7 +7,6 @@ import java.util.TreeMap;
  *
  * @author Pete Cappello
  */
-//final public class NonNullMap<MessageValueType> extends TreeMap<Long, MessageQ<MessageValueType>>
 final public class NonNullMap<MessageValueType> extends HashMap<Long, MessageQ<MessageValueType>>
 {
     private Combiner combiner;
@@ -30,8 +29,5 @@ final public class NonNullMap<MessageValueType> extends HashMap<Long, MessageQ<M
         return super.put( key, value );
     }
     
-    synchronized public MessageQ<MessageValueType> remove( Long key )
-    {
-        return super.remove( key );
-    }
+    synchronized public MessageQ<MessageValueType> remove( Long key ) { return super.remove( key ); }
 }

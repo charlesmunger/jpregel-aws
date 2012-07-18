@@ -106,5 +106,5 @@ public class ShortestPathVertex extends Vertex<OutEdge, Integer>
         return new String( stringBuffer );
     }
     
-    boolean isSource() { return ( (Integer) getVertexId() == 0 ) ? true : false; }
+    protected boolean isSource() { return ( (Integer) getVertexId() == 0 ) ? true : false; }
 }

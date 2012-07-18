@@ -35,12 +35,7 @@ import java.util.Map;
  * @author Peter Cappello
  */
 abstract public class Vertex<OutEdgeType, MessageValueType> implements java.io.Serializable
-{
-//    static public  Vertex make( String line, Combiner combiner ) { return null; }
-//    static private   int  numParts;
-//    static protected int  getNumParts() { return numParts; }
-//    static public    void setNumParts( int nParts ) { numParts = nParts; }
-            
+{           
     private final Object vertexId;
     private final Combiner combiner;
     private transient Part part;
@@ -87,6 +82,8 @@ abstract public class Vertex<OutEdgeType, MessageValueType> implements java.io.S
     synchronized protected void addVertex( Object vertexId, Object vertexValue ) { /* combiner */ }
 
     abstract protected void compute();
+    
+    abstract protected boolean isSource();
 
     abstract public String output();
     
@@ -120,13 +117,10 @@ abstract public class Vertex<OutEdgeType, MessageValueType> implements java.io.S
     
     synchronized public int getOutEdgeMapSize() { return outEdgeMap.size(); }
     
-//    public int getPartId( int partitionSize ) { return vertexId.hashCode() % partitionSize; }
     public int getPartId( Object vertexId, int numParts ) 
     { 
-//        System.out.println("Vertex.getPartId: vertexId.hashCode() % numParts: " + (vertexId.hashCode() % numParts));
         return vertexId.hashCode() % numParts; 
     }
-//    public int getPartId() { return vertexId.hashCode() % numParts; }
     
     synchronized protected long getSuperStep() { return superStep; }
     
