@@ -57,10 +57,8 @@ public class ShortestPathVertex extends Vertex<OutEdge, Integer>
         // compute currently known minimum distance from source to me
         int minDistance = isSource() ? 0 : Integer.MAX_VALUE;
         Message<Integer> minDistanceMessage = new Message<Integer>( getVertexId(), minDistance );
-        Iterator<Message<Integer>> messageSetIterator = getMessageIterator();
-        while ( messageSetIterator.hasNext() )
+        for ( Message<Integer> message : getMessageQ() )
         {
-            Message<Integer> message = messageSetIterator.next();
             if ( message.getMessageValue() < minDistanceMessage.getMessageValue() )
             {
                 minDistanceMessage = message;
@@ -68,11 +66,10 @@ public class ShortestPathVertex extends Vertex<OutEdge, Integer>
         }
         int numSentMessages = 0;
         if ( minDistanceMessage.getMessageValue() < ((Message<Integer>) getVertexValue() ).getMessageValue() )
-        {
-            // There is a new shorter path from the source to me
+        {   // There is a new shorter path from the source to me
             setVertexValue( minDistanceMessage ); // update my value: the shortest path to me
             
-            // To each of my target vertices: The shortest known path length to you through me just got shorter 
+            // To each of my target vertices: The shortest known path to you through me just got shorter 
             for ( OutEdge outEdge : getOutEdgeValues() )
             {
                 Object targetVertexId = outEdge.getVertexId();
@@ -82,10 +79,10 @@ public class ShortestPathVertex extends Vertex<OutEdge, Integer>
             }
             numSentMessages = getOutEdgeMapSize();
         }
+        
         // aggregate number of messages sent in this step & this problem
         setOutputStepAggregator(    new IntegerSumAggregator( numSentMessages ) );
         setOutputProblemAggregator( new IntegerSumAggregator( numSentMessages ) );            
-        
         
         /* This vote will be overturned, if during this step, a vertex for whom 
          * I am a target vertex discovers a shorter path to itself, 

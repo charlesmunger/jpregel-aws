@@ -23,7 +23,7 @@ public class StartSuperStep implements Command
     public void execute( ServiceImpl serviceImpl ) throws Exception 
     {
         Worker worker = (Worker) serviceImpl;
-        worker.startComputation( computeInput );
+        worker.startSuperStep( computeInput );
     } 
     
     public String toString()

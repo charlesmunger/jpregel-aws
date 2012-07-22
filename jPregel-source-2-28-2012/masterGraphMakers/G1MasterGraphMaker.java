@@ -29,11 +29,9 @@ public class G1MasterGraphMaker implements MasterGraphMaker
         boolean isEc2 = fileSystem.getFileSystem();
         if ( isEc2 ) 
         {
-            //System.out.println(" G1MasterGraphMaker.read() : jus entered isEc2") ;
             jobDirectoryName = fileSystem.getJobDirectory();
             S3MasterInputMaker masterFileMaker = new S3MasterInputMaker();
             bufferedReader = masterFileMaker.FileInput(jobDirectoryName);
-            //System.out.println(" G1MasterGraphMaker.read() : exiting isEc2" + jobDirectoryName) ;
         } 
         else // use local file system
         {
@@ -75,10 +73,9 @@ public class G1MasterGraphMaker implements MasterGraphMaker
             }
         }
         int vertexNum = 0;
-        int fileNum;
-        for (fileNum = 1; fileNum <= numWorkers; fileNum++) {
+        for ( int fileNum = 1; fileNum <= numWorkers; fileNum++) 
+        {
             // open file for output in "in" directory
-            //System.out.println(" G1MasterGraphMaker.read() 2: jus entered isEc2") ;
             FileOutputStream fileOutputStream = null;
             try 
             {

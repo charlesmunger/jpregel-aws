@@ -24,7 +24,6 @@ public class StandardWorkerGraphMaker implements GraphMaker
         int numVertices = 0;
         try
         {
-//            int fis_read = 0 ; 
             int workerNum       = worker.getWorkerNum();
             WorkerJob workerJob = worker.getWorkerJob();
             FileSystem fileSystem = workerJob.getFileSystem();
@@ -33,8 +32,6 @@ public class StandardWorkerGraphMaker implements GraphMaker
             BufferedReader bufferedReader = null ; 
             DataInputStream dataInputStream =null ; 
             FileInputStream fileInputStream = null ; 
-//            String jobDirectoryName = null ; 
-
             boolean isEc2 = fileSystem.getFileSystem() ; 
             if (isEc2) 
             {
@@ -45,8 +42,7 @@ public class StandardWorkerGraphMaker implements GraphMaker
             }
             else 
             {
-                // read file
-//                fis_read = 1  ; 
+                // read local file
                 fileInputStream = fileSystem.getWorkerInputFileInputStream( workerNum );
                 dataInputStream = new DataInputStream( fileInputStream );
                 bufferedReader   = new BufferedReader(new InputStreamReader( dataInputStream ));  
@@ -63,12 +59,7 @@ public class StandardWorkerGraphMaker implements GraphMaker
                 Vertex vertex = vertexFactory.make( line, combiner );
 //                worker.addVertex( vertex, workerJob.getPartId( vertex ), line );
                 worker.addVertex( vertex, line );
-            }
-//            if (fis_read == 1)
-//            { 
-//                dataInputStream.close();
-//                fileInputStream.close(); 
-//            } 
+            } 
             bufferedReader.close();
             if ( ! isEc2 )
             { 

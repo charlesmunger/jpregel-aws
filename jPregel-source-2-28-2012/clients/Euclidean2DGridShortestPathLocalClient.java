@@ -17,7 +17,7 @@ import workerOutputMakers.StandardWorkerOutputMaker;
  *
  * @author Pete Cappello
  */
-public class Euclidean2DGridShortestPathMacClient 
+public class Euclidean2DGridShortestPathLocalClient 
 {
     /**
      * @param args the command line arguments
@@ -85,20 +85,20 @@ public class Euclidean2DGridShortestPathMacClient
 //        System.exit( 0 );
     }
     
-    static ClientToMaster getMaster()
-    {
-        String masterDomainName = "localhost";
-        String url = "//" + masterDomainName + ":" + Master.PORT + "/" + Master.SERVICE_NAME;
-        ClientToMaster master = null;
-        try 
-        {
-            master = (ClientToMaster) Naming.lookup(url);
-        }
-        catch (Exception exception) 
-        {
-            exception.printStackTrace();
-            System.exit( 1 );
-        }       
-        return master;
-    }
+//    static ClientToMaster getMaster()
+//    {
+//        String masterDomainName = "localhost";
+//        String url = "//" + masterDomainName + ":" + Master.PORT + "/" + Master.SERVICE_NAME;
+//        ClientToMaster master = null;
+//        try 
+//        {
+//            master = (ClientToMaster) Naming.lookup(url);
+//        }
+//        catch (Exception exception) 
+//        {
+//            exception.printStackTrace();
+//            System.exit( 1 );
+//        }       
+//        return master;
+//    }
 }

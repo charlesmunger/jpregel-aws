@@ -56,11 +56,10 @@ public class EuclideanShortestPathVertex extends Vertex<Point2D.Float, Float>
         }
         
         // initialize vertexValue
-        //Float minDistance = isSource() ? (float) 0.0 : Float.MAX_VALUE;
+        // Cannot use isSource() to compute minDistance; vertex has not been created yet.
         Float minDistance = ( vx == 0.0 && vy == 0.0 ) ? (float) 0.0 : Float.MAX_VALUE;
         Message<Float> minDistanceMessage = new Message<Float>( new Point2D.Float(), minDistance );
         setVertexValue( minDistanceMessage );
-//        out.println("EuclideanShortestPathVertex: vertexValue: " + ((Message<Float>) getVertexValue()).getMessageValue() );
 
         return new EuclideanShortestPathVertex( vertexId, outEdgeMap, combiner );
     }  
@@ -88,11 +87,11 @@ public class EuclideanShortestPathVertex extends Vertex<Point2D.Float, Float>
             // there is a new shorter path from the source to me
             setVertexValue( minDistanceMessage ); // update my value: the shortest path to me
             
-            // To each target vertex: The shortest known path length to you through me just got shorter 
+            // To each target vertex: The shortest known path to you through me just got shorter 
             for ( Point2D.Float targetVertexId : getOutEdgeValues() )            
             {
                 float edgeValue = distance( targetVertexId );
-                Message<Float> message = new Message<Float>( getVertexId(), minDistanceMessage.getMessageValue() + edgeValue );
+                Message<Float> message = new Message<Float>( getVertexId(), minDistanceMessage.getMessageValue() + edgeValue );   
                 sendMessage( targetVertexId, message );
             }
         }

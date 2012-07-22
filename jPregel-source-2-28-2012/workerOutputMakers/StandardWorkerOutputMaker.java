@@ -7,30 +7,23 @@ import static java.lang.System.exit;
 import system.FileSystem;
 import system.*;
 
-
-
-
 /**
  *
  * @author Pete Cappello
  */
 public class StandardWorkerOutputMaker implements WorkerWriter
 {
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public void write( FileSystem fileSystem, Worker worker )
+    public void write( FileSystem fileSystem, Worker worker )
     {
         try
         {
             // open Worker file for output
-		    //System.out.println("StandardWorkerOutputMaker.write() starting") ; 
             boolean isEc2 = fileSystem.getFileSystem() ; 
-        	String jobDirectoryName = fileSystem.getJobDirectory() ; 
+            String jobDirectoryName = fileSystem.getJobDirectory() ; 
             int workerNum = worker.getWorkerNum(); 
-            (new File(jobDirectoryName+"/out")).mkdirs();
+            (new File(jobDirectoryName + "/out")).mkdirs();
             
             FileOutputStream fileOutputStream = fileSystem.getWorkerOutputFileOutputStream( workerNum );
             DataOutputStream dataOutputStream = new DataOutputStream( fileOutputStream );
@@ -39,11 +32,10 @@ public class StandardWorkerOutputMaker implements WorkerWriter
             
             for ( Part part : worker.getParts() )
             {
-            	//System.out.println(" workers output i'm writing: StandardWorkerOutputMaker.java: Part:part "  ) ;  
-
                 for ( Vertex vertex : part.getVertices() )
                 {
-                	//System.out.println(" workers output i'm writing: StandardWorkerOutputMaker.java"  ) ;  
+                    // TODO: Does not seem to create out directory and files for EuclideanShortestPathLocalClient
+//                    System.out.println("StandardWorkerOutputMaker: " + vertex.output() ) ;  
                     bufferedWriter.write( vertex.output() );
                     bufferedWriter.newLine();
                 }
@@ -60,15 +52,13 @@ public class StandardWorkerOutputMaker implements WorkerWriter
             	workerGraph.UploadFilesOntoS3(jobDirectoryName) ;            
             	//S3FileSystem.WorkerUploadFiles(jobDirectoryName, "out", workerNum) ; 
             }
-            
-
         }
         catch ( Exception exception )
         {
             err.println( "StandardWorkerOutput.write: Error: " + exception.getMessage());
+            exception.printStackTrace();
             exit( 1 );
         }
 	    //System.out.println("StandardWorkerOutputMaker.write()  exiting") ; 
-
     }
 }

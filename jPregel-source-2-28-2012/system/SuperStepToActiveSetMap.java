@@ -10,7 +10,7 @@ import java.util.Set;
  */
 public class SuperStepToActiveSetMap extends HashMap<Long,Set<Vertex>>
 {
-    synchronized public Set<Vertex> get( Long superStep )
+    synchronized public Set<Vertex> get( long superStep )
     {
         Set<Vertex> activeSet = super.get( superStep );
         if ( activeSet == null )

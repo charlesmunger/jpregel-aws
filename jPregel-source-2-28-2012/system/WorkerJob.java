@@ -1,7 +1,5 @@
 package system;
 
-import java.awt.geom.Point2D;
-
 /**
  * The WorkerJob class exists to reduce the class file size. 
  *
@@ -9,6 +7,7 @@ import java.awt.geom.Point2D;
  */
 public class WorkerJob extends Job
 {
+    // TODO either eliminate WorkerJob
     private final GraphMaker workerGraphMaker;
     private final WorkerWriter workerWriter;
     private FileSystem fileSystem;
@@ -18,7 +17,6 @@ public class WorkerJob extends Job
         super( job );
         workerWriter     = job.getWorkerWriter();
         workerGraphMaker = job.getWorkerGraphMaker();
-        System.out.println("WorkerJob: vertexFactory type: " + vertexFactory.getClass() );
     }
     
     public FileSystem getFileSystem() { return fileSystem; }

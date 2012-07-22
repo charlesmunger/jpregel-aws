@@ -179,11 +179,18 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         // begin computation phase
         problemAggregator = workerJob.makeProblemAggregator();
         long superStep = 0;
-        long startStepTime = System.currentTimeMillis(); // DEBUG
+        long startStepTime = System.currentTimeMillis(); // Progress monitoring
         long maxMemory = Runtime.getRuntime().maxMemory();
-        for (thereIsANextStep = true; thereIsANextStep; superStep++) {
+        for (thereIsANextStep = true; thereIsANextStep; superStep++) 
+        {
+            thereIsANextStep = false;           // until a Worker says otherwise
+            ComputeInput computeInput = new ComputeInput(stepAggregator, problemAggregator, numVertices);
+            Command startSuperStep = new StartSuperStep(computeInput);
+            stepAggregator = workerJob.makeStepAggregator(); // initialize stepAggregator
+            barrierComputation(startSuperStep); // broadcaast to workers: start a super step
             // BEGIN Progress monitoring
-            if (superStep % 1 == 0) {
+            if (superStep % 1 == 0) 
+            {
                 long endStepTime = System.currentTimeMillis();
                 long elapsedTime = endStepTime - startStepTime;
                 long freeMemory = Runtime.getRuntime().freeMemory();
@@ -195,11 +202,6 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
                 startStepTime = endStepTime;
             }
             // END Progress monitoring
-            thereIsANextStep = false;           // until a Worker says otherwise
-            ComputeInput computeInput = new ComputeInput(stepAggregator, problemAggregator, numVertices);
-            Command startSuperStep = new StartSuperStep(computeInput);
-            stepAggregator = workerJob.makeStepAggregator(); // initialize stepAggregator
-            barrierComputation(startSuperStep); // broadcaast to workers: start a super step
         }
         jobRunData.setEndTimeComputation();
         jobRunData.setNumSuperSteps(superStep);

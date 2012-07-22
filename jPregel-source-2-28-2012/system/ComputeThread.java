@@ -20,6 +20,7 @@ public class ComputeThread extends Thread
     private Combiner combiner;
     private ComputeInput computeInput;
     private int deltaNumVertices;
+    private long superStep;
         
     ComputeThread( Worker worker, int computeThreadNum )
     { 
@@ -32,6 +33,7 @@ public class ComputeThread extends Thread
     {
         while ( true )
         {
+            // TODO Should this be refactored? Have ComputeThread get next available Part from Worker
             try
             {
                 synchronized ( this )
@@ -56,7 +58,7 @@ public class ComputeThread extends Thread
             PartIterator partIterator = worker.getPartIterator();
             for ( Part part = partIterator.getPart(); part != null; part = partIterator.getPart() )
             {
-                ComputeOutput computeOutput = part.doSuperStep( this, computeInput );
+                ComputeOutput computeOutput = part.doSuperStep( this, superStep, computeInput );
                 thereIsANextStep |= computeOutput.getThereIsANextStep();
                 outputStepAggregator.aggregate(    computeOutput.getStepAggregator() );
                 outputProblemAggregator.aggregate( computeOutput.getProblemAggregator() );
@@ -103,9 +105,10 @@ public class ComputeThread extends Thread
     
     void setPartIdToPartMap( Map<Integer, Part> partIdToPartMap ) { this.partIdToPartMap = partIdToPartMap; }
     
-    synchronized void workIsAvailable( ComputeInput computeInput )
+    synchronized void workIsAvailable( long superStep, ComputeInput computeInput )
     {
         this.computeInput = computeInput;
+        this.superStep = superStep;
         workIsAvailable = true;
         notify();
     }

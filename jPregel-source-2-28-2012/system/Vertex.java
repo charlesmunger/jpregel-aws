@@ -1,7 +1,5 @@
 package system;
 
-import static java.lang.System.out;
-
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -17,11 +15,10 @@ import java.util.Map;
  *    Have Part add 1st, and let that Vertex resolve subsequent conflicts?
  * - Design and implement Vertex AddVertex conflict "handler". Use combiner concept. where feasible.
  * - Put RemoveVertex message in Inbox. Use combiners to resolve multiple requests. 
- *   How to handle request where no such Vertex exisits?
+ *   How to handle request where no such Vertex exists?
  * - Design and implement Vertex AddVertex conflict "handler". Use combiner concept, where feasible.
  * 
  * !! Is it safe & faster to make MessageQ thread-safe & remove synchronization of receive methods?
- * !! Should I make superStep Long instead of AtomicLong?
  * 
  * When a vertex completes the compute method for a super step, it may not have
  * received all its messages for the next super step. When the compute method
@@ -35,7 +32,8 @@ import java.util.Map;
  * @author Peter Cappello
  */
 abstract public class Vertex<OutEdgeType, MessageValueType> implements java.io.Serializable
-{           
+{
+    // TODO vertexID: Use generics to avoid casts
     private final Object vertexId;
     private final Combiner combiner;
     private transient Part part;
@@ -46,9 +44,7 @@ abstract public class Vertex<OutEdgeType, MessageValueType> implements java.io.S
     private NonNullMap<MessageValueType> superstepToMessageQMap;
     private NonNullMap<MessageValueType> superstepToInboxMap;
     private boolean currentStepIsActive = true;
-    private boolean nextStepIsActive = true;
-    private long superStep = -1L;
-    
+    private boolean nextStepIsActive = true;    
     private Aggregator outputStepAggregator;
     private Aggregator outputProblemAggregator;
     private ComputeInput computeInput;
@@ -93,7 +89,7 @@ abstract public class Vertex<OutEdgeType, MessageValueType> implements java.io.S
 
     synchronized protected Iterator<Message<MessageValueType>> getMessageIterator()
     {
-        MessageQ<MessageValueType> messageQ = superstepToMessageQMap.remove( superStep );
+        MessageQ<MessageValueType> messageQ = superstepToMessageQMap.remove( getSuperStep() );
         if ( messageQ == null )
         {
             messageQ = new MessageQ<MessageValueType>( combiner );
@@ -103,7 +99,7 @@ abstract public class Vertex<OutEdgeType, MessageValueType> implements java.io.S
     
     synchronized protected MessageQ<MessageValueType> getMessageQ()
     {
-        MessageQ<MessageValueType> messageQ = superstepToMessageQMap.remove( superStep );
+        MessageQ<MessageValueType> messageQ = superstepToMessageQMap.remove( getSuperStep() );
         if ( messageQ == null )
         {
             messageQ = new MessageQ<MessageValueType>( combiner );
@@ -122,7 +118,7 @@ abstract public class Vertex<OutEdgeType, MessageValueType> implements java.io.S
         return vertexId.hashCode() % numParts; 
     }
     
-    synchronized protected long getSuperStep() { return superStep; }
+    synchronized protected long getSuperStep() { return part.getSuperStep(); }
     
     public Object getVertexId() { return vertexId; }
         
@@ -139,9 +135,9 @@ abstract public class Vertex<OutEdgeType, MessageValueType> implements java.io.S
     synchronized protected void removeVertex( Object vertexId ) { part.removeVertex( vertexId ); }
 
     protected void sendMessage( Object targetVertexId, Message message )
-    { 
+    {
         numMessagesSent++;
-        part.sendMessage( targetVertexId, message, superStep + 1 ); 
+        part.sendMessage( targetVertexId, message, getSuperStep() + 1 ); 
     }
     
     protected void setOutputStepAggregator( Aggregator outputStepAggregator ) { this.outputStepAggregator = outputStepAggregator; }
@@ -156,7 +152,7 @@ abstract public class Vertex<OutEdgeType, MessageValueType> implements java.io.S
      */
     synchronized protected void voteToHalt()
     { 
-        MessageQ messageQ = superstepToMessageQMap.get( superStep + 1 );
+        MessageQ messageQ = superstepToMessageQMap.get( getSuperStep() + 1 );
         if ( messageQ.isEmpty() )
         {
             nextStepIsActive = false;
@@ -168,10 +164,10 @@ abstract public class Vertex<OutEdgeType, MessageValueType> implements java.io.S
      * _________________________________________
      */
     
+    // TODO eliminate this method
     synchronized void advanceStep()
     {  
-        superStep++;
-        MessageQ messageQ = superstepToMessageQMap.get( superStep );
+        MessageQ messageQ = superstepToMessageQMap.get( getSuperStep() );
         if ( ! messageQ.isEmpty() )
         {
             nextStepIsActive = true;
@@ -190,11 +186,14 @@ abstract public class Vertex<OutEdgeType, MessageValueType> implements java.io.S
     
     synchronized public boolean isNextStepActive() { return nextStepIsActive; }
     
-    void receiveMessage( Message newMessage, long superStep ) { superstepToMessageQMap.get( superStep ).add( newMessage ); }
+    void receiveMessage( Message newMessage, long superStep )
+    { 
+        superstepToMessageQMap.get( superStep ).add( newMessage );
+    }
     
     void receiveMessageQ( MessageQ newMessageQ, long superStep ) { superstepToMessageQMap.get( superStep ).addAll( newMessageQ ); }
-    
-    void removeMessageQ( long superStep ) { superstepToMessageQMap.remove( superStep ); }       
+        
+    void removeMessageQ( long superStep ) { superstepToMessageQMap.remove( superStep ); }
     
     void setInput( ComputeInput computeInput ) { this.computeInput = computeInput; }  
                 

@@ -131,5 +131,24 @@ public class Job implements Serializable
     void readJobInputFile( FileSystem fileSystem, int workerSetSize )
     {
         masterGraphMaker.make( fileSystem, workerSetSize );
-    }   
+    }
+    
+    public String toString()
+    {
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append("Job:\n\t");
+        stringBuffer.append("Name: ").append(jobName).append("\n\t");
+        stringBuffer.append("Directory name: ").append(jobDirectoryName).append("\n\t");
+        stringBuffer.append("Number of parts: ").append(numParts).append("\n\t");
+        stringBuffer.append("Worker is multithreaded: ").append(workerIsMultithreaded).append("\n\t");
+        stringBuffer.append("Combiner: ").append( null == combiner  ? "NULL" : combiner.getClass().getCanonicalName() ).append("\n\t");
+        stringBuffer.append("Step Aggregator: ").append(stepAggregator.getClass().getCanonicalName()).append("\n\t");
+        stringBuffer.append("Problem Aggregator: ").append(problemAggregator.getClass().getCanonicalName()).append("\n\t");
+        stringBuffer.append("Vertex factory: ").append(vertexFactory.getClass().getCanonicalName()).append("\n\t");
+        stringBuffer.append("Worker writer: ").append(workerWriter.getClass().getCanonicalName()).append("\n\t");
+        stringBuffer.append("Worker graph maker: ").append(workerGraphMaker.getClass().getCanonicalName()).append("\n\t");
+        stringBuffer.append("Master graph maker: ").append(masterGraphMaker.getClass().getCanonicalName()).append("\n\t");
+        stringBuffer.append("Writer: ").append(writer.getClass().getCanonicalName()).append("\n\t");
+        return new String( stringBuffer );
+    }
 }
