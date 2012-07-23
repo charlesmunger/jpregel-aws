@@ -19,7 +19,10 @@ import workerOutputMakers.StandardWorkerOutputMaker;
 public class EuclideanShortestPathLocalClient 
 {
     /**
-     * @param args the command line arguments
+     * @param args [0]: Job Directory
+     *             [1]: Number of Workers
+     *             [2]: true if and only if worker is to be multi-threaded
+     *             [3]: true if and only if messages are to be combined
      */
     public static void main( String[] args ) throws RemoteException
     {

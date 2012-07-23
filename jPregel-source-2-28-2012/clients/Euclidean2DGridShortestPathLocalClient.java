@@ -1,8 +1,5 @@
 package clients;
 
-import static java.lang.System.out;
-import java.rmi.Naming;
-
 import java.rmi.RemoteException;
 import masterGraphMakers.GridMasterGraphMaker;
 import masterOutputMakers.StandardMasterOutputMaker;
@@ -20,41 +17,29 @@ import workerOutputMakers.StandardWorkerOutputMaker;
 public class Euclidean2DGridShortestPathLocalClient 
 {
     /**
-     * @param args the command line arguments
+     * @param args [0]: Job directory name
      */
     public static void main( String[] args ) throws RemoteException
     {
-        String  jobName               = "Euclidean 2D Grid Shortest Path";
-        String  jobDirectoryName      = args[0];
-        int     numWorkers            = 4; // should be n * n 
-        boolean workerIsMultithreaded = true;
-        boolean combiningMessages     = true;
-        int     numParts = numWorkers * 2 * 2; // numWorkers * ComputeThreads/Worker * Parts/ComputeThread
-        Combiner combiner = null;
-        if ( combiningMessages )
-        {
-            combiner = new FloatMinCombiner();
-        }
-        Vertex vertexFactory        = new EuclideanShortestPathVertex();
-        WorkerWriter workerWriter   = new StandardWorkerOutputMaker();
-        GraphMaker workerGraphMaker = new GridWorkerGraphMaker();
-        MasterGraphMaker reader     = new GridMasterGraphMaker();
-        Writer writer               = new StandardMasterOutputMaker();
-        
-        out.println("Euclidean2DGridShortestPathMacClient.main: "
-                + "\n jobDirectoryName: " + jobDirectoryName
-                + "\n numParts: " + numParts
-                + "\n numWorkers: " + numWorkers
-                + "\n workerIsMultithreaded: " + workerIsMultithreaded
-                + "\n combining messages: " + combiningMessages
-                );
-        
-        Job job = new Job( 
-                jobName, jobDirectoryName, vertexFactory, numParts, 
-                workerIsMultithreaded, combiner, workerWriter, 
-                workerGraphMaker, reader, writer 
+        int numWorkers = 2 * 2; // should be n * n, for some natural number n
+        int computeThreadsPerWorker = 2;
+        int partsPerComputeThread = 2;
+        int numParts = numWorkers * computeThreadsPerWorker * partsPerComputeThread;        
+        Job job = new Job(
+                "Euclidean 2D Grid Shortest Path", // jobName
+                args[0],                           // jobDirectoryName, 
+                new EuclideanShortestPathVertex(), // vertexFactory, 
+                numParts, 
+                true,                              // workerIsMultithreaded, 
+                new FloatMinCombiner(),            // Combiner
+                new StandardWorkerOutputMaker(),   // WorkerWriter, 
+                new GridWorkerGraphMaker(),        // WorkerGraphMaker, 
+                new GridMasterGraphMaker(),        // MasterGraphMaker
+                new StandardMasterOutputMaker()    // Writer 
                 );
         job.setProblemAggregator( new IntegerSumAggregator() );
+        System.out.println( "Euclidean2DGridShortestPathMacClient: \n  numWorkers: " 
+                + numWorkers + "\n  numParts: " + numParts + "\n  " + job );
         try
         {
             boolean   isEc2Master = false;
@@ -66,39 +51,5 @@ public class Euclidean2DGridShortestPathLocalClient
             System.exit(1);
         }
         System.exit( 0 );
-//        try
-//        {
-//            // get reference to Master
-//            ClientToMaster master = getMaster();
-//            boolean isEc2Master = false;
-//            master.setWorkerMap();
-//            JobRunData jobRunData = master.run( job, isEc2Master );
-//            job.processMasterOutputFile();
-//            out.print( jobRunData );
-//            master.shutdown();
-//        } 
-//        catch ( Exception exception )
-//        {
-//            //exception.printStackTrace();
-//            System.exit(1);
-//        }
-//        System.exit( 0 );
     }
-    
-//    static ClientToMaster getMaster()
-//    {
-//        String masterDomainName = "localhost";
-//        String url = "//" + masterDomainName + ":" + Master.PORT + "/" + Master.SERVICE_NAME;
-//        ClientToMaster master = null;
-//        try 
-//        {
-//            master = (ClientToMaster) Naming.lookup(url);
-//        }
-//        catch (Exception exception) 
-//        {
-//            exception.printStackTrace();
-//            System.exit( 1 );
-//        }       
-//        return master;
-//    }
 }

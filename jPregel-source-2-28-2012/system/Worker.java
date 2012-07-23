@@ -43,12 +43,12 @@ import system.commands.WriteWorkerOutputFile;
 import system.commands.RegisterWorker;
 import system.commands.SendMessage;
 import system.commands.SendVertexIdToMessageQMap;
-import system.commands.SetWorkerJob;
+import system.commands.SetJob;
 import system.commands.SetWorkerMap;
 import system.commands.ShutdownWorker;
 import system.commands.StartSuperStep;
 import system.commands.SuperStepComplete;
-import system.commands.WorkerJobSet;
+import system.commands.JobSet;
 import system.commands.WorkerMapSet;
 
 /**
@@ -71,7 +71,7 @@ public final class Worker extends ServiceImpl
             WriteWorkerOutputFile.class,
             SendMessage.class,
             SendVertexIdToMessageQMap.class,
-            SetWorkerJob.class,
+            SetJob.class,
             SetWorkerMap.class,
             ShutdownWorker.class,
             StartSuperStep.class
@@ -85,7 +85,8 @@ public final class Worker extends ServiceImpl
     private final ComputeThread[] computeThreads;
     
     private Map<Integer, Service> workerNumToWorkerMap;
-    private WorkerJob workerJob;
+//    private WorkerJob job;
+    private Job job;
     private Map<Integer, Part> partIdToPartMap = new HashMap<Integer, Part>();
     private Set<Part> partSet = new LinkedHashSet();
     private FileSystem fileSystem;
@@ -156,7 +157,8 @@ public final class Worker extends ServiceImpl
     
     synchronized PartIterator getPartIterator() { return partIterator; }
     
-    synchronized public WorkerJob getWorkerJob() { return workerJob; }
+//    synchronized public WorkerJob getWorkerJob() { return job; }
+    synchronized public Job getJob() { return job; }
     
     int getWorkerNum( int partId )
     {
@@ -168,7 +170,7 @@ public final class Worker extends ServiceImpl
 //    synchronized public void addVertex( Vertex vertex, int partId, String stringVertex )
     synchronized public void addVertex( Vertex vertex, String stringVertex )
     {
-        int partId = workerJob.getPartId( vertex.getVertexId() );
+        int partId = job.getPartId( vertex.getVertexId() );
         int workerNum = getWorkerNum( partId );
         if ( myWorkerNum == workerNum )
         {
@@ -254,9 +256,9 @@ public final class Worker extends ServiceImpl
     // Command: AddVertexToWorker
     synchronized public void addVertexToWorker( int partId, String stringVertex, Service sendingWorker )
     {
-        Vertex vertexFactory = workerJob.getVertexFactory();
+        Vertex vertexFactory = job.getVertexFactory();
 //        out.println("Worker.addVertexToWorker: vertexFactory.class: "  + vertexFactory.getClass().getName());
-        Combiner combiner    = workerJob.getCombiner();
+        Combiner combiner    = job.getCombiner();
         Vertex vertex = vertexFactory.make( stringVertex, combiner );
         addVertexToPart( partId, vertex );
         sendCommand( sendingWorker, AddVertexToPartCompleteCommand );
@@ -283,7 +285,7 @@ public final class Worker extends ServiceImpl
     // Command: ReadWorkerInputFile 
     synchronized public void processInputFile()
     { 
-        int numVertices = workerJob.makeGraph( this );
+        int numVertices = job.makeGraph( this );
         
         // ensure that all AddVertexToPath Commands complete
         if ( numUnacknowledgedAddVertexCommands.get() > 0 )
@@ -322,7 +324,7 @@ public final class Worker extends ServiceImpl
     {
         for ( Object vertexId : vertexIdToMessageQMap.keySet() )
         {
-            int partId = workerJob.getPartId( vertexId );
+            int partId = job.getPartId( vertexId );
             Part receivingPart = partIdToPartMap.get( partId );
             MessageQ messageQ = vertexIdToMessageQMap.get( vertexId );
             receivingPart.receiveMessageQ( vertexId, messageQ, superStep );
@@ -330,19 +332,19 @@ public final class Worker extends ServiceImpl
         sendCommand( sendingWorker, MessageReceived );
     }
     
-    // Command: SetWorkerJob 
-    synchronized public void setWorkerJob( WorkerJob workerJob, boolean isEc2 )
+    // Command: SetJob 
+    synchronized public void setJob( Job job, boolean isEc2 )
     {
         superStep = -1L;
-        this.workerJob = workerJob;
-        String jobDirectoryName = workerJob.getJobDirectoryName();
+        this.job = job;
+        String jobDirectoryName = job.getJobDirectoryName();
         fileSystem = makeFileSystem( isEc2, jobDirectoryName );
-        workerJob.setFileSystem( fileSystem );
-        Command command = new WorkerJobSet( myWorkerNum );
+        job.setFileSystem( fileSystem );
+        Command command = new JobSet( myWorkerNum );
         masterProxy.execute( command );
      }
     
-    // Command: SetWorkerJob 
+    // Command: SetJob 
     synchronized public void setWorkerMap( Map<Integer, Service> integerToWorkerMap )
     {
         this.workerNumToWorkerMap = integerToWorkerMap;
@@ -378,7 +380,7 @@ public final class Worker extends ServiceImpl
     public void writeWorkerOutputFile()
     {        
     	//System.out.println( " inside worker.writeWorkerOutputFile() ") ; 
-        workerJob.makeOutputFile( this );        
+        job.makeOutputFile( this );        
         Command command = new CommandComplete( myWorkerNum );
         masterProxy.execute( command );
     }
@@ -401,8 +403,8 @@ public final class Worker extends ServiceImpl
         superStep++;
         partIterator = new PartIterator( partSet.iterator() ); // initialize thread-safe Part iterator       
         numWorkingComputeThreads.set( computeThreads.length );
-        problemAggregator = workerJob.makeProblemAggregator(); // construct new problem aggregator for this step
-        stepAggregator    = workerJob.makeStepAggregator(); // construct new step aggregator
+        problemAggregator = job.makeProblemAggregator(); // construct new problem aggregator for this step
+        stepAggregator    = job.makeStepAggregator(); // construct new step aggregator
         deltaNumVertices = 0;
                 
         for ( int i = 0; i < computeThreads.length; i++ )
@@ -508,7 +510,7 @@ public final class Worker extends ServiceImpl
     
     public void output()
     {
-        workerJob.makeOutputFile( this );
+        job.makeOutputFile( this );
         Command command = new CommandComplete( myWorkerNum );
         masterProxy.execute( command );   
     }

@@ -1,7 +1,5 @@
 package system;
 
-import static java.lang.System.out;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,13 +45,13 @@ public class ComputeThread extends Thread
             }
             catch ( InterruptedException ignore ) {}
             
-            combiner = worker.getWorkerJob().getCombiner();
+            combiner = worker.getJob().getCombiner();
 
             // compute parts of a superstep until there are no more parts
             boolean thereIsANextStep =  false;
             workerNumToVertexIdToMessageQMapMap = new HashMap<Integer, Map<Object, MessageQ>>();
-            Aggregator outputStepAggregator     = worker.getWorkerJob().makeStepAggregator();
-            Aggregator outputProblemAggregator  = worker.getWorkerJob().makeProblemAggregator();
+            Aggregator outputStepAggregator     = worker.getJob().makeStepAggregator();
+            Aggregator outputProblemAggregator  = worker.getJob().makeProblemAggregator();
             deltaNumVertices = 0;
             PartIterator partIterator = worker.getPartIterator();
             for ( Part part = partIterator.getPart(); part != null; part = partIterator.getPart() )

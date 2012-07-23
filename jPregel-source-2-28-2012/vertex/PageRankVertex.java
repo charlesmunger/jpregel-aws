@@ -53,7 +53,7 @@ public class PageRankVertex extends Vertex<OutEdge, Double>
         } 
         else 
         { 
-                voteToHalt() ; 
+//                voteToHalt() ; 
         }
     }
 

@@ -71,10 +71,10 @@ public class TestMutabilityVertex extends Vertex<OutEdge, Integer>
          * I am a target vertex discovered a shorter path to itself, 
          * in which case, it will send me a message.
          */   
-        if ( getSuperStep() == 3 )
-        {
-            voteToHalt(); 
-        }
+//        if ( getSuperStep() == 3 )
+//        {
+//            voteToHalt(); 
+//        }
     }
 
     @Override

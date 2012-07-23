@@ -106,7 +106,7 @@ public class EuclideanShortestPathVertex extends Vertex<Point2D.Float, Float>
          * I am a target vertex discovered a shorter path to itself, 
          * in which case, it will send me a message.
          */   
-        voteToHalt();  
+//        voteToHalt();  
     }
 
     @Override

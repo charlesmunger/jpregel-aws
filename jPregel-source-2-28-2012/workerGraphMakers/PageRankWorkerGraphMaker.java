@@ -14,7 +14,7 @@ import system.FileSystem;
 import system.GraphMaker;
 import system.Vertex;
 import system.Worker;
-import system.WorkerJob;
+import system.Job;
 
 public class PageRankWorkerGraphMaker implements GraphMaker 
 {
@@ -27,10 +27,10 @@ public class PageRankWorkerGraphMaker implements GraphMaker
         {
     //        int fis_read = 0 ; 
             int workerNum       = worker.getWorkerNum();
-            WorkerJob workerJob = worker.getWorkerJob();
-            FileSystem fileSystem = workerJob.getFileSystem();
-            Combiner combiner     = workerJob.getCombiner();
-            Vertex vertexFactory  = workerJob.getVertexFactory();
+            Job job = worker.getJob();
+            FileSystem fileSystem = job.getFileSystem();
+            Combiner combiner     = job.getCombiner();
+            Vertex vertexFactory  = job.getVertexFactory();
             BufferedReader bufferedReader = null ; 
             DataInputStream dataInputStream =null ; 
             FileInputStream fileInputStream = null ; 
@@ -64,7 +64,7 @@ public class PageRankWorkerGraphMaker implements GraphMaker
             for ( String line; ( line = bufferedReader.readLine() ) != null; numVertices++ )
             {
                 Vertex vertex = vertexFactory.make( line, combiner );
-//                worker.addVertex( vertex, workerJob.getPartId( vertex ), line );
+//                worker.addVertex( vertex, job.getPartId( vertex ), line );
                 worker.addVertex( vertex, line );
             }
 //            if(fis_read == 1)

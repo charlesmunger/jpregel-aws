@@ -88,7 +88,7 @@ public class ShortestPathVertex extends Vertex<OutEdge, Integer>
          * I am a target vertex discovers a shorter path to itself, 
          * in which case, it will send me a message.
          */   
-        voteToHalt(); 
+//        voteToHalt(); 
     }
 
     @Override

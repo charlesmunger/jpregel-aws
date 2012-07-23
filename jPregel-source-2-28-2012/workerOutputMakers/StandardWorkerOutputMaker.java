@@ -59,6 +59,5 @@ public class StandardWorkerOutputMaker implements WorkerWriter
             exception.printStackTrace();
             exit( 1 );
         }
-	    //System.out.println("StandardWorkerOutputMaker.write()  exiting") ; 
     }
 }

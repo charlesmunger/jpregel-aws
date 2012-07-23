@@ -22,10 +22,12 @@ public class Job implements Serializable
     private       Aggregator stepAggregator    = new NullAggregator();
     private       Aggregator problemAggregator = new NullAggregator();
     protected final Vertex   vertexFactory;
-    private final WorkerWriter workerWriter;
-    private final GraphMaker workerGraphMaker;
+    protected final WorkerWriter workerWriter;
+    protected final GraphMaker workerGraphMaker;
     private final MasterGraphMaker masterGraphMaker;
     private final Writer writer;
+    
+    protected FileSystem fileSystem;
 
     /*
      * @param numParts - this is a Job attribute so that we can conveniently 
@@ -68,11 +70,17 @@ public class Job implements Serializable
         writer                = job.getWriter();
     }  
     
-    public Combiner getCombiner()      { return combiner; }
+    public Combiner   getCombiner()      { return combiner; }
     
-    public int      getNumParts()      { return numParts; }
+    public FileSystem getFileSystem()    { return fileSystem; }
     
-    public Vertex   getVertexFactory() { return vertexFactory; }
+    public int        getNumParts()      { return numParts; }
+    
+//    public int        getPartId( Vertex vertex ) { return getPartId( vertex.getVertexId() ); }
+    
+    public int        getPartId( Object vertexId ) { return vertexFactory.getPartId( vertexId, getNumParts() ); }
+    
+    public Vertex     getVertexFactory() { return vertexFactory; }
     
     public void setProblemAggregator( Aggregator problemAggregator ) { this.problemAggregator = problemAggregator; }
 
@@ -100,15 +108,22 @@ public class Job implements Serializable
      * 
      * @return the WorkerJob associated with this Job
      */
-    WorkerJob    getWorkerJob()             { return new WorkerJob( this ); }
+//    WorkerJob    getWorkerJob()             { return new WorkerJob( this ); }
     
     WorkerWriter getWorkerWriter()          { return workerWriter; }
     
     Writer       getWriter()                { return writer; }
-
-    Aggregator   makeStepAggregator()       { return stepAggregator.make(); }
     
-    Aggregator   makeProblemAggregator()    { return problemAggregator.make(); }
+    /*
+     * @return the number of vertices that were constructed.
+     */
+    public int  makeGraph( Worker worker )      { return workerGraphMaker.makeGraph( worker ); }
+    
+    public void makeOutputFile( Worker worker ) { workerWriter.write( fileSystem, worker ); }
+
+    Aggregator  makeStepAggregator()            { return stepAggregator.make(); }
+    
+    Aggregator  makeProblemAggregator()         { return problemAggregator.make(); }
     
     /*
      * Process Result
@@ -132,6 +147,8 @@ public class Job implements Serializable
     {
         masterGraphMaker.make( fileSystem, workerSetSize );
     }
+    
+    void setFileSystem( FileSystem fileSystem ) { this.fileSystem = fileSystem; }
     
     public String toString()
     {

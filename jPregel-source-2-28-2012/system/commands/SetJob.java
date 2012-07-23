@@ -4,18 +4,18 @@ import jicosfoundation.Command;
 import jicosfoundation.Proxy;
 import jicosfoundation.ServiceImpl;
 import system.Worker;
-import system.WorkerJob;
+import system.Job;
 
 /**
  *
  * @author Pete Cappello
  */
-public class SetWorkerJob implements Command
+public class SetJob implements Command
 {
-    private WorkerJob workerJob;
+    private Job workerJob;
     private boolean isEc2;
     
-    public SetWorkerJob( WorkerJob workerJob, boolean isEc2 )
+    public SetJob( Job workerJob, boolean isEc2 )
     {
         this.workerJob = workerJob;
         this.isEc2 = isEc2;
@@ -28,6 +28,6 @@ public class SetWorkerJob implements Command
     public void execute( ServiceImpl serviceImpl ) throws Exception 
     {
         Worker worker = (Worker) serviceImpl;
-        worker.setWorkerJob( workerJob, isEc2 );
+        worker.setJob( workerJob, isEc2 );
     }
 }

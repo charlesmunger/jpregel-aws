@@ -4,21 +4,38 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
+// TODO  Implement topology mutations:
+// * - Refactor code to work with stepToInboxMap instead of superstepToMessageQMap.
+// * - Put AddEdge messageQ in Inbox.
+// * - Design and implement Vertex AddEdge conflict "handler". Use combiner concept, where feasible.
+// * - Put RemoveEdge messageQ in Inbox.
+// * - Design and implement Vertex RemoveEdge conflict "handler". Use combiner concept, where feasible.
+// * - Put AddVertex messageQ in Inbox. This is tricky, since the Vertex typically does not exist. If it does, it is a conflict. 
+// *    Have Part add 1st, and let that Vertex resolve subsequent conflicts?
+// * - Design and implement Vertex AddVertex conflict "handler". Use combiner concept. where feasible.
+// * - Put RemoveVertex message in Inbox. Use combiners to resolve multiple requests. 
+// *   How to handle request where no such Vertex exists?
+// * - Design and implement Vertex AddVertex conflict "handler". Use combiner concept, where feasible.
+// * 
 /**
- * Implementation of topology mutations:
- * - Refactor code to work with stepToInboxMap instead of superstepToMessageQMap.
- * - Put AddEdge messageQ in Inbox.
- * - Design and implement Vertex AddEdge conflict "handler". Use combiner concept, where feasible.
- * - Put RemoveEdge messageQ in Inbox.
- * - Design and implement Vertex RemoveEdge conflict "handler". Use combiner concept, where feasible.
- * - Put AddVertex messageQ in Inbox. This is tricky, since the Vertex typically does not exist. If it does, it is a conflict. 
- *    Have Part add 1st, and let that Vertex resolve subsequent conflicts?
- * - Design and implement Vertex AddVertex conflict "handler". Use combiner concept. where feasible.
- * - Put RemoveVertex message in Inbox. Use combiners to resolve multiple requests. 
- *   How to handle request where no such Vertex exists?
- * - Design and implement Vertex AddVertex conflict "handler". Use combiner concept, where feasible.
- * 
  * !! Is it safe & faster to make MessageQ thread-safe & remove synchronization of receive methods?
+ * 
+ * I currently am of the opinion that vertex does not need the bit of state 
+ * explicitly designating it active. Instead I will:
+ * 
+ *  1. make it the responsibility of the graph maker to add source vertices in 
+ *     the active set for the initial super step;
+ *  2. thereafter regard a vertex as active during superStep s if and only if 
+ *     its MessageQ for superStep s is nonempty.
+ * 
+ * The opinion assumes that a vertex has no basis for activity unless it 
+ * receives a message; otherwise nothing has changed since it last sent messages 
+ * to other vertices. This assumption implies that changing the superStep does 
+ * not in and of itself constitute a state change for the vertex. If I encounter 
+ * an algorithm that falsifies this assumption, I will revise this view. 
+ * 
+ * In the meantime, a vertex'x compute method no longer needs to vote to halt.
+ * This method thus has been removed from the API.
  * 
  * When a vertex completes the compute method for a super step, it may not have
  * received all its messages for the next super step. When the compute method
@@ -43,8 +60,8 @@ abstract public class Vertex<OutEdgeType, MessageValueType> implements java.io.S
     private Map<Object, OutEdgeType> outEdgeMap;
     private NonNullMap<MessageValueType> superstepToMessageQMap;
     private NonNullMap<MessageValueType> superstepToInboxMap;
-    private boolean currentStepIsActive = true;
-    private boolean nextStepIsActive = true;    
+//    private boolean currentStepIsActive = true;
+//    private boolean nextStepIsActive = true;    
     private Aggregator outputStepAggregator;
     private Aggregator outputProblemAggregator;
     private ComputeInput computeInput;
@@ -150,14 +167,14 @@ abstract public class Vertex<OutEdgeType, MessageValueType> implements java.io.S
      * vertex is activated only if it receives a message, in which case it
      * must explicitly deactivate, when it again wishes to halt.
      */
-    synchronized protected void voteToHalt()
-    { 
-        MessageQ messageQ = superstepToMessageQMap.get( getSuperStep() + 1 );
-        if ( messageQ.isEmpty() )
-        {
-            nextStepIsActive = false;
-        }
-    }   
+//    synchronized protected void voteToHalt()
+//    { 
+//        MessageQ messageQ = superstepToMessageQMap.get( getSuperStep() + 1 );
+//        if ( messageQ.isEmpty() )
+//        {
+//            nextStepIsActive = false;
+//        }
+//    }   
     /* _________________________________________
      * 
      *               End API
@@ -167,12 +184,11 @@ abstract public class Vertex<OutEdgeType, MessageValueType> implements java.io.S
     // TODO eliminate this method
     synchronized void advanceStep()
     {  
-        MessageQ messageQ = superstepToMessageQMap.get( getSuperStep() );
-        if ( ! messageQ.isEmpty() )
-        {
-            nextStepIsActive = true;
-        }
-        currentStepIsActive = nextStepIsActive;
+//        MessageQ messageQ = superstepToMessageQMap.get( getSuperStep() );
+//        if ( ! messageQ.isEmpty() )
+//        {
+//            nextStepIsActive = true;
+//        }
         numMessagesSent = 0;
     }
     
@@ -181,10 +197,8 @@ abstract public class Vertex<OutEdgeType, MessageValueType> implements java.io.S
     synchronized Aggregator getOutputProblemAggregator() { return outputProblemAggregator; }
     
     synchronized Aggregator getOutputStepAggregator() { return outputStepAggregator; }
-    
-    synchronized boolean isActive() { return currentStepIsActive; }
-    
-    synchronized public boolean isNextStepActive() { return nextStepIsActive; }
+        
+//    synchronized public boolean isNextStepActive() { return nextStepIsActive; }
     
     void receiveMessage( Message newMessage, long superStep )
     { 

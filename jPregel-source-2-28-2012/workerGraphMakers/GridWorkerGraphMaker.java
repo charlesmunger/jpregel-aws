@@ -29,7 +29,7 @@ import system.FileSystem;
 import system.GraphMaker;
 import system.Vertex;
 import system.Worker;
-import system.WorkerJob;
+import system.Job;
 import vertex.EuclideanShortestPathVertex;
 
 /**
@@ -41,10 +41,10 @@ public class GridWorkerGraphMaker implements GraphMaker
     public int makeGraph( Worker worker ) 
     {
         int workerNum       = worker.getWorkerNum();
-        WorkerJob workerJob = worker.getWorkerJob();
-        FileSystem fileSystem = workerJob.getFileSystem();
-        Combiner combiner     = workerJob.getCombiner();
-        Vertex vertexFactory  = workerJob.getVertexFactory();
+        Job job = worker.getJob();
+        FileSystem fileSystem = job.getFileSystem();
+        Combiner combiner     = job.getCombiner();
+        Vertex vertexFactory  = job.getVertexFactory();
         int numVertices = 0;
         
         FileInputStream fileInputStream = null;

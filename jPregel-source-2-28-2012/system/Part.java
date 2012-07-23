@@ -11,7 +11,8 @@ public final class Part
 {
     private final int partId;
     private final Worker worker; // to which this part is assigned
-    private final WorkerJob workerJob;
+//    private final WorkerJob job;
+    private final Job job;
     
     private Map<Object, Vertex> vertexIdToVertexMap = Collections.synchronizedMap( new HashMap<Object, Vertex>() );   
     private SuperStepToActiveSetMap superstepToActiveSetMap = new SuperStepToActiveSetMap();
@@ -22,7 +23,8 @@ public final class Part
     {
         this.partId = partId;
         this.worker = worker;
-        workerJob = worker.getWorkerJob();
+        job = worker.getJob();
+//        job = worker.getJob();
     }
     
     /*
@@ -51,46 +53,30 @@ public final class Part
     {
         this.computeThread = computeThread;
         this.superStep = superStep;
-        int numActiveVertices = 0;
         int numMessagesSent   = 0;
-        Aggregator outputStepAggregator    = workerJob.makeStepAggregator();
-        Aggregator outputProblemAggregator = workerJob.makeProblemAggregator();
-//        for ( Vertex vertex : vertexIdToVertexMap.values() )
+        Aggregator outputStepAggregator    = job.makeStepAggregator();
+        Aggregator outputProblemAggregator = job.makeProblemAggregator();
         Set<Vertex> currentActiveSet = superstepToActiveSetMap.get( superStep     );
         Set<Vertex>    nextActiveSet = superstepToActiveSetMap.get( superStep + 1 );
         for ( Vertex vertex : currentActiveSet )
         {
-//            vertex.advanceStep();
-//            if ( vertex.isActive() )
-//            {
-//                vertex.setInput( computeInput );
-//                vertex.compute();
-//                vertex.removeMessageQ( vertex.getSuperStep() ); // MessageQ is garbage
-//                outputStepAggregator.aggregate(    vertex.getOutputStepAggregator()    );
-//                outputProblemAggregator.aggregate( vertex.getOutputProblemAggregator() );
-//                if ( vertex.isNextStepActive() )
-//                {
-//                    numActiveVertices++;
-//                }
-//                numMessagesSent += vertex.getNumMessagesSent();
-//            }
-//            System.out.println("Part.doSuperStep: step: " + superStep + " active vertex: " + vertex.getVertexId() );
             vertex.advanceStep(); // TODO Eliminate this method call
             vertex.setInput( computeInput );
             vertex.compute();
             vertex.removeMessageQ( superStep ); // MessageQ is garbage
             outputStepAggregator.aggregate(    vertex.getOutputStepAggregator()    );
             outputProblemAggregator.aggregate( vertex.getOutputProblemAggregator() );
-            if ( vertex.isNextStepActive() )
-            {
-                numActiveVertices++;
-                nextActiveSet.add( vertex );
-                
-            }
+//            if ( vertex.isNextStepActive() )
+//            {
+//                numActiveVertices++;
+//                nextActiveSet.add( vertex );
+//                
+//            }
             numMessagesSent += vertex.getNumMessagesSent();
         }
         superstepToActiveSetMap.remove( superStep ); // current activeSet now is garbage
-        boolean thereIsNextStep = numMessagesSent > 0 || numActiveVertices > 0;
+//        boolean thereIsNextStep = numMessagesSent > 0 || numActiveVertices > 0;
+        boolean thereIsNextStep = numMessagesSent > 0;
         ComputeOutput computeOutput = new ComputeOutput( thereIsNextStep, outputStepAggregator, outputProblemAggregator );
         return computeOutput;
     }
@@ -138,7 +124,7 @@ public final class Part
     
     void sendMessage( Object vertexId, Message message, long superStep )
     {
-        int receivingPartId = workerJob.getPartId( vertexId );
+        int receivingPartId = job.getPartId( vertexId );
         if ( receivingPartId == this.partId )
         {
             receiveMessage( vertexId, message, superStep );

@@ -64,7 +64,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         {
             CommandComplete.class,
             InputFileProcessingComplete.class,
-            WorkerJobSet.class,
+            JobSet.class,
             WorkerMapSet.class,
             SuperStepComplete.class
         }
@@ -149,23 +149,23 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         JobRunData jobRunData = new JobRunData(job, integerToWorkerMap.size());
 
         // broadcaast to workers: set your Job & FileSystem
-        WorkerJob workerJob = job.getWorkerJob();
+//        WorkerJob workerJob = job.getWorkerJob();
         String jobDirectoryName = job.getJobDirectoryName();
         FileSystem fileSystem = makeFileSystem(isEc2, jobDirectoryName);
         numUnfinishedWorkers = integerToWorkerMap.size();
         commandExeutionIsComplete = false;
-        Command command = new SetWorkerJob(workerJob, isEc2);
-        System.out.println("Master.run: about to broadcast SetWorkerJob command.");
+        Command command = new SetJob(job, isEc2);
+        System.out.println("Master.run: about to broadcast SetJob command.");
         broadcast(command, this);
-        System.out.println("Master.run: finished broadcast of SetWorkerJob command.");
-        // while workers SetWorkerJob, read Job input file, write Worker input files
+        System.out.println("Master.run: finished broadcast of SetJob command.");
+        // while workers SetJob, read Job input file, write Worker input files
         job.readJobInputFile(fileSystem, integerToWorkerMap.size());
 
-        // wait for all workers to SetWorkerJob before proceeding
+        // wait for all workers to SetJob before proceeding
         try {
             synchronized (this) {
                 if (!commandExeutionIsComplete) {
-                    wait(); // until numUnfinishedWorkers == 0 for SetWorkerJob
+                    wait(); // until numUnfinishedWorkers == 0 for SetJob
                 }
             }
         } catch (InterruptedException ignore) {
@@ -177,7 +177,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         jobRunData.setEndTimeReadWorkerInputFile();
 
         // begin computation phase
-        problemAggregator = workerJob.makeProblemAggregator();
+        problemAggregator = job.makeProblemAggregator();
         long superStep = 0;
         long startStepTime = System.currentTimeMillis(); // Progress monitoring
         long maxMemory = Runtime.getRuntime().maxMemory();
@@ -186,7 +186,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
             thereIsANextStep = false;           // until a Worker says otherwise
             ComputeInput computeInput = new ComputeInput(stepAggregator, problemAggregator, numVertices);
             Command startSuperStep = new StartSuperStep(computeInput);
-            stepAggregator = workerJob.makeStepAggregator(); // initialize stepAggregator
+            stepAggregator = job.makeStepAggregator(); // initialize stepAggregator
             barrierComputation(startSuperStep); // broadcaast to workers: start a super step
             // BEGIN Progress monitoring
             if (superStep % 1 == 0) 
@@ -277,17 +277,14 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         processAcknowledgement();
     }
 
-    // Command: WorkerJobSet
-    public void workerJobSet(int workerNum) {
-        processAcknowledgement();
-    }
+    // Command: JobSet
+    public void jobSet(int workerNum) { processAcknowledgement(); }
 
     // Command: WorkerMapSet
-    public void workerMapSet() {
-        processAcknowledgement();
-    }
+    public void workerMapSet() { processAcknowledgement(); }
 
-    synchronized protected void barrierComputation(Command command) {
+    synchronized protected void barrierComputation(Command command)
+    {
         numUnfinishedWorkers = integerToWorkerMap.size();
         commandExeutionIsComplete = false;
         broadcast(command, this);
@@ -295,8 +292,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
             if (!commandExeutionIsComplete) {
                 wait(); // until all Workers complete
             }
-        } catch (InterruptedException ignore) {
-        }
+        } catch (InterruptedException ignore) {}
     }
 
     synchronized private void processAcknowledgement() {
