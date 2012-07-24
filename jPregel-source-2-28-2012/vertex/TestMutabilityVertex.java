@@ -17,7 +17,7 @@ import system.Vertex;
  *
  * @author Pete Cappello
  */
-public class TestMutabilityVertex extends Vertex<OutEdge, Integer>
+public class TestMutabilityVertex extends Vertex<Integer, OutEdge, Integer>
 {
     public TestMutabilityVertex( Integer vertexId, Map<Object, OutEdge> outEdgeMap, Combiner<Integer> combiner )
     {

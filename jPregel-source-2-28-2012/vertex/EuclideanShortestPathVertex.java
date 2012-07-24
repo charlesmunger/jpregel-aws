@@ -22,7 +22,7 @@ import system.aggregators.IntegerSumAggregator;
  * 
  * @author Pete Cappello
  */
-public final class EuclideanShortestPathVertex extends Vertex<Point2D.Float, Float>
+public final class EuclideanShortestPathVertex extends Vertex<Point2D.Float, Point2D.Float, Float>
 {    
     public EuclideanShortestPathVertex( Point2D.Float vertexId, Map<Object, Point2D.Float> outEdgeMap, Combiner combiner )
     {
@@ -105,20 +105,20 @@ public final class EuclideanShortestPathVertex extends Vertex<Point2D.Float, Flo
     public String output() 
     {
         StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append( (Point2D.Float) getVertexId() );
+        stringBuffer.append( getVertexId() );
         stringBuffer.append( " : ");
-        stringBuffer.append( (Point2D.Float) ((Message)  getVertexValue() ).getVertexId() );
+        stringBuffer.append( (Point2D.Float) ((Message<Float>)  getVertexValue() ).getVertexId() );
         stringBuffer.append( " --- ");
-        stringBuffer.append( (Float) ((Message)  getVertexValue() ).getMessageValue() );
+        stringBuffer.append( ((Message<Float>)  getVertexValue() ).getMessageValue() );
         return new String( stringBuffer );
     }
     
     /*
      * Would prefer to map square subgrids to a part.
      */
-    public int getPartId( Object vertexId, int numParts )
+    public int getPartId( Point2D.Float vertexId, int numParts )
     {
-        int row = (int) ((Point2D.Float) vertexId).getX();
+        int row = (int) vertexId.getX();
         return row % numParts;
     }
     
@@ -130,8 +130,8 @@ public final class EuclideanShortestPathVertex extends Vertex<Point2D.Float, Flo
     
     private float distance( Point2D.Float targetVertexId )
     {
-        double x1 = ((Point2D.Float) getVertexId()).getX();
-        double y1 = ((Point2D.Float) getVertexId()).getY();
+        double x1 = getVertexId().getX();
+        double y1 = getVertexId().getY();
         double x2 = targetVertexId.getX();
         double y2 = targetVertexId.getY();
         double deltaX = x1 - x2;

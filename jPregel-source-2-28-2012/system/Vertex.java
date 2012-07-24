@@ -48,10 +48,10 @@ import java.util.Map;
  *
  * @author Peter Cappello
  */
-abstract public class Vertex<OutEdgeType, MessageValueType> implements java.io.Serializable
+abstract public class Vertex<VertexIdType, OutEdgeType, MessageValueType> implements java.io.Serializable
 {
     // TODO vertexID: Use generics to avoid casts
-    private final Object vertexId;
+    private final VertexIdType vertexId;
     
     // TODO: Vertex: Eliminate Combiner field; get from Part 
     private final Combiner combiner;
@@ -69,7 +69,7 @@ abstract public class Vertex<OutEdgeType, MessageValueType> implements java.io.S
         combiner = null;
     }
                       
-    public Vertex( Object vertexId, Map<Object, OutEdgeType> outEdgeMap, Combiner combiner )
+    public Vertex( VertexIdType vertexId, Map<Object, OutEdgeType> outEdgeMap, Combiner combiner )
     {
         this.vertexId   = vertexId;
         this.outEdgeMap = outEdgeMap;
@@ -82,11 +82,11 @@ abstract public class Vertex<OutEdgeType, MessageValueType> implements java.io.S
      *               Begin API
      * _________________________________________
      */   
-    synchronized protected void addEdge( Object target, OutEdgeType outEdge ) { outEdgeMap.put( target, outEdge ); }
+    synchronized protected void addEdge( VertexIdType target, OutEdgeType outEdge ) { outEdgeMap.put( target, outEdge ); }
 
-    synchronized protected void addEdge( Object vertexId, Object target, OutEdgeType outEdge ) { }
+    synchronized protected void addEdge( VertexIdType vertexId, Object target, OutEdgeType outEdge ) { }
 
-    synchronized protected void addVertex( Object vertexId, Object vertexValue ) { /* combiner */ }
+    synchronized protected void addVertex( VertexIdType vertexId, Object vertexValue ) { /* combiner */ }
 
     protected void aggregateOutputProblemAggregator( Aggregator aggregator ) { part.aggregateOutputProblemAggregator( aggregator ); }
 
@@ -128,36 +128,32 @@ abstract public class Vertex<OutEdgeType, MessageValueType> implements java.io.S
     
     synchronized public int getOutEdgeMapSize() { return outEdgeMap.size(); }
     
-    public int getPartId( Object vertexId, int numParts ) 
+    public int getPartId( VertexIdType vertexId, int numParts ) 
     { 
         return vertexId.hashCode() % numParts; 
     }
     
     synchronized protected long getSuperStep() { return part.getSuperStep(); }
     
-    public Object getVertexId() { return vertexId; }
+    public VertexIdType getVertexId() { return vertexId; }
         
     public Object getVertexValue() { return vertexValue; }
     
     public abstract Vertex make( String line, Combiner combiner );
     
-    synchronized protected OutEdgeType removeEdge( Object vertexId ) { return outEdgeMap.remove( vertexId ); }
+    synchronized protected OutEdgeType removeEdge( VertexIdType vertexId ) { return outEdgeMap.remove( vertexId ); }
 
-    synchronized protected void removeEdge( Object vertexId, Object targetVertexId ) { }
+    synchronized protected void removeEdge( VertexIdType vertexId, Object targetVertexId ) { }
     
     synchronized protected void removeVertex() { part.removeVertex( vertexId ); }
     
-    synchronized protected void removeVertex( Object vertexId ) { part.removeVertex( vertexId ); }
+    synchronized protected void removeVertex( VertexIdType vertexId ) { part.removeVertex( vertexId ); }
 
     protected void sendMessage( Object targetVertexId, Message message )
     {
         part.sendMessage( targetVertexId, message, getSuperStep() + 1 ); 
     }
-    
-//    protected void setOutputStepAggregator( Aggregator outputStepAggregator ) { this.outputStepAggregator = outputStepAggregator; }
-//    
-//    protected void setOutputProblemAggregator( Aggregator outputProblemAggregator ) { this.outputProblemAggregator = outputProblemAggregator; }
-    
+        
     protected void setVertexValue( Object vertexValue ) { this.vertexValue = vertexValue; }
     
     /* vertex deactivates itself by voting to halt.

@@ -11,7 +11,7 @@ import system.Message;
 import system.OutEdge;
 import system.Vertex;
 
-public class PageRankVertex extends Vertex<OutEdge, Double> 
+public class PageRankVertex extends Vertex<Integer, OutEdge, Double> 
 {
     public PageRankVertex( Integer vertexId, Map<Object, OutEdge> outEdgeMap, Combiner<Integer> combiner )
     {

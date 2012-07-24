@@ -1,6 +1,5 @@
 package system;
  
-import static java.lang.System.out;
 import java.util.*;
 
 /**
@@ -20,12 +19,9 @@ public final class Part
     private ComputeThread computeThread;
     private long superStep;
     private ComputeInput computeInput;
+    // The following 3 parameters are modified by each vertex during its compute method
     private Aggregator outputProblemAggregator;
     private Aggregator outputStepAggregator;
-    /*
-     * numMessagesSent is used by the Vertex.compute method: 
-     * The set of vertices must have their compute methods invoked sequentially.
-     */
     private int numMessagesSent; 
     
     Part( int partId, Worker worker )
@@ -98,7 +94,7 @@ public final class Part
         // BEGIN DEBUG
         if ( vertex == null )
         {
-            out.println("Part.receiveMessage: vertexId: " + vertexId );
+            System.out.println("Part.receiveMessage: vertexId: " + vertexId );
         }
         // END DEBUG
         vertex.receiveMessage( message, superStep );

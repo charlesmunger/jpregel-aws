@@ -35,7 +35,6 @@ public class StandardWorkerOutputMaker implements WorkerWriter
                 for ( Vertex vertex : part.getVertices() )
                 {
                     // TODO: Does not seem to create out directory and files for EuclideanShortestPathLocalClient
-//                    System.out.println("StandardWorkerOutputMaker: " + vertex.output() ) ;  
                     bufferedWriter.write( vertex.output() );
                     bufferedWriter.newLine();
                 }

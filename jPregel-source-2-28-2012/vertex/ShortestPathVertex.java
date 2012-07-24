@@ -21,7 +21,7 @@ import system.aggregators.IntegerSumAggregator;
  * 
  * @author Pete Cappello
  */
-public final class ShortestPathVertex extends Vertex<OutEdge, Integer>
+public final class ShortestPathVertex extends Vertex<Integer, OutEdge, Integer>
 {
     public ShortestPathVertex( Integer vertexId, Map<Object, OutEdge> outEdgeMap, Combiner<Integer> combiner )
     {
