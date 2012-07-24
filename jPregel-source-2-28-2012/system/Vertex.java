@@ -52,23 +52,17 @@ abstract public class Vertex<OutEdgeType, MessageValueType> implements java.io.S
 {
     // TODO vertexID: Use generics to avoid casts
     private final Object vertexId;
+    
+    // TODO: Vertex: Eliminate Combiner field; get from Part 
     private final Combiner combiner;
-    private transient Part part;
+    private Part part;
     
     // vertex state
     private Object vertexValue;
     private Map<Object, OutEdgeType> outEdgeMap;
     private NonNullMap<MessageValueType> superstepToMessageQMap;
     private NonNullMap<MessageValueType> superstepToInboxMap;
-//    private boolean currentStepIsActive = true;
-//    private boolean nextStepIsActive = true;    
-    private Aggregator outputStepAggregator;
-    private Aggregator outputProblemAggregator;
-    private ComputeInput computeInput;
-    
-    // coordination
-    private int numMessagesSent;
-    
+            
     public Vertex()
     {
         vertexId = null;
@@ -94,15 +88,19 @@ abstract public class Vertex<OutEdgeType, MessageValueType> implements java.io.S
 
     synchronized protected void addVertex( Object vertexId, Object vertexValue ) { /* combiner */ }
 
+    protected void aggregateOutputProblemAggregator( Aggregator aggregator ) { part.aggregateOutputProblemAggregator( aggregator ); }
+
+    protected void aggregateOutputStepAggregator( Aggregator aggregator ) { part.aggregateOutputStepAggregator( aggregator ); }
+    
     abstract protected void compute();
     
     abstract protected boolean isSource();
 
     abstract public String output();
     
-    protected Aggregator getInputStepAggregator()    { return computeInput.getStepAggregator();    }
+    protected Aggregator getInputStepAggregator()    { return part.getComputeInput().getStepAggregator();    }
     
-    protected Aggregator getInputProblemAggregator() { return computeInput.getProblemAggregator(); }
+    protected Aggregator getInputProblemAggregator() { return part.getComputeInput().getProblemAggregator(); }
 
     synchronized protected Iterator<Message<MessageValueType>> getMessageIterator()
     {
@@ -124,7 +122,7 @@ abstract public class Vertex<OutEdgeType, MessageValueType> implements java.io.S
         return messageQ; 
     }
     
-    protected int getNumVertices() { return computeInput.getNumVertices(); }
+    protected int getNumVertices() { return part.getComputeInput().getNumVertices(); }
     
     synchronized protected Collection<OutEdgeType> getOutEdgeValues() { return outEdgeMap.values(); }
     
@@ -153,13 +151,12 @@ abstract public class Vertex<OutEdgeType, MessageValueType> implements java.io.S
 
     protected void sendMessage( Object targetVertexId, Message message )
     {
-        numMessagesSent++;
         part.sendMessage( targetVertexId, message, getSuperStep() + 1 ); 
     }
     
-    protected void setOutputStepAggregator( Aggregator outputStepAggregator ) { this.outputStepAggregator = outputStepAggregator; }
-    
-    protected void setOutputProblemAggregator( Aggregator outputProblemAggregator ) { this.outputProblemAggregator = outputProblemAggregator; }
+//    protected void setOutputStepAggregator( Aggregator outputStepAggregator ) { this.outputStepAggregator = outputStepAggregator; }
+//    
+//    protected void setOutputProblemAggregator( Aggregator outputProblemAggregator ) { this.outputProblemAggregator = outputProblemAggregator; }
     
     protected void setVertexValue( Object vertexValue ) { this.vertexValue = vertexValue; }
     
@@ -181,23 +178,6 @@ abstract public class Vertex<OutEdgeType, MessageValueType> implements java.io.S
      * _________________________________________
      */
     
-    // TODO eliminate this method
-    synchronized void advanceStep()
-    {  
-//        MessageQ messageQ = superstepToMessageQMap.get( getSuperStep() );
-//        if ( ! messageQ.isEmpty() )
-//        {
-//            nextStepIsActive = true;
-//        }
-        numMessagesSent = 0;
-    }
-    
-    synchronized int getNumMessagesSent() { return numMessagesSent; }
-
-    synchronized Aggregator getOutputProblemAggregator() { return outputProblemAggregator; }
-    
-    synchronized Aggregator getOutputStepAggregator() { return outputStepAggregator; }
-        
 //    synchronized public boolean isNextStepActive() { return nextStepIsActive; }
     
     void receiveMessage( Message newMessage, long superStep )
@@ -208,8 +188,6 @@ abstract public class Vertex<OutEdgeType, MessageValueType> implements java.io.S
     void receiveMessageQ( MessageQ newMessageQ, long superStep ) { superstepToMessageQMap.get( superStep ).addAll( newMessageQ ); }
         
     void removeMessageQ( long superStep ) { superstepToMessageQMap.remove( superStep ); }
-    
-    void setInput( ComputeInput computeInput ) { this.computeInput = computeInput; }  
-                
+                    
     void setPart( Part part ) { this.part = part; }
 }

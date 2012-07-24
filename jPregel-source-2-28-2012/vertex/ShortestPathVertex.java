@@ -4,7 +4,6 @@ import static java.lang.System.err;
 import static java.lang.System.exit;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.StringTokenizer;
 import system.Combiner;
@@ -22,7 +21,7 @@ import system.aggregators.IntegerSumAggregator;
  * 
  * @author Pete Cappello
  */
-public class ShortestPathVertex extends Vertex<OutEdge, Integer>
+public final class ShortestPathVertex extends Vertex<OutEdge, Integer>
 {
     public ShortestPathVertex( Integer vertexId, Map<Object, OutEdge> outEdgeMap, Combiner<Integer> combiner )
     {
@@ -64,7 +63,6 @@ public class ShortestPathVertex extends Vertex<OutEdge, Integer>
                 minDistanceMessage = message;
             }
         }
-        int numSentMessages = 0;
         if ( minDistanceMessage.getMessageValue() < ((Message<Integer>) getVertexValue() ).getMessageValue() )
         {   // There is a new shorter path from the source to me
             setVertexValue( minDistanceMessage ); // update my value: the shortest path to me
@@ -77,12 +75,11 @@ public class ShortestPathVertex extends Vertex<OutEdge, Integer>
                 Message message = new Message( getVertexId(), minDistanceMessage.getMessageValue() + (Integer) edgeValue );
                 sendMessage( targetVertexId, message );
             }
-            numSentMessages = getOutEdgeMapSize();
+            
+            // aggregate number of messages sent in this step & this problem
+            aggregateOutputProblemAggregator( new IntegerSumAggregator( getOutEdgeMapSize() ));
+            aggregateOutputStepAggregator(    new IntegerSumAggregator( getOutEdgeMapSize() ));
         }
-        
-        // aggregate number of messages sent in this step & this problem
-        setOutputStepAggregator(    new IntegerSumAggregator( numSentMessages ) );
-        setOutputProblemAggregator( new IntegerSumAggregator( numSentMessages ) );            
         
         /* This vote will be overturned, if during this step, a vertex for whom 
          * I am a target vertex discovers a shorter path to itself, 

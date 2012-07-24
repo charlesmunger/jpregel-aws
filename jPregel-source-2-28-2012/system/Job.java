@@ -7,12 +7,12 @@ import java.io.Serializable;
  * particular kind of graph problem, as well as parameter values for a 
  * particular instance of such a graph problem.
  * 
- * The number of Workers is an attribute, not of Job, but of the JPregel environment
+ * The number of Workers is an attribute, not of Job, but of the jpregel environment
  * Whether or not a Job is run in local mode is an attribute, not of Job, but of the Client
  * 
  * @author Peter Cappello
  */
-public class Job implements Serializable
+public final class Job implements Serializable
 {
     private final String   jobName;
     private final String   jobDirectoryName;
@@ -21,13 +21,13 @@ public class Job implements Serializable
     private final Combiner combiner;
     private       Aggregator stepAggregator    = new NullAggregator();
     private       Aggregator problemAggregator = new NullAggregator();
-    protected final Vertex   vertexFactory;
-    protected final WorkerWriter workerWriter;
-    protected final GraphMaker workerGraphMaker;
+    private final Vertex   vertexFactory;
+    private final WorkerWriter workerWriter;
+    private final GraphMaker workerGraphMaker;
     private final MasterGraphMaker masterGraphMaker;
     private final Writer writer;
     
-    protected FileSystem fileSystem;
+    private FileSystem fileSystem;
 
     /*
      * @param numParts - this is a Job attribute so that we can conveniently 
@@ -102,13 +102,6 @@ public class Job implements Serializable
     GraphMaker       getWorkerGraphMaker()      { return workerGraphMaker; }
     
     MasterGraphMaker getMasterGraphMaker()      { return masterGraphMaker; }
-    
-    /*
-     * Make a WorkerJob
-     * 
-     * @return the WorkerJob associated with this Job
-     */
-//    WorkerJob    getWorkerJob()             { return new WorkerJob( this ); }
     
     WorkerWriter getWorkerWriter()          { return workerWriter; }
     

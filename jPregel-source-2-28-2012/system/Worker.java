@@ -1,13 +1,12 @@
 /*
- * To do:
- * -  Currently, when vertices are added during graph construction, a message
- *    is sent for each vertex added (as opposed to batching all such requests
- *    destined for the same worker). Is this best?
- * 
  * -  Is it worthwhile to send the Master the Worker numbers, thereby allowing
  *    the Master to avoid sending start super step commands to workers that
  *    have no active parts? Probably not worth the effort.
  */
+// TODO: Worker: Batch add vertex requests?
+//       Currently, when vertices are added during graph construction, a message
+//       is sent for each vertex added (as opposed to batching all such requests
+//       destined for the same worker). Is this best?
 package system;
 
 import static java.lang.System.err;
@@ -85,7 +84,6 @@ public final class Worker extends ServiceImpl
     private final ComputeThread[] computeThreads;
     
     private Map<Integer, Service> workerNumToWorkerMap;
-//    private WorkerJob job;
     private Job job;
     private Map<Integer, Part> partIdToPartMap = new HashMap<Integer, Part>();
     private Set<Part> partSet = new LinkedHashSet();
@@ -163,7 +161,6 @@ public final class Worker extends ServiceImpl
     int getWorkerNum( int partId )
     {
         int numWorkers = workerNumToWorkerMap.size();
-//        out.println(" Worker.getWorkerNum: " + ( ( partId % numWorkers ) + 1 ));
         return ( partId % numWorkers ) + 1;
     }
       
@@ -246,18 +243,9 @@ public final class Worker extends ServiceImpl
      */
     
     // Command: AddVertexToWorker
-//    synchronized public void addVertexToWorker( int partId, Vertex vertex, Worker sendingWorker )
-//    {
-//        addVertexToPart( partId, vertex );
-//        Command command = new AddVertexToPartComplete();
-//        sendCommand( sendingWorker, command );
-//    }
-    
-    // Command: AddVertexToWorker
     synchronized public void addVertexToWorker( int partId, String stringVertex, Service sendingWorker )
     {
         Vertex vertexFactory = job.getVertexFactory();
-//        out.println("Worker.addVertexToWorker: vertexFactory.class: "  + vertexFactory.getClass().getName());
         Combiner combiner    = job.getCombiner();
         Vertex vertex = vertexFactory.make( stringVertex, combiner );
         addVertexToPart( partId, vertex );
@@ -379,7 +367,6 @@ public final class Worker extends ServiceImpl
     // Command: WriteWorkerOutputFile
     public void writeWorkerOutputFile()
     {        
-    	//System.out.println( " inside worker.writeWorkerOutputFile() ") ; 
         job.makeOutputFile( this );        
         Command command = new CommandComplete( myWorkerNum );
         masterProxy.execute( command );

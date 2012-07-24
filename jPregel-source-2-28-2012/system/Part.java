@@ -11,20 +11,28 @@ public final class Part
 {
     private final int partId;
     private final Worker worker; // to which this part is assigned
-//    private final WorkerJob job;
     private final Job job;
     
     private Map<Object, Vertex> vertexIdToVertexMap = Collections.synchronizedMap( new HashMap<Object, Vertex>() );   
     private SuperStepToActiveSetMap superstepToActiveSetMap = new SuperStepToActiveSetMap();
+    
+    // superStep parameters
     private ComputeThread computeThread;
     private long superStep;
+    private ComputeInput computeInput;
+    private Aggregator outputProblemAggregator;
+    private Aggregator outputStepAggregator;
+    /*
+     * numMessagesSent is used by the Vertex.compute method: 
+     * The set of vertices must have their compute methods invoked sequentially.
+     */
+    private int numMessagesSent; 
     
     Part( int partId, Worker worker )
     {
         this.partId = partId;
         this.worker = worker;
         job = worker.getJob();
-//        job = worker.getJob();
     }
     
     /*
@@ -44,42 +52,33 @@ public final class Part
         }
     }
     
-    void addToActiveSet( long superStep, Vertex vertex )
-    {
-        superstepToActiveSetMap.get( superStep ).add( vertex );
-    }
+    void addToActiveSet( long superStep, Vertex vertex ) { superstepToActiveSetMap.get( superStep ).add( vertex ); }
+    
+    void aggregateOutputProblemAggregator( Aggregator aggregator ) { outputProblemAggregator.aggregate(aggregator); }
+    
+    void aggregateOutputStepAggregator( Aggregator aggregator ) { outputStepAggregator.aggregate(aggregator); }
     
     ComputeOutput doSuperStep( ComputeThread computeThread, long superStep, ComputeInput computeInput )
     {
         this.computeThread = computeThread;
         this.superStep = superStep;
-        int numMessagesSent   = 0;
-        Aggregator outputStepAggregator    = job.makeStepAggregator();
-        Aggregator outputProblemAggregator = job.makeProblemAggregator();
+        this.computeInput = computeInput;
+        numMessagesSent   = 0;
+        outputStepAggregator    = job.makeStepAggregator();
+        outputProblemAggregator = job.makeProblemAggregator();
         Set<Vertex> currentActiveSet = superstepToActiveSetMap.get( superStep     );
         Set<Vertex>    nextActiveSet = superstepToActiveSetMap.get( superStep + 1 );
         for ( Vertex vertex : currentActiveSet )
         {
-            vertex.advanceStep(); // TODO Eliminate this method call
-            vertex.setInput( computeInput );
             vertex.compute();
             vertex.removeMessageQ( superStep ); // MessageQ is garbage
-            outputStepAggregator.aggregate(    vertex.getOutputStepAggregator()    );
-            outputProblemAggregator.aggregate( vertex.getOutputProblemAggregator() );
-//            if ( vertex.isNextStepActive() )
-//            {
-//                numActiveVertices++;
-//                nextActiveSet.add( vertex );
-//                
-//            }
-            numMessagesSent += vertex.getNumMessagesSent();
         }
         superstepToActiveSetMap.remove( superStep ); // current activeSet now is garbage
-//        boolean thereIsNextStep = numMessagesSent > 0 || numActiveVertices > 0;
         boolean thereIsNextStep = numMessagesSent > 0;
-        ComputeOutput computeOutput = new ComputeOutput( thereIsNextStep, outputStepAggregator, outputProblemAggregator );
-        return computeOutput;
+        return new ComputeOutput( thereIsNextStep, outputStepAggregator, outputProblemAggregator );
     }
+    
+    ComputeInput getComputeInput() { return computeInput; }
         
     int getPartId() { return partId; }
     
@@ -90,6 +89,8 @@ public final class Part
     Map<Object, Vertex> getVertexIdToVertexMap() { return vertexIdToVertexMap; }
     
     public Collection<Vertex> getVertices() { return vertexIdToVertexMap.values(); }
+    
+    void incrementNumMessagesSent() { numMessagesSent++; }
     
     synchronized void receiveMessage( Object vertexId, Message message, long superStep )
     {
@@ -124,6 +125,7 @@ public final class Part
     
     void sendMessage( Object vertexId, Message message, long superStep )
     {
+        numMessagesSent++;
         int receivingPartId = job.getPartId( vertexId );
         if ( receivingPartId == this.partId )
         {

@@ -10,10 +10,7 @@ import java.awt.geom.Point2D;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
-import system.Combiner;
-import system.Message;
-import system.MessageQ;
-import system.Vertex;
+import system.*;
 import system.aggregators.IntegerSumAggregator;
 
 /**
@@ -25,7 +22,7 @@ import system.aggregators.IntegerSumAggregator;
  * 
  * @author Pete Cappello
  */
-public class EuclideanShortestPathVertex extends Vertex<Point2D.Float, Float>
+public final class EuclideanShortestPathVertex extends Vertex<Point2D.Float, Float>
 {    
     public EuclideanShortestPathVertex( Point2D.Float vertexId, Map<Object, Point2D.Float> outEdgeMap, Combiner combiner )
     {
@@ -82,7 +79,8 @@ public class EuclideanShortestPathVertex extends Vertex<Point2D.Float, Float>
         {
             // A new shortest path to me was found
             // aggregate number of messages sent in this step & in this problem
-            setOutputProblemAggregator( new IntegerSumAggregator( getOutEdgeMapSize() ) );
+            aggregateOutputProblemAggregator( new IntegerSumAggregator( getOutEdgeMapSize() ));
+            aggregateOutputStepAggregator(    new IntegerSumAggregator( getOutEdgeMapSize() ));
             
             // there is a new shorter path from the source to me
             setVertexValue( minDistanceMessage ); // update my value: the shortest path to me
@@ -95,12 +93,6 @@ public class EuclideanShortestPathVertex extends Vertex<Point2D.Float, Float>
                 sendMessage( targetVertexId, message );
             }
         }
-        else
-        {
-            // NO new shortest path to me was found
-            // aggregate number of messages sent in this step
-            setOutputProblemAggregator( new IntegerSumAggregator( 0 ) );
-        } 
    
         /* This vote will be overturned, if during this step, a vertex for whom 
          * I am a target vertex discovered a shorter path to itself, 
