@@ -138,7 +138,7 @@ public final class Worker extends ServiceImpl
         Part part = partIdToPartMap.get( partId );
         if ( null == part )
         {
-            part = new Part( partId, this );
+            part = new Part( partId, job );
             partSet.add( part );
             partIdToPartMap.put( partId, part );
         }
@@ -155,7 +155,6 @@ public final class Worker extends ServiceImpl
     
     synchronized PartIterator getPartIterator() { return partIterator; }
     
-//    synchronized public WorkerJob getWorkerJob() { return job; }
     synchronized public Job getJob() { return job; }
     
     int getWorkerNum( int partId )

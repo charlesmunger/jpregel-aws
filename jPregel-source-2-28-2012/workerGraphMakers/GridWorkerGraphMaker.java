@@ -123,6 +123,7 @@ public class GridWorkerGraphMaker implements GraphMaker
                     stringVertex.append( x ).append( " ").append( y ).append( " ");
                 } 
                 Vertex vertex = new EuclideanShortestPathVertex( vertexId, outEdgeMap, combiner );
+//                Vertex vertex = new EuclideanShortestPathVertex( vertexId, outEdgeMap );
                 String vertexString = new String( stringVertex );
                 worker.addVertex( vertex, vertexString );
             }

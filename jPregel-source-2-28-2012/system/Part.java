@@ -9,8 +9,8 @@ import java.util.*;
 public final class Part
 {
     private final int partId;
-    private final Worker worker; // to which this part is assigned
     private final Job job;
+    private final Combiner combiner;
     
     private Map<Object, Vertex> vertexIdToVertexMap = Collections.synchronizedMap( new HashMap<Object, Vertex>() );   
     private SuperStepToActiveSetMap superstepToActiveSetMap = new SuperStepToActiveSetMap();
@@ -24,11 +24,13 @@ public final class Part
     private Aggregator outputStepAggregator;
     private int numMessagesSent; 
     
-    Part( int partId, Worker worker )
+    Part( int partId, Job job )
+//    Part( int partId, Worker worker )
     {
         this.partId = partId;
-        this.worker = worker;
-        job = worker.getJob();
+        this.job    = job;
+        combiner    = job.getCombiner();
+//        job = worker.getJob();
     }
     
     /*
@@ -73,6 +75,8 @@ public final class Part
         boolean thereIsNextStep = numMessagesSent > 0;
         return new ComputeOutput( thereIsNextStep, outputStepAggregator, outputProblemAggregator );
     }
+    
+    Combiner getCombiner() { return combiner; }
     
     ComputeInput getComputeInput() { return computeInput; }
         

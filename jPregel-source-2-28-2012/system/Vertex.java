@@ -50,29 +50,23 @@ import java.util.Map;
  */
 abstract public class Vertex<VertexIdType, VertexValueType, OutEdgeType, MessageValueType> implements java.io.Serializable
 {
-    private final VertexIdType vertexId;
+//    private static Combiner combiner;
     
-    // TODO: Vertex: Eliminate Combiner field; get from Part 
-    private final Combiner combiner;
+    private final VertexIdType    vertexId;
+    private       VertexValueType vertexValue;
     private Part part;
     
-    // vertex state
-    private VertexValueType vertexValue;
     private Map<Object, OutEdgeType> outEdgeMap;
     private NonNullMap<MessageValueType> superstepToMessageQMap;
 //    private NonNullMap<MessageValueType> superstepToInboxMap;
             
-    public Vertex()
-    {
-        vertexId = null;
-        combiner = null;
-    }
-                      
+    public Vertex() { vertexId = null; }
+          
+    // TODO Vertex: Make Combiner a static field of Vertex class
     public Vertex( VertexIdType vertexId, Map<Object, OutEdgeType> outEdgeMap, Combiner combiner )
     {
         this.vertexId   = vertexId;
         this.outEdgeMap = outEdgeMap;
-        this.combiner   = combiner;
         superstepToMessageQMap = new NonNullMap<MessageValueType>( combiner );
     }
     
@@ -106,7 +100,7 @@ abstract public class Vertex<VertexIdType, VertexValueType, OutEdgeType, Message
         MessageQ<MessageValueType> messageQ = superstepToMessageQMap.remove( getSuperStep() );
         if ( messageQ == null )
         {
-            messageQ = new MessageQ<MessageValueType>( combiner );
+            messageQ = new MessageQ<MessageValueType>( part.getCombiner() );
         }
         return messageQ.iterator(); 
     }
@@ -116,7 +110,7 @@ abstract public class Vertex<VertexIdType, VertexValueType, OutEdgeType, Message
         MessageQ<MessageValueType> messageQ = superstepToMessageQMap.remove( getSuperStep() );
         if ( messageQ == null )
         {
-            messageQ = new MessageQ<MessageValueType>( combiner );
+            messageQ = new MessageQ<MessageValueType>( part.getCombiner() );
         }
         return messageQ; 
     }

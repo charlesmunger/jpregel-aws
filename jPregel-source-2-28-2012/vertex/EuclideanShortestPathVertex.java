@@ -57,7 +57,7 @@ public final class EuclideanShortestPathVertex extends Vertex<Point2D.Float, Mes
         Float minDistance = ( vx == 0.0 && vy == 0.0 ) ? (float) 0.0 : Float.MAX_VALUE;
         Message<Point2D.Float, Float> minDistanceMessage = new Message<Point2D.Float, Float>( new Point2D.Float(), minDistance );
         setVertexValue( minDistanceMessage );
-
+        
         return new EuclideanShortestPathVertex( vertexId, outEdgeMap, combiner );
     }  
 

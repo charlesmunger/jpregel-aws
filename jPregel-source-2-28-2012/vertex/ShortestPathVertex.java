@@ -11,6 +11,7 @@ import system.Message;
 import system.OutEdge;
 import system.Vertex;
 import system.aggregators.IntegerSumAggregator;
+import system.combiners.IntegerMinCombiner;
 
 /**
  *
@@ -23,6 +24,8 @@ import system.aggregators.IntegerSumAggregator;
  */
 public final class ShortestPathVertex extends Vertex<Integer, Message, OutEdge, Integer>
 {
+//    private static Combiner combiner = new IntegerMinCombiner();
+    
     public ShortestPathVertex( Integer vertexId, Map<Object, OutEdge> outEdgeMap, Combiner<Integer> combiner )
     {
         super( vertexId, outEdgeMap, combiner );
