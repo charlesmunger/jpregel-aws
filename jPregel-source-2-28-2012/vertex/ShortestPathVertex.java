@@ -21,7 +21,7 @@ import system.aggregators.IntegerSumAggregator;
  * 
  * @author Pete Cappello
  */
-public final class ShortestPathVertex extends Vertex<Integer, OutEdge, Integer>
+public final class ShortestPathVertex extends Vertex<Integer, Message, OutEdge, Integer>
 {
     public ShortestPathVertex( Integer vertexId, Map<Object, OutEdge> outEdgeMap, Combiner<Integer> combiner )
     {
@@ -94,11 +94,11 @@ public final class ShortestPathVertex extends Vertex<Integer, OutEdge, Integer>
         StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append( getVertexId() );
         stringBuffer.append( " : ");
-        stringBuffer.append( ((Message)  getVertexValue() ).getVertexId() );
+        stringBuffer.append( getVertexValue().getVertexId() );
         stringBuffer.append( " ");
-        stringBuffer.append( ((Message)  getVertexValue() ).getMessageValue() );
+        stringBuffer.append( getVertexValue().getMessageValue() );
         return new String( stringBuffer );
     }
     
-    protected boolean isSource() { return ( (Integer) getVertexId() == 0 ) ? true : false; }
+    protected boolean isSource() { return getVertexId() == 0; }
 }

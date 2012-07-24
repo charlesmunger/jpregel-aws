@@ -48,7 +48,7 @@ import java.util.Map;
  *
  * @author Peter Cappello
  */
-abstract public class Vertex<VertexIdType, OutEdgeType, MessageValueType> implements java.io.Serializable
+abstract public class Vertex<VertexIdType, VertexValueType, OutEdgeType, MessageValueType> implements java.io.Serializable
 {
     private final VertexIdType vertexId;
     
@@ -57,11 +57,10 @@ abstract public class Vertex<VertexIdType, OutEdgeType, MessageValueType> implem
     private Part part;
     
     // vertex state
-    // TODO: Vertex: replace vertexValue type of Object with generic
-    private Object vertexValue;
+    private VertexValueType vertexValue;
     private Map<Object, OutEdgeType> outEdgeMap;
     private NonNullMap<MessageValueType> superstepToMessageQMap;
-    private NonNullMap<MessageValueType> superstepToInboxMap;
+//    private NonNullMap<MessageValueType> superstepToInboxMap;
             
     public Vertex()
     {
@@ -137,7 +136,7 @@ abstract public class Vertex<VertexIdType, OutEdgeType, MessageValueType> implem
     
     public VertexIdType getVertexId() { return vertexId; }
         
-    public Object getVertexValue() { return vertexValue; }
+    public VertexValueType getVertexValue() { return vertexValue; }
     
     public abstract Vertex make( String line, Combiner combiner );
     
@@ -154,7 +153,7 @@ abstract public class Vertex<VertexIdType, OutEdgeType, MessageValueType> implem
         part.sendMessage( targetVertexId, message, getSuperStep() + 1 ); 
     }
         
-    protected void setVertexValue( Object vertexValue ) { this.vertexValue = vertexValue; }
+    protected void setVertexValue( VertexValueType vertexValue ) { this.vertexValue = vertexValue; }
     
     /* vertex deactivates itself by voting to halt.
      * vertex is activated only if it receives a message, in which case it

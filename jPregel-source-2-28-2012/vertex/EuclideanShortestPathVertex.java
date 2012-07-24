@@ -22,7 +22,7 @@ import system.aggregators.IntegerSumAggregator;
  * 
  * @author Pete Cappello
  */
-public final class EuclideanShortestPathVertex extends Vertex<Point2D.Float, Point2D.Float, Float>
+public final class EuclideanShortestPathVertex extends Vertex<Point2D.Float, Message, Point2D.Float, Float>
 {    
     public EuclideanShortestPathVertex( Point2D.Float vertexId, Map<Object, Point2D.Float> outEdgeMap, Combiner combiner )
     {
@@ -107,9 +107,9 @@ public final class EuclideanShortestPathVertex extends Vertex<Point2D.Float, Poi
         StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append( getVertexId() );
         stringBuffer.append( " : ");
-        stringBuffer.append(  ((Message<Point2D.Float, Float>)  getVertexValue() ).getVertexId() );
+        stringBuffer.append(  getVertexValue().getVertexId() );
         stringBuffer.append( " --- ");
-        stringBuffer.append( ((Message<Point2D.Float, Float>)  getVertexValue() ).getMessageValue() );
+        stringBuffer.append( getVertexValue().getMessageValue() );
         return new String( stringBuffer );
     }
     

@@ -11,12 +11,13 @@ import system.Message;
 import system.OutEdge;
 import system.Vertex;
 
-public class PageRankVertex extends Vertex<Integer, OutEdge, Double> 
+public class PageRankVertex extends Vertex<Integer, Double, OutEdge, Double> 
 {
     public PageRankVertex( Integer vertexId, Map<Object, OutEdge> outEdgeMap, Combiner<Integer> combiner )
     {
         super( vertexId, outEdgeMap, combiner );
-        setVertexValue( new Message( vertexId, Integer.MAX_VALUE ) );
+//        setVertexValue( new Message( vertexId, Integer.MAX_VALUE ) );
+        setVertexValue( Double.MAX_VALUE  );
     }
 	
     public PageRankVertex() {}
@@ -39,8 +40,8 @@ public class PageRankVertex extends Vertex<Integer, OutEdge, Double>
         } 
         if (getSuperStep() < 30) 
         { 
-            double messageValue = (Double) getVertexValue() / (getNumVertices() - (Integer)getVertexId() - 1 ) ; 
-            for(int targetVertexId = (Integer)(getVertexId()) + 1 ; targetVertexId <= getNumVertices() ; targetVertexId++ )
+            double messageValue = getVertexValue() / (getNumVertices() - getVertexId() - 1 ) ; 
+            for(int targetVertexId = getVertexId() + 1 ; targetVertexId <= getNumVertices() ; targetVertexId++ )
             {
                     Message<Integer, Double> message = new Message<Integer, Double>( getVertexId(), messageValue );
                     sendMessage( targetVertexId , message) ;  
@@ -63,9 +64,10 @@ public class PageRankVertex extends Vertex<Integer, OutEdge, Double>
             StringBuffer stringBuffer = new StringBuffer();
             stringBuffer.append( getVertexId() );
             stringBuffer.append( " : ");
-            stringBuffer.append( ((Message)  getVertexValue() ).getVertexId() );
-            stringBuffer.append( " ");
-            stringBuffer.append( ((Message)  getVertexValue() ).getMessageValue() );
+//            stringBuffer.append( ((Message)  getVertexValue() ).getVertexId() );
+//            stringBuffer.append( " ");
+//            stringBuffer.append( ((Message) getVertexValue() ).getMessageValue() );
+            stringBuffer.append( getVertexValue() );
             return new String( stringBuffer );
 	}
 
@@ -79,7 +81,7 @@ public class PageRankVertex extends Vertex<Integer, OutEdge, Double>
                 exit( 1 );
             }
             int vertexId = Integer.parseInt( stringTokenizer.nextToken() );
-            setVertexValue(1/ getNumVertices()) ; 
+            setVertexValue( 1.0 / getNumVertices() ) ; 
             int endVertexValue = Integer.parseInt( stringTokenizer.nextToken() ); 
             int numVertices  = Integer.parseInt( stringTokenizer.nextToken() ); 
 
