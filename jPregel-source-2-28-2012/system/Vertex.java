@@ -50,7 +50,6 @@ import java.util.Map;
  */
 abstract public class Vertex<VertexIdType, OutEdgeType, MessageValueType> implements java.io.Serializable
 {
-    // TODO vertexID: Use generics to avoid casts
     private final VertexIdType vertexId;
     
     // TODO: Vertex: Eliminate Combiner field; get from Part 
@@ -58,6 +57,7 @@ abstract public class Vertex<VertexIdType, OutEdgeType, MessageValueType> implem
     private Part part;
     
     // vertex state
+    // TODO: Vertex: replace vertexValue type of Object with generic
     private Object vertexValue;
     private Map<Object, OutEdgeType> outEdgeMap;
     private NonNullMap<MessageValueType> superstepToMessageQMap;
@@ -102,7 +102,7 @@ abstract public class Vertex<VertexIdType, OutEdgeType, MessageValueType> implem
     
     protected Aggregator getInputProblemAggregator() { return part.getComputeInput().getProblemAggregator(); }
 
-    synchronized protected Iterator<Message<MessageValueType>> getMessageIterator()
+    synchronized protected Iterator<Message<?, MessageValueType>> getMessageIterator()
     {
         MessageQ<MessageValueType> messageQ = superstepToMessageQMap.remove( getSuperStep() );
         if ( messageQ == null )

@@ -5,24 +5,24 @@ package system;
  *
  * @author Pete Cappello
  */
-public class Message<ValueType> implements java.io.Serializable
+public class Message<VertexIdType, ValueType> implements java.io.Serializable
 {
-    private Object vertexId;
+    private VertexIdType vertexId;
     private ValueType messageValue;
     
-    public Message( Object vertexId, ValueType messageValue )
+    public Message( VertexIdType vertexId, ValueType messageValue )
     {
         this.vertexId     = vertexId;
         this.messageValue = messageValue;
     }
     
-    public Message( Message<ValueType> sourceMessage )
+    public Message( Message<VertexIdType, ValueType> sourceMessage )
     {
         vertexId     = sourceMessage.getVertexId();
         messageValue = sourceMessage.getMessageValue();
     }
     
-    public Object getVertexId()     { return vertexId; }
+    public VertexIdType getVertexId()     { return vertexId; }
     
     public ValueType getMessageValue() { return messageValue; }
 }

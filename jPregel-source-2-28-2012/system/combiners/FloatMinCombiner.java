@@ -9,7 +9,7 @@ import system.Message;
  */
 public class FloatMinCombiner extends Combiner<Float>
 {
-    protected Message<Float> combine( Message<Float> currentMessage, Message<Float> newMessage ) 
+    protected Message<?, Float> combine( Message<?, Float> currentMessage, Message<?, Float> newMessage ) 
     {
         return ( currentMessage.getMessageValue() <= newMessage.getMessageValue() ) ? currentMessage : newMessage;
     }

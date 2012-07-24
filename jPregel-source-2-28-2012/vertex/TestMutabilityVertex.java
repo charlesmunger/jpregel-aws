@@ -22,7 +22,7 @@ public class TestMutabilityVertex extends Vertex<Integer, OutEdge, Integer>
     public TestMutabilityVertex( Integer vertexId, Map<Object, OutEdge> outEdgeMap, Combiner<Integer> combiner )
     {
         super( vertexId, outEdgeMap, combiner );
-        setVertexValue( new Message<Integer>( vertexId, Integer.MAX_VALUE ) );
+        setVertexValue( new Message<Integer, Integer>( vertexId, Integer.MAX_VALUE ) );
     }
     
     public TestMutabilityVertex() {}
@@ -49,20 +49,20 @@ public class TestMutabilityVertex extends Vertex<Integer, OutEdge, Integer>
     @Override
     public void compute() 
     {
-        if ( getSuperStep() == 0 && (Integer) getVertexId() == 0 )
+        if ( getSuperStep() == 0 && getVertexId() == 0 )
         {
             addEdge( new Integer( 2 ), new OutEdge( 2, -1 ) );
         }
-        if ( getSuperStep() == 1 && (Integer) getVertexId() == 0 )
+        if ( getSuperStep() == 1 && getVertexId() == 0 )
         {
             removeEdge( new Integer( 1 ) );
         }
-        if ( getSuperStep() == 2 && (Integer) getVertexId() == 1 )
+        if ( getSuperStep() == 2 && getVertexId() == 1 )
         {
             out.println("TestMutabilityVertex.compute: step: " + getSuperStep() + " numVertices: " + getNumVertices() );
             removeVertex();
         }
-        if ( getSuperStep() == 3 && (Integer) getVertexId() == 0 )
+        if ( getSuperStep() == 3 && getVertexId() == 0 )
         {
             out.println("TestMutabilityVertex.compute: step: numVertices: " + getNumVertices() );
         }
@@ -86,13 +86,13 @@ public class TestMutabilityVertex extends Vertex<Integer, OutEdge, Integer>
 //        stringBuffer.append( ((Message)  getVertexValue() ).getMessageValue() );
         for ( OutEdge outEdge : getOutEdgeValues() )
             {
-                stringBuffer.append( (Integer) outEdge.getVertexId() );
+                stringBuffer.append( outEdge.getVertexId() );
                 stringBuffer.append( " ");
-                stringBuffer.append( (Integer) outEdge.getEdgeValue() );
+                stringBuffer.append( outEdge.getEdgeValue() );
                 stringBuffer.append( " ");
             }
         return new String( stringBuffer );
     }
     
-    protected boolean isSource() { return ( (Integer) getVertexId() == 0 ) ? true : false; }
+    protected boolean isSource() { return getVertexId() == 0; }
 }

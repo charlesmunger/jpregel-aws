@@ -28,11 +28,11 @@ public class PageRankVertex extends Vertex<Integer, OutEdge, Double>
         double sum = 0 ; 
         if ( getSuperStep() >= 1 ) 
         {
-            Iterator<Message<Double>> messageSetIterator = getMessageIterator();
+            Iterator<Message<?, Double>> messageSetIterator = getMessageIterator();
 
             while ( messageSetIterator.hasNext() )
             {
-                Message<Double> message = messageSetIterator.next();
+                Message<?, Double> message = messageSetIterator.next();
                 sum += message.getMessageValue() ;   
             }
             setVertexValue( 0.15/ getNumVertices() + 0.85 * sum ) ; 
@@ -42,7 +42,7 @@ public class PageRankVertex extends Vertex<Integer, OutEdge, Double>
             double messageValue = (Double) getVertexValue() / (getNumVertices() - (Integer)getVertexId() - 1 ) ; 
             for(int targetVertexId = (Integer)(getVertexId()) + 1 ; targetVertexId <= getNumVertices() ; targetVertexId++ )
             {
-                    Message<Double> message = new Message<Double>( getVertexId(), messageValue );
+                    Message<Integer, Double> message = new Message<Integer, Double>( getVertexId(), messageValue );
                     sendMessage( targetVertexId , message) ;  
             }
                 //final long n  = getOutEdgeMapSize() ;  

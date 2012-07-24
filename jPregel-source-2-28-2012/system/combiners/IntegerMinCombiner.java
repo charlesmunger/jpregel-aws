@@ -9,7 +9,7 @@ import system.Message;
  */
 public class IntegerMinCombiner extends Combiner<Integer>
 {    
-    protected Message<Integer> combine( Message<Integer> currentMessage, Message<Integer> newMessage ) 
+    protected Message<?, Integer> combine( Message<?, Integer> currentMessage, Message<?, Integer> newMessage ) 
     {
         return ( currentMessage.getMessageValue() <= newMessage.getMessageValue() ) ? currentMessage : newMessage;
     }

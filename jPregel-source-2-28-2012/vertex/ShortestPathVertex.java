@@ -26,7 +26,7 @@ public final class ShortestPathVertex extends Vertex<Integer, OutEdge, Integer>
     public ShortestPathVertex( Integer vertexId, Map<Object, OutEdge> outEdgeMap, Combiner<Integer> combiner )
     {
         super( vertexId, outEdgeMap, combiner );
-        setVertexValue( new Message<Integer>( vertexId, Integer.MAX_VALUE ) );
+        setVertexValue( new Message<Integer, Integer>( vertexId, Integer.MAX_VALUE ) );
     }
     
     public ShortestPathVertex() {}
@@ -55,15 +55,15 @@ public final class ShortestPathVertex extends Vertex<Integer, OutEdge, Integer>
     {
         // compute currently known minimum distance from source to me
         int minDistance = isSource() ? 0 : Integer.MAX_VALUE;
-        Message<Integer> minDistanceMessage = new Message<Integer>( getVertexId(), minDistance );
-        for ( Message<Integer> message : getMessageQ() )
+        Message<?, Integer> minDistanceMessage = new Message<Integer, Integer>( getVertexId(), minDistance );
+        for ( Message<?, Integer> message : getMessageQ() )
         {
             if ( message.getMessageValue() < minDistanceMessage.getMessageValue() )
             {
                 minDistanceMessage = message;
             }
         }
-        if ( minDistanceMessage.getMessageValue() < ((Message<Integer>) getVertexValue() ).getMessageValue() )
+        if ( minDistanceMessage.getMessageValue() < ((Message<Integer, Integer>) getVertexValue() ).getMessageValue() )
         {   // There is a new shorter path from the source to me
             setVertexValue( minDistanceMessage ); // update my value: the shortest path to me
             

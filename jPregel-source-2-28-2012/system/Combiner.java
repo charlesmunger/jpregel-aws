@@ -8,5 +8,5 @@ import java.io.Serializable;
  */
 public class Combiner<MessageValueType> implements Serializable
 {            
-    protected Message<MessageValueType> combine( Message<MessageValueType> currentMessage, Message<MessageValueType> newMessage ) { return null; } 
+    protected Message<?, MessageValueType> combine( Message<?, MessageValueType> currentMessage, Message<?, MessageValueType> newMessage ) { return null; } 
 }
