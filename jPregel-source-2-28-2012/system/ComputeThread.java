@@ -45,7 +45,7 @@ public class ComputeThread extends Thread
             }
             catch ( InterruptedException ignore ) {}
             
-            combiner = worker.getJob().getCombiner();
+            combiner = worker.getJob().getVertexFactory().getCombiner();
 
             // compute parts of a superstep until there are no more parts
             boolean thereIsANextStep =  false;
@@ -78,7 +78,7 @@ public class ComputeThread extends Thread
         }
         else
         {
-            // !! Later: monitor size of map: when too large, give to Worker to combine/send & reinitialize
+            // TODO ComputeThread: Later: monitor size of map: when too large, give to Worker to combine/send & reinitialize
             
             // get vertexIdToMessageQMap for destination Worker
             int workerNum = worker.getWorkerNum( receivingPartId );

@@ -18,7 +18,6 @@ public final class Job implements Serializable
     private final String   jobDirectoryName;
     private final int      numParts;
     private final boolean  workerIsMultithreaded;
-    private final Combiner combiner;
     private       Aggregator stepAggregator    = new NullAggregator();
     private       Aggregator problemAggregator = new NullAggregator();
     private final Vertex   vertexFactory;
@@ -35,7 +34,7 @@ public final class Job implements Serializable
      * function of graph problem type.
      */
     public Job( String jobName, String jobDirectoryName, Vertex vertexFactory, 
-            int numParts, boolean workerIsMultithreaded, Combiner combiner, 
+            int numParts, boolean workerIsMultithreaded, //Combiner combiner, 
                 WorkerWriter workerWriter, GraphMaker workerGraphMaker,
                 MasterGraphMaker reader, Writer writer )
     {
@@ -44,7 +43,6 @@ public final class Job implements Serializable
         this.vertexFactory         = vertexFactory;
         this.numParts              = numParts;
         this.workerIsMultithreaded = workerIsMultithreaded;
-        this.combiner              = combiner;
         this.workerWriter          = workerWriter;
         this.workerGraphMaker      = workerGraphMaker;
         this.masterGraphMaker      = reader;
@@ -61,7 +59,6 @@ public final class Job implements Serializable
         vertexFactory         = job.getVertexFactory();
         numParts              = job.getNumParts();
         workerIsMultithreaded = job.getWorkerIsMultithreaded();
-        combiner              = job.getCombiner();
         stepAggregator        = job.getStepAggregator();
         problemAggregator     = job.getProblemAggregator();
         workerWriter          = job.getWorkerWriter();
@@ -69,9 +66,7 @@ public final class Job implements Serializable
         masterGraphMaker      = job.getMasterGraphMaker();
         writer                = job.getWriter();
     }  
-    
-    public Combiner   getCombiner()      { return combiner; }
-    
+        
     public FileSystem getFileSystem()    { return fileSystem; }
     
     public int        getNumParts()      { return numParts; }
@@ -151,7 +146,6 @@ public final class Job implements Serializable
         stringBuffer.append("Directory name: ").append(jobDirectoryName).append("\n\t");
         stringBuffer.append("Number of parts: ").append(numParts).append("\n\t");
         stringBuffer.append("Worker is multithreaded: ").append(workerIsMultithreaded).append("\n\t");
-        stringBuffer.append("Combiner: ").append( null == combiner  ? "NULL" : combiner.getClass().getCanonicalName() ).append("\n\t");
         stringBuffer.append("Step Aggregator: ").append(stepAggregator.getClass().getCanonicalName()).append("\n\t");
         stringBuffer.append("Problem Aggregator: ").append(problemAggregator.getClass().getCanonicalName()).append("\n\t");
         stringBuffer.append("Vertex factory: ").append(vertexFactory.getClass().getCanonicalName()).append("\n\t");

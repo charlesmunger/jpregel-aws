@@ -1,6 +1,5 @@
 package clients;
 
-import JpAws.Machine;
 import static java.lang.System.out;
 
 import java.rmi.RemoteException;
@@ -8,14 +7,12 @@ import vertex.TestMutabilityVertex;
 import masterGraphMakers.StandardMasterGraphMaker;
 import masterOutputMakers.StandardMasterOutputMaker;
 import system.Client;
-import system.Combiner;
 import system.GraphMaker;
 import system.Job;
 import system.MasterGraphMaker;
 import system.Vertex;
 import system.WorkerWriter;
 import system.Writer;
-import system.combiners.DoubleMinCombiner;
 import workerGraphMakers.StandardWorkerGraphMaker;
 import workerOutputMakers.StandardWorkerOutputMaker;
 
@@ -34,13 +31,7 @@ public class TestMutabilityClient
         String  jobDirectoryName      = args[0];
         int     numWorkers            = Integer.parseInt(     args[1] );
         boolean workerIsMultithreaded = Boolean.parseBoolean( args[2] );
-        boolean combiningMessages     = Boolean.parseBoolean( args[3] );
         int     numParts = numWorkers * 2 * 2; // numWorkers * ComputeThrads/Worker * Parts/ComputeThread
-        Combiner combiner = null;
-        if ( combiningMessages )
-        {
-            combiner = new DoubleMinCombiner();
-        }
         WorkerWriter workerWriter = new StandardWorkerOutputMaker();
         GraphMaker workerGraphMaker = new StandardWorkerGraphMaker();
         MasterGraphMaker reader = new StandardMasterGraphMaker();
@@ -52,17 +43,16 @@ public class TestMutabilityClient
                 + "\n numParts: " + numParts
                 + "\n numWorkers: " + numWorkers
                 + "\n workerIsMultithreaded: " + workerIsMultithreaded
-                + "\n combining messages: " + combiningMessages
                 );
         
         Job job = new Job( jobName,
                   jobDirectoryName, 
-                  vertexFactory, numParts, workerIsMultithreaded, combiner, 
+                  vertexFactory, numParts, workerIsMultithreaded,  
                   workerWriter, workerGraphMaker, reader, writer );
         try
         {
             boolean isEc2Master = false;
-            Client.run( job, isEc2Master, numWorkers);//TODO fix me
+            Client.run( job, isEc2Master, numWorkers);
         } 
         catch ( Exception exception )
         {

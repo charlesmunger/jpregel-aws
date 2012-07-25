@@ -2,7 +2,6 @@ package vertex;
 
 import static java.lang.System.err;
 import static java.lang.System.exit;
-import static java.lang.System.out;
 
 import static java.lang.Math.sqrt;
 
@@ -12,6 +11,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import system.*;
 import system.aggregators.IntegerSumAggregator;
+import system.combiners.FloatMinCombiner;
 
 /**
  *
@@ -23,16 +23,18 @@ import system.aggregators.IntegerSumAggregator;
  * @author Pete Cappello
  */
 public final class EuclideanShortestPathVertex extends Vertex<Point2D.Float, Message, Point2D.Float, Float>
-{    
-    public EuclideanShortestPathVertex( Point2D.Float vertexId, Map<Object, Point2D.Float> outEdgeMap, Combiner combiner )
+{
+    public static Combiner combiner = new FloatMinCombiner();
+    
+    public EuclideanShortestPathVertex( Point2D.Float vertexId, Map<Object, Point2D.Float> outEdgeMap )
     {
-        super( vertexId, outEdgeMap, combiner );
+        super( vertexId, outEdgeMap );
         setVertexValue( new Message( vertexId, Float.MAX_VALUE ) );
     }
     
     public EuclideanShortestPathVertex() {}
     
-    public Vertex make( String line, Combiner combiner )
+    public Vertex make( String line )
     {
         StringTokenizer stringTokenizer = new StringTokenizer( line );
         if ( ! stringTokenizer.hasMoreTokens() )
@@ -58,7 +60,7 @@ public final class EuclideanShortestPathVertex extends Vertex<Point2D.Float, Mes
         Message<Point2D.Float, Float> minDistanceMessage = new Message<Point2D.Float, Float>( new Point2D.Float(), minDistance );
         setVertexValue( minDistanceMessage );
         
-        return new EuclideanShortestPathVertex( vertexId, outEdgeMap, combiner );
+        return new EuclideanShortestPathVertex( vertexId, outEdgeMap );
     }  
 
     @Override     
@@ -77,12 +79,7 @@ public final class EuclideanShortestPathVertex extends Vertex<Point2D.Float, Mes
         
         if ( minDistanceMessage.getMessageValue() < ((Message<Point2D.Float, Float>) getVertexValue() ).getMessageValue() )
         {
-            // A new shortest path to me was found
-            // aggregate number of messages sent in this step & in this problem
-            aggregateOutputProblemAggregator( new IntegerSumAggregator( getOutEdgeMapSize() ));
-            aggregateOutputStepAggregator(    new IntegerSumAggregator( getOutEdgeMapSize() ));
-            
-            // there is a new shorter path from the source to me
+            // found a new shorter path from the source to me
             setVertexValue( minDistanceMessage ); // update my value: the shortest path to me
             
             // To each target vertex: The shortest known path to you through me just got shorter 
@@ -92,6 +89,10 @@ public final class EuclideanShortestPathVertex extends Vertex<Point2D.Float, Mes
                 Message<Point2D.Float, Float> message = new Message<Point2D.Float, Float>( getVertexId(), minDistanceMessage.getMessageValue() + edgeValue );   
                 sendMessage( targetVertexId, message );
             }
+            
+            // aggregate number of messages sent in this step & in this problem
+            aggregateOutputProblemAggregator( new IntegerSumAggregator( getOutEdgeMapSize() ));
+            aggregateOutputStepAggregator(    new IntegerSumAggregator( getOutEdgeMapSize() ));
         }
    
         /* This vote will be overturned, if during this step, a vertex for whom 

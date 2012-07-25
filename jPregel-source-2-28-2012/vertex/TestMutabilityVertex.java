@@ -19,15 +19,18 @@ import system.Vertex;
  */
 public class TestMutabilityVertex extends Vertex<Integer, Message, OutEdge, Integer>
 {
-    public TestMutabilityVertex( Integer vertexId, Map<Object, OutEdge> outEdgeMap, Combiner<Integer> combiner )
+//    public TestMutabilityVertex( Integer vertexId, Map<Object, OutEdge> outEdgeMap, Combiner<Integer> combiner )
+    public TestMutabilityVertex( Integer vertexId, Map<Object, OutEdge> outEdgeMap )
     {
-        super( vertexId, outEdgeMap, combiner );
+//        super( vertexId, outEdgeMap, combiner );
+        super( vertexId, outEdgeMap );
         setVertexValue( new Message<Integer, Integer>( vertexId, Integer.MAX_VALUE ) );
     }
     
     public TestMutabilityVertex() {}
     
-    public Vertex make( String line, Combiner combiner )
+//    public Vertex make( String line, Combiner combiner )
+    public Vertex make( String line )
     {
         StringTokenizer stringTokenizer = new StringTokenizer( line );
         if ( ! stringTokenizer.hasMoreTokens() )
@@ -43,7 +46,8 @@ public class TestMutabilityVertex extends Vertex<Integer, Message, OutEdge, Inte
             int weight  = Integer.parseInt( stringTokenizer.nextToken() ); 
             outEdgeMap.put( target, new OutEdge( target, weight ) );
         }
-        return new TestMutabilityVertex( vertexId, outEdgeMap, combiner );
+//        return new TestMutabilityVertex( vertexId, outEdgeMap, combiner );
+        return new TestMutabilityVertex( vertexId, outEdgeMap );
     }
     
     @Override

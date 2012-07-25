@@ -43,7 +43,7 @@ public class GridWorkerGraphMaker implements GraphMaker
         int workerNum       = worker.getWorkerNum();
         Job job = worker.getJob();
         FileSystem fileSystem = job.getFileSystem();
-        Combiner combiner     = job.getCombiner();
+//        Combiner combiner     = job.getCombiner();
         Vertex vertexFactory  = job.getVertexFactory();
         int numVertices = 0;
         
@@ -122,7 +122,8 @@ public class GridWorkerGraphMaker implements GraphMaker
                     outEdgeMap.put( target, target );
                     stringVertex.append( x ).append( " ").append( y ).append( " ");
                 } 
-                Vertex vertex = new EuclideanShortestPathVertex( vertexId, outEdgeMap, combiner );
+//                Vertex vertex = new EuclideanShortestPathVertex( vertexId, outEdgeMap, combiner );
+                Vertex vertex = new EuclideanShortestPathVertex( vertexId, outEdgeMap );
 //                Vertex vertex = new EuclideanShortestPathVertex( vertexId, outEdgeMap );
                 String vertexString = new String( stringVertex );
                 worker.addVertex( vertex, vertexString );

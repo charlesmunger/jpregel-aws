@@ -27,13 +27,7 @@ public class Euclidean2DGridShortestPathClient
         String  jobDirectoryName      = args[0];
         int     numWorkers            = 1;
         boolean workerIsMultithreaded = false;
-        boolean combiningMessages     = false;
         int     numParts = numWorkers * (( workerIsMultithreaded) ? 2 : 1 ) * 1; // numWorkers * ComputeThrads/Worker * Parts/ComputeThread
-        Combiner combiner = null;
-        if ( combiningMessages )
-        {
-            combiner = new FloatMinCombiner();
-        }
         Vertex vertexFactory        = new EuclideanShortestPathVertex();
         WorkerWriter workerWriter   = new StandardWorkerOutputMaker();
         GraphMaker workerGraphMaker = new GridWorkerGraphMaker();
@@ -45,11 +39,11 @@ public class Euclidean2DGridShortestPathClient
                 + "\n numParts: " + numParts
                 + "\n numWorkers: " + numWorkers
                 + "\n workerIsMultithreaded: " + workerIsMultithreaded
-                + "\n combining messages: " + combiningMessages
                 );
         
         Job job = new Job( jobName, jobDirectoryName, vertexFactory, numParts, 
-                           workerIsMultithreaded, combiner, workerWriter, 
+                           workerIsMultithreaded,  
+                workerWriter, 
                            workerGraphMaker, reader, writer );
         job.setProblemAggregator( new IntegerSumAggregator() );
         try

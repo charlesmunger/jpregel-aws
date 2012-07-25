@@ -10,12 +10,17 @@ import system.Combiner;
 import system.Message;
 import system.OutEdge;
 import system.Vertex;
+import system.combiners.IntegerMinCombiner;
 
 public class PageRankVertex extends Vertex<Integer, Double, OutEdge, Double> 
 {
-    public PageRankVertex( Integer vertexId, Map<Object, OutEdge> outEdgeMap, Combiner<Integer> combiner )
+    public static Combiner combiner = new IntegerMinCombiner();
+    
+//    public PageRankVertex( Integer vertexId, Map<Object, OutEdge> outEdgeMap, Combiner<Integer> combiner )
+    public PageRankVertex( Integer vertexId, Map<Object, OutEdge> outEdgeMap )
     {
-        super( vertexId, outEdgeMap, combiner );
+//        super( vertexId, outEdgeMap, combiner );
+        super( vertexId, outEdgeMap );
 //        setVertexValue( new Message( vertexId, Integer.MAX_VALUE ) );
         setVertexValue( Double.MAX_VALUE  );
     }
@@ -72,7 +77,8 @@ public class PageRankVertex extends Vertex<Integer, Double, OutEdge, Double>
 	}
 
 	@Override
-	public Vertex make(String line, Combiner combiner) 
+//	public Vertex make(String line, Combiner combiner)
+        public Vertex make(String line)
         {
             StringTokenizer stringTokenizer = new StringTokenizer( line );
             if ( ! stringTokenizer.hasMoreTokens() )
@@ -107,7 +113,8 @@ public class PageRankVertex extends Vertex<Integer, Double, OutEdge, Double>
                 outEdgeMap.put( target, new OutEdge( target, weight ) );
             } */
 
-            return new PageRankVertex( vertexId, outEdgeMap, combiner );			
+//            return new PageRankVertex( vertexId, outEdgeMap, combiner );			
+            return new PageRankVertex( vertexId, outEdgeMap );			
 	}
         
         /*

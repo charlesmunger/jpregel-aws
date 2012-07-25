@@ -24,17 +24,17 @@ import system.combiners.IntegerMinCombiner;
  */
 public final class ShortestPathVertex extends Vertex<Integer, Message, OutEdge, Integer>
 {
-//    private static Combiner combiner = new IntegerMinCombiner();
+    private static Combiner combiner = new IntegerMinCombiner();
     
-    public ShortestPathVertex( Integer vertexId, Map<Object, OutEdge> outEdgeMap, Combiner<Integer> combiner )
+    public ShortestPathVertex( Integer vertexId, Map<Object, OutEdge> outEdgeMap )
     {
-        super( vertexId, outEdgeMap, combiner );
+        super( vertexId, outEdgeMap );
         setVertexValue( new Message<Integer, Integer>( vertexId, Integer.MAX_VALUE ) );
     }
     
     public ShortestPathVertex() {}
     
-    public Vertex make( String line, Combiner combiner )
+    public Vertex make( String line )
     {
         StringTokenizer stringTokenizer = new StringTokenizer( line );
         if ( ! stringTokenizer.hasMoreTokens() )
@@ -50,7 +50,7 @@ public final class ShortestPathVertex extends Vertex<Integer, Message, OutEdge, 
             int weight = Integer.parseInt( stringTokenizer.nextToken() ); 
             outEdgeMap.put( target, new OutEdge( target, weight ) );
         }
-        return new ShortestPathVertex( vertexId, outEdgeMap, combiner );
+        return new ShortestPathVertex( vertexId, outEdgeMap );
     }
     
     @Override

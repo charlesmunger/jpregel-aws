@@ -5,7 +5,6 @@ import masterGraphMakers.G1MasterGraphMaker;
 import masterOutputMakers.StandardMasterOutputMaker;
 import system.*;
 import system.aggregators.IntegerSumAggregator;
-import system.combiners.IntegerMinCombiner;
 import vertex.ShortestPathVertex;
 import workerGraphMakers.StandardWorkerGraphMaker;
 import workerOutputMakers.StandardWorkerOutputMaker;
@@ -20,25 +19,16 @@ public class ShortestPathLocalClient
      * @param args [0]: Job Directory
      *             [1]: Number of Workers
      *             [2]: true if and only if worker is to be multi-threaded
-     *             [3]: true if and only if messages are to be combined
      */
     public static void main(String[] args) throws RemoteException 
     {
         int numWorkers = Integer.parseInt(args[1]);
-        boolean combiningMessages = Boolean.parseBoolean(args[3]);
         int numParts = numWorkers * 2 * 2; // numWorkers * ComputeThreads/Worker * Parts/ComputeThread
-        Combiner combiner = null;
-        if (combiningMessages) 
-        {
-            combiner = new IntegerMinCombiner();
-        }
-
         Job job = new Job("Shortest Path Problem", // jobName
                   args[0],                         // jobDirectoryName
                   new ShortestPathVertex(),        // vertexFactory, 
                   numParts, 
                   Boolean.parseBoolean(args[2]),   // workerIsMultithreaded, 
-                  combiner, 
                   new StandardWorkerOutputMaker(), // workerWriter,
                   new StandardWorkerGraphMaker(),  // workerGraphMaker, 
                   new G1MasterGraphMaker(),        // MasterGraphMaker, 
@@ -50,7 +40,7 @@ public class ShortestPathLocalClient
         try 
         {
             boolean isEc2Master = false;
-            Client.run(job, isEc2Master, numWorkers); //TODO fix this
+            Client.run(job, isEc2Master, numWorkers);
         } catch (Exception exception) 
         {
             exception.printStackTrace();

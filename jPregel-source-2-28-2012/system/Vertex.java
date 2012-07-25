@@ -16,12 +16,12 @@ import java.util.Map;
 // * - Put RemoveVertex message in Inbox. Use combiners to resolve multiple requests. 
 // *   How to handle request where no such Vertex exists?
 // * - Design and implement Vertex AddVertex conflict "handler". Use combiner concept, where feasible.
-// * 
+// 
 /**
  * !! Is it safe & faster to make MessageQ thread-safe & remove synchronization of receive methods?
  * 
  * I currently am of the opinion that vertex does not need the bit of state 
- * explicitly designating it active. Instead I will:
+ * explicitly designating it active/inactive. Instead I will:
  * 
  *  1. make it the responsibility of the graph maker to add source vertices in 
  *     the active set for the initial super step;
@@ -34,7 +34,7 @@ import java.util.Map;
  * not in and of itself constitute a state change for the vertex. If I encounter 
  * an algorithm that falsifies this assumption, I will revise this view. 
  * 
- * In the meantime, a vertex'x compute method no longer needs to vote to halt.
+ * In the meantime, the compute method no longer needs to vote to halt.
  * This method thus has been removed from the API.
  * 
  * When a vertex completes the compute method for a super step, it may not have
@@ -48,22 +48,24 @@ import java.util.Map;
  *
  * @author Peter Cappello
  */
-abstract public class Vertex<VertexIdType, VertexValueType, OutEdgeType, MessageValueType> implements java.io.Serializable
+abstract public class Vertex<VertexIdType, VertexValueType, OutEdgeType, MessageValueType> //implements java.io.Serializable
 {
-//    private static Combiner combiner;
+    public static Combiner combiner;
     
     private final VertexIdType    vertexId;
     private       VertexValueType vertexValue;
     private Part part;
     
+    /*
+     * This is no longer a Set<OutEdgeType> in preparation for implementing OutEdge deletion.
+     */
     private Map<Object, OutEdgeType> outEdgeMap;
     private NonNullMap<MessageValueType> superstepToMessageQMap;
 //    private NonNullMap<MessageValueType> superstepToInboxMap;
             
     public Vertex() { vertexId = null; }
           
-    // TODO Vertex: Make Combiner a static field of Vertex class
-    public Vertex( VertexIdType vertexId, Map<Object, OutEdgeType> outEdgeMap, Combiner combiner )
+    public Vertex( VertexIdType vertexId, Map<Object, OutEdgeType> outEdgeMap )
     {
         this.vertexId   = vertexId;
         this.outEdgeMap = outEdgeMap;
@@ -100,7 +102,7 @@ abstract public class Vertex<VertexIdType, VertexValueType, OutEdgeType, Message
         MessageQ<MessageValueType> messageQ = superstepToMessageQMap.remove( getSuperStep() );
         if ( messageQ == null )
         {
-            messageQ = new MessageQ<MessageValueType>( part.getCombiner() );
+            messageQ = new MessageQ<MessageValueType>( combiner );
         }
         return messageQ.iterator(); 
     }
@@ -110,7 +112,7 @@ abstract public class Vertex<VertexIdType, VertexValueType, OutEdgeType, Message
         MessageQ<MessageValueType> messageQ = superstepToMessageQMap.remove( getSuperStep() );
         if ( messageQ == null )
         {
-            messageQ = new MessageQ<MessageValueType>( part.getCombiner() );
+            messageQ = new MessageQ<MessageValueType>( combiner );
         }
         return messageQ; 
     }
@@ -132,7 +134,7 @@ abstract public class Vertex<VertexIdType, VertexValueType, OutEdgeType, Message
         
     public VertexValueType getVertexValue() { return vertexValue; }
     
-    public abstract Vertex make( String line, Combiner combiner );
+    public abstract Vertex make( String line );
     
     synchronized protected OutEdgeType removeEdge( VertexIdType vertexId ) { return outEdgeMap.remove( vertexId ); }
 
@@ -168,6 +170,8 @@ abstract public class Vertex<VertexIdType, VertexValueType, OutEdgeType, Message
      */
     
 //    synchronized public boolean isNextStepActive() { return nextStepIsActive; }
+    
+    Combiner getCombiner() { return combiner; }
     
     void receiveMessage( Message newMessage, long superStep )
     { 

@@ -4,7 +4,6 @@ import java.rmi.RemoteException;
 import masterGraphMakers.G1MasterGraphMaker;
 import masterOutputMakers.StandardMasterOutputMaker;
 import system.*;
-import system.combiners.IntegerMinCombiner;
 import vertex.ShortestPathVertex;
 import workerGraphMakers.StandardWorkerGraphMaker;
 import workerOutputMakers.StandardWorkerOutputMaker;
@@ -22,16 +21,10 @@ public class ShortestPathEc2Client extends Client
     {
         String jobName = "ShortestPath";
         String jobDirectoryName = args[0];
-        int numParts = Integer.parseInt(args[1]);
-        int numWorkers = Integer.parseInt(args[2]);
+        int numWorkers = Integer.parseInt(args[1]);
+        int numParts = numWorkers * 2 * 2; // numParts = numWorkers * ComputeThreads/Worker * Parts/ComputeThread;
         boolean workerIsMultithreaded = Boolean.parseBoolean(args[3]);
         boolean isEc2Master = true;
-        boolean combiningMessages = Boolean.parseBoolean(args[4]);
-        Combiner combiner = null;
-        if (combiningMessages) 
-        {
-            combiner = new IntegerMinCombiner();
-        }
         Vertex vertexFactory = new ShortestPathVertex();
         WorkerWriter workerWriter = new StandardWorkerOutputMaker();
         GraphMaker workerGraphMaker = new StandardWorkerGraphMaker();
@@ -39,9 +32,18 @@ public class ShortestPathEc2Client extends Client
         Writer writer = new StandardMasterOutputMaker();
         Job job = new Job(jobName,
                 jobDirectoryName,
-                vertexFactory, numParts, workerIsMultithreaded, combiner,
+                vertexFactory, numParts, workerIsMultithreaded, 
                 workerWriter, workerGraphMaker, reader, writer);
-        Client.run(job, isEc2Master, numWorkers);        
+        try
+        {
+            Client.run(job, isEc2Master, numWorkers);
+        }
+        catch ( Exception exception )
+        {
+            exception.printStackTrace();
+            System.exit( 1 );
+        }
+                
         System.exit(0);
     }
 }

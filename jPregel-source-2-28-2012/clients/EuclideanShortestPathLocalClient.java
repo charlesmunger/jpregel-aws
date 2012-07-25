@@ -22,7 +22,6 @@ public class EuclideanShortestPathLocalClient
      * @param args [0]: Job Directory
      *             [1]: Number of Workers
      *             [2]: true if and only if worker is to be multi-threaded
-     *             [3]: true if and only if messages are to be combined
      */
     public static void main( String[] args ) throws RemoteException
     {
@@ -31,14 +30,7 @@ public class EuclideanShortestPathLocalClient
         int     computeThreadsPerWorker = isMultithreaded ? Runtime.getRuntime().availableProcessors() : 1;
         int     partsPerComputeThread   = 2;
         int     numParts                = numWorkers * computeThreadsPerWorker * partsPerComputeThread;
-        boolean combiningMessages       = Boolean.parseBoolean( args[3] );
-        boolean isEc2Run                = Boolean.parseBoolean( args[4] );
-        Combiner combiner = null;
-        if ( combiningMessages )
-        {
-            combiner = new FloatMinCombiner();
-        }
-        
+        boolean isEc2Run = false;
         System.out.println("EuclideanShortestPathLocalClient: numWorkers: " + numWorkers + " isAWS run: " + isEc2Run);
         
         Job job = new Job( 
@@ -47,14 +39,13 @@ public class EuclideanShortestPathLocalClient
                 new EuclideanShortestPathVertex(),    // Vertex factory
                 numParts, 
                 Boolean.parseBoolean( args[2] ) ,     // Worker Is Multithreaded
-                combiner, 
                 new StandardWorkerOutputMaker(),      // WorkerWriter
                 new StandardWorkerGraphMaker(),       // WorkerGraphMaker
                 new StandardMasterGraphMaker(),       // MasterGraphMaker
                 new StandardMasterOutputMaker()       // Writer 
                 );
         job.setProblemAggregator( new IntegerSumAggregator() );
-        System.out.println( job );
+        System.out.println( job );    
         try
         {
             Client.run( job, isEc2Run, numWorkers); //TODO fix this

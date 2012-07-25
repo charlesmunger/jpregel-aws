@@ -18,7 +18,7 @@ public class JobRunData implements java.io.Serializable
     private final Date date;
     private final int numParts;
     private final boolean workerIsMultithreaded;
-    private final Combiner combiner;
+//    private final Combiner combiner;
     private final int numWorkers;
     private final long maxMemory = Runtime.getRuntime().maxMemory();
     
@@ -36,7 +36,7 @@ public class JobRunData implements java.io.Serializable
         date      = new Date();
         numParts = job.getNumParts();
         workerIsMultithreaded = job.getWorkerIsMultithreaded();
-        combiner = job.getCombiner();
+//        combiner = job.getCombiner();
         this.numWorkers = numWorkers;
         beginRunTime = currentTimeMillis();
     }
@@ -66,7 +66,6 @@ public class JobRunData implements java.io.Serializable
         stringBuffer.append( "\n   " ).append( maxMemory / 1000  ).append( " Maximum memory (KB)" );
         stringBuffer.append( "\n   " ).append( numParts ).append( " Parts" );
         stringBuffer.append( "\n   Workers are ").append( workerIsMultithreaded ? "" : "NOT").append( " multithreaded" );
-        stringBuffer.append( "\n   Messages will ").append( combiner != null ? "" : "NOT").append( " be combined\n   " );
         stringBuffer.append( numSuperSteps ).append( " super steps\n   " );
 
         stringBuffer.append( "\nElapsed times in milliseconds: \n   " );

@@ -13,13 +13,12 @@ import system.MasterGraphMaker;
 import system.Vertex;
 import system.WorkerWriter;
 import system.Writer;
-import system.combiners.IntegerMinCombiner;
 import workerGraphMakers.StandardWorkerGraphMaker;
 import workerOutputMakers.StandardWorkerOutputMaker;
 
-public class PageRankEc2Client extends Client {
-
-	public static void main( String[] args ) throws RemoteException
+public class PageRankEc2Client extends Client
+{
+    public static void main( String[] args ) throws RemoteException
     {
         String    jobName               = "PageRank";
         String    jobDirectoryName      = args[0];
@@ -27,14 +26,8 @@ public class PageRankEc2Client extends Client {
         int       numWorkers            = Integer.parseInt( args[2] );
         boolean   workerIsMultithreaded = Boolean.parseBoolean( args[3]);
         boolean   isEc2Master           = true;
-        boolean combiningMessages       = Boolean.parseBoolean( args[4]);
-        String imageIdMaster = args[5] ; 
-        String imageIdWorker = args[6] ; 
-        Combiner combiner = null;
-        if ( combiningMessages )
-        {
-            combiner = new IntegerMinCombiner();
-        }
+        String imageIdMaster = args[4] ; 
+        String imageIdWorker = args[5] ; 
         Vertex vertexFactory = new PageRankVertex();
         WorkerWriter workerWriter = new StandardWorkerOutputMaker();
         GraphMaker workerGraphMaker = new StandardWorkerGraphMaker();
@@ -43,10 +36,17 @@ public class PageRankEc2Client extends Client {
         
         Job job = new Job( jobName,
                 jobDirectoryName, 
-                vertexFactory, numParts, workerIsMultithreaded, combiner, 
+                vertexFactory, numParts, workerIsMultithreaded,  
                 workerWriter, workerGraphMaker, reader, writer );
-        Client.run( job, isEc2Master, numWorkers);    }
-	
-	
-	
+        try
+        {
+            Client.run( job, isEc2Master, numWorkers);    
+        }
+        catch ( Exception exception )
+        {
+            exception.printStackTrace();
+            System.exit( 1 );
+        }
+        System.exit( 0 );
+    }
 }

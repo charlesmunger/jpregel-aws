@@ -245,8 +245,9 @@ public final class Worker extends ServiceImpl
     synchronized public void addVertexToWorker( int partId, String stringVertex, Service sendingWorker )
     {
         Vertex vertexFactory = job.getVertexFactory();
-        Combiner combiner    = job.getCombiner();
-        Vertex vertex = vertexFactory.make( stringVertex, combiner );
+//        Combiner combiner    = job.getCombiner();
+//        Vertex vertex = vertexFactory.make( stringVertex, combiner );
+        Vertex vertex = vertexFactory.make( stringVertex );
         addVertexToPart( partId, vertex );
         sendCommand( sendingWorker, AddVertexToPartCompleteCommand );
     }
