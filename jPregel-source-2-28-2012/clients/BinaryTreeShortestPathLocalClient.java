@@ -20,7 +20,7 @@ public class BinaryTreeShortestPathLocalClient
      */
     public static void main( String[] args ) throws Exception
     {
-        int numWorkers = 3; 
+        int numWorkers = 2; 
         int computeThreadsPerWorker = Runtime.getRuntime().availableProcessors();
         int partsPerComputeThread = 2;
         int numParts = numWorkers * computeThreadsPerWorker * partsPerComputeThread;        
