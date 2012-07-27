@@ -36,7 +36,7 @@ public final class BinaryTreeShortestPathVertex extends Vertex<Integer, Message<
         
         numVertices = Integer.parseInt( stringTokenizer.nextToken() );
         Map<Integer, Message<Integer, Integer>> outEdgeMap = new HashMap<Integer, Message<Integer, Integer>>();
-        Integer targetVertexId = 2 * getVertexId();
+        Integer targetVertexId = 2 * vertexId;
         
         if ( targetVertexId <= numVertices )
         {   // make OutEdge for left child

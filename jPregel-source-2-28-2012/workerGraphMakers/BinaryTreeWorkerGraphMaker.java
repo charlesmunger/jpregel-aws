@@ -63,7 +63,7 @@ public class BinaryTreeWorkerGraphMaker implements GraphMaker
             for ( int vertexId = startVertexId; vertexId <= stopVertexId; vertexId++ )
             {
                 StringBuilder stringVertex = new StringBuilder();
-                stringVertex.append( vertexId );
+                stringVertex.append( vertexId ).append(' ').append( numVertices );
                 
                 // initialize vertexValue
                 Integer initialKnownDistance = ( vertexId == 1 ) ? 0 : Integer.MAX_VALUE;

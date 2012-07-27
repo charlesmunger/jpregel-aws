@@ -20,7 +20,7 @@ public class BinaryTreeShortestPathLocalClient
      */
     public static void main( String[] args ) throws Exception
     {
-        int numWorkers = 1; 
+        int numWorkers = 3; 
         int computeThreadsPerWorker = Runtime.getRuntime().availableProcessors();
         int partsPerComputeThread = 2;
         int numParts = numWorkers * computeThreadsPerWorker * partsPerComputeThread;        
@@ -35,6 +35,7 @@ public class BinaryTreeShortestPathLocalClient
                 new BinaryTreeMasterGraphMaker(),   // MasterGraphMaker !! Make for binart tree
                 new StandardMasterOutputMaker()     // Writer 
                 );
+//        System.out.println("JVM data model: " + System.getProperty("sun.arch.data.model"));
         job.setProblemAggregator( new NullAggregator() );
         System.out.println( job + "\n  numWorkers: " + numWorkers );
         boolean isEc2Master = false;

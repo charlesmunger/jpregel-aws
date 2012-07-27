@@ -183,7 +183,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
             stepAggregator = job.makeStepAggregator(); // initialize stepAggregator
             barrierComputation(startSuperStep); // broadcaast to workers: start a super step
             // BEGIN Progress monitoring
-            if (superStep % 10 == 0) 
+            if (superStep % 4 == 0) 
             {
                 long endStepTime = System.currentTimeMillis();
                 long elapsedTime = endStepTime - startStepTime;
