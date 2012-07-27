@@ -21,10 +21,11 @@ import system.MasterGraphMaker;
  *
  * @author Pete Cappello
  */
-public class GridMasterGraphMaker implements MasterGraphMaker {
-
+public class GridMasterGraphMaker implements MasterGraphMaker 
+{
     @Override
-    public void make(FileSystem fileSystem, int numWorkers) {
+    public void make(FileSystem fileSystem, int numWorkers) 
+    {
         try 
         {
             // make file
@@ -52,13 +53,13 @@ public class GridMasterGraphMaker implements MasterGraphMaker {
                     BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(dataOutputStream));
 
                     // line = "N blockSize row col" as described in preamble
-                    StringBuffer stringBuffer = new StringBuffer();
-                    stringBuffer.append(N).append(' ');
-                    stringBuffer.append(blockSize).append(' ');
-                    stringBuffer.append(row * blockSize).append(' ');
-                    stringBuffer.append(col * blockSize);
+                    StringBuilder string = new StringBuilder();
+                    string.append(N).append(' ');
+                    string.append(blockSize).append(' ');
+                    string.append(row * blockSize).append(' ');
+                    string.append(col * blockSize);
 
-                    line = new String(stringBuffer);
+                    line = new String(string);
                     out.println("GridMasterGraphMaker: line: " + line);
                     bufferedWriter.write(line);
 

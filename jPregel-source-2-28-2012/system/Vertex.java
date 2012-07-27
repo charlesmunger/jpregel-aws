@@ -48,28 +48,29 @@ import java.util.Map;
  *
  * @author Peter Cappello
  */
-abstract public class Vertex<VertexIdType, VertexValueType, OutEdgeType, MessageValueType> //implements java.io.Serializable
+abstract public class Vertex<VertexIdType, VertexValueType, OutEdgeType, MessageValueType> implements java.io.Serializable
 {
-    public static Combiner combiner;
+    public    static Combiner combiner;
+    protected static int      numVertices;
     
     private final VertexIdType    vertexId;
     private       VertexValueType vertexValue;
-    private Part part;
+    private       Part            part;
     
     /*
      * This is no longer a Set<OutEdgeType> in preparation for implementing OutEdge deletion.
      */
-    private Map<Object, OutEdgeType> outEdgeMap;
-    private NonNullMap<MessageValueType> superstepToMessageQMap;
+    private Map<VertexIdType, OutEdgeType> outEdgeMap;
+    private NonNullMap<VertexIdType, MessageValueType> superstepToMessageQMap;
 //    private NonNullMap<MessageValueType> superstepToInboxMap;
             
     public Vertex() { vertexId = null; }
           
-    public Vertex( VertexIdType vertexId, Map<Object, OutEdgeType> outEdgeMap )
+    public Vertex( VertexIdType vertexId, Map<VertexIdType, OutEdgeType> outEdgeMap )
     {
         this.vertexId   = vertexId;
         this.outEdgeMap = outEdgeMap;
-        superstepToMessageQMap = new NonNullMap<MessageValueType>( combiner );
+        superstepToMessageQMap = new NonNullMap<VertexIdType, MessageValueType>( combiner );
     }
     
     /* _________________________________________
@@ -97,22 +98,22 @@ abstract public class Vertex<VertexIdType, VertexValueType, OutEdgeType, Message
     
     protected Aggregator getInputProblemAggregator() { return part.getComputeInput().getProblemAggregator(); }
 
-    synchronized protected Iterator<Message<?, MessageValueType>> getMessageIterator()
+    synchronized protected Iterator<Message<VertexIdType, MessageValueType>> getMessageIterator()
     {
-        MessageQ<MessageValueType> messageQ = superstepToMessageQMap.remove( getSuperStep() );
+        MessageQ<VertexIdType, MessageValueType> messageQ = superstepToMessageQMap.remove( getSuperStep() );
         if ( messageQ == null )
         {
-            messageQ = new MessageQ<MessageValueType>( combiner );
+            messageQ = new MessageQ<VertexIdType, MessageValueType>( combiner );
         }
         return messageQ.iterator(); 
     }
     
-    synchronized protected MessageQ<MessageValueType> getMessageQ()
+    synchronized protected MessageQ<VertexIdType, MessageValueType> getMessageQ()
     {
-        MessageQ<MessageValueType> messageQ = superstepToMessageQMap.remove( getSuperStep() );
+        MessageQ<VertexIdType, MessageValueType> messageQ = superstepToMessageQMap.remove( getSuperStep() );
         if ( messageQ == null )
         {
-            messageQ = new MessageQ<MessageValueType>( combiner );
+            messageQ = new MessageQ<VertexIdType, MessageValueType>( combiner );
         }
         return messageQ; 
     }
@@ -183,4 +184,6 @@ abstract public class Vertex<VertexIdType, VertexValueType, OutEdgeType, Message
     void removeMessageQ( long superStep ) { superstepToMessageQMap.remove( superStep ); }
                     
     void setPart( Part part ) { this.part = part; }
+    
+    void setNumVertices( int numV ) { numVertices = numV; }
 }

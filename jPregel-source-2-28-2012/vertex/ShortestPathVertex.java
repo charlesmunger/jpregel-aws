@@ -22,11 +22,11 @@ import system.combiners.IntegerMinCombiner;
  * 
  * @author Pete Cappello
  */
-public final class ShortestPathVertex extends Vertex<Integer, Message, OutEdge, Integer>
+public final class ShortestPathVertex extends Vertex<Integer, Message<Integer, Integer>, OutEdge, Integer>
 {
     private static Combiner combiner = new IntegerMinCombiner();
     
-    public ShortestPathVertex( Integer vertexId, Map<Object, OutEdge> outEdgeMap )
+    public ShortestPathVertex( Integer vertexId, Map<Integer, OutEdge> outEdgeMap )
     {
         super( vertexId, outEdgeMap );
         setVertexValue( new Message<Integer, Integer>( vertexId, Integer.MAX_VALUE ) );
@@ -43,7 +43,7 @@ public final class ShortestPathVertex extends Vertex<Integer, Message, OutEdge, 
             exit( 1 );
         }
         int vertexId = Integer.parseInt( stringTokenizer.nextToken() );
-        Map<Object, OutEdge> outEdgeMap = new HashMap<Object, OutEdge>();
+        Map<Integer, OutEdge> outEdgeMap = new HashMap<Integer, OutEdge>();
         while( stringTokenizer.hasMoreTokens() )
         { 
             int target = Integer.parseInt( stringTokenizer.nextToken() );
@@ -58,8 +58,8 @@ public final class ShortestPathVertex extends Vertex<Integer, Message, OutEdge, 
     {
         // compute currently known minimum distance from source to me
         int minDistance = isSource() ? 0 : Integer.MAX_VALUE;
-        Message<?, Integer> minDistanceMessage = new Message<Integer, Integer>( getVertexId(), minDistance );
-        for ( Message<?, Integer> message : getMessageQ() )
+        Message<Integer, Integer> minDistanceMessage = new Message<Integer, Integer>( getVertexId(), minDistance );
+        for ( Message<Integer, Integer> message : getMessageQ() )
         {
             if ( message.getMessageValue() < minDistanceMessage.getMessageValue() )
             {
@@ -94,13 +94,13 @@ public final class ShortestPathVertex extends Vertex<Integer, Message, OutEdge, 
     @Override
     public String output() 
     {
-        StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append( getVertexId() );
-        stringBuffer.append( " : ");
-        stringBuffer.append( getVertexValue().getVertexId() );
-        stringBuffer.append( " ");
-        stringBuffer.append( getVertexValue().getMessageValue() );
-        return new String( stringBuffer );
+        StringBuilder string = new StringBuilder();
+        string.append( getVertexId() );
+        string.append( " : ");
+        string.append( getVertexValue().getVertexId() );
+        string.append( " ");
+        string.append( getVertexValue().getMessageValue() );
+        return new String( string );
     }
     
     protected boolean isSource() { return getVertexId() == 0; }

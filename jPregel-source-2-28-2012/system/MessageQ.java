@@ -1,20 +1,18 @@
 package system;
 
-import static java.lang.System.out;
-
 import java.util.LinkedList;
 
 /**
  *
  * @author Pete Cappello
  */
-final public class MessageQ<MessageValueType> extends LinkedList<Message<?, MessageValueType>>
+final public class MessageQ<VertexIdType, MessageValueType> extends LinkedList<Message<VertexIdType, MessageValueType>>
 {
-    private Combiner<MessageValueType> combiner; // == null: Combining is disabled
+    private Combiner<VertexIdType, MessageValueType> combiner; // == null: Combining is disabled
         
-    MessageQ( Combiner<MessageValueType> combiner ) { this.combiner = combiner; } 
+    MessageQ( Combiner<VertexIdType, MessageValueType> combiner ) { this.combiner = combiner; } 
     
-    synchronized public boolean add( Message<?, MessageValueType> message )
+    synchronized public boolean add( Message<VertexIdType, MessageValueType> message )
     {
         if ( ! isEmpty() && combiner != null ) 
         {
@@ -24,7 +22,7 @@ final public class MessageQ<MessageValueType> extends LinkedList<Message<?, Mess
         return super.add( message );
     }
     
-    synchronized public boolean addAll( MessageQ<MessageValueType> messageQ )
+    synchronized public boolean addAll( MessageQ<VertexIdType, MessageValueType> messageQ )
     {
         if ( ! isEmpty() && combiner != null ) 
         {

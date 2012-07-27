@@ -272,7 +272,7 @@ public final class Worker extends ServiceImpl
     
     // Command: ReadWorkerInputFile 
     synchronized public void processInputFile()
-    { 
+    {
         int numVertices = job.makeGraph( this );
         
         // ensure that all AddVertexToPath Commands complete

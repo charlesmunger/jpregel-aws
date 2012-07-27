@@ -23,7 +23,7 @@ public class EuclideanShortestPathLocalClient
      *             [1]: Number of Workers
      *             [2]: true if and only if worker is to be multi-threaded
      */
-    public static void main( String[] args ) throws RemoteException
+    public static void main( String[] args ) throws Exception
     {
         int     numWorkers              = Integer.parseInt(     args[1] );
         boolean isMultithreaded         = Boolean.parseBoolean( args[2] );
@@ -46,15 +46,7 @@ public class EuclideanShortestPathLocalClient
                 );
         job.setProblemAggregator( new IntegerSumAggregator() );
         System.out.println( job );    
-        try
-        {
-            Client.run( job, isEc2Run, numWorkers); //TODO fix this
-        } 
-        catch ( Exception exception )
-        {
-            exception.printStackTrace();
-            System.exit(1);
-        }
+        Client.run( job, isEc2Run, numWorkers); //TODO fix this
         System.exit( 0 );
     }
 }

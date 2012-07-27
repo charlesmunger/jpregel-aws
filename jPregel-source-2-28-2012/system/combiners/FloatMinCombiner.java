@@ -1,5 +1,6 @@
 package system.combiners;
 
+import java.awt.geom.Point2D;
 import system.Combiner;
 import system.Message;
 
@@ -7,9 +8,9 @@ import system.Message;
  *
  * @author Pete Cappello
  */
-public class FloatMinCombiner extends Combiner<Float>
+public class FloatMinCombiner extends Combiner<Point2D.Float, Float>
 {
-    protected Message<?, Float> combine( Message<?, Float> currentMessage, Message<?, Float> newMessage ) 
+    protected Message combine( Message<Point2D.Float, Float> currentMessage, Message<Point2D.Float, Float> newMessage ) 
     {
         return ( currentMessage.getMessageValue() <= newMessage.getMessageValue() ) ? currentMessage : newMessage;
     }

@@ -22,17 +22,17 @@ import system.combiners.FloatMinCombiner;
  * 
  * @author Pete Cappello
  */
-public final class EuclideanShortestPathVertex extends Vertex<Point2D.Float, Message, Point2D.Float, Float>
+public final class EuclideanShortestPathVertex extends Vertex<Point2D.Float, Message<Point2D.Float, Float>, Point2D.Float, Float>
 {
     public static Combiner combiner = new FloatMinCombiner();
     
-    public EuclideanShortestPathVertex( Point2D.Float vertexId, Map<Object, Point2D.Float> outEdgeMap )
+    public EuclideanShortestPathVertex( Point2D.Float vertexId, Map<Point2D.Float, Point2D.Float> outEdgeMap )
     {
         super( vertexId, outEdgeMap );
         setVertexValue( new Message( vertexId, Float.MAX_VALUE ) );
     }
     
-    public EuclideanShortestPathVertex() {}
+    public EuclideanShortestPathVertex() {} // needed to make vertexFactory
     
     public Vertex make( String line )
     {
@@ -45,7 +45,7 @@ public final class EuclideanShortestPathVertex extends Vertex<Point2D.Float, Mes
         float vx  = Float.parseFloat( stringTokenizer.nextToken() );
         float vy  = Float.parseFloat( stringTokenizer.nextToken() );
         Point2D.Float vertexId = new Point2D.Float( vx, vy);
-        Map<Object, Point2D.Float> outEdgeMap = new HashMap<Object, Point2D.Float>();
+        Map<Point2D.Float, Point2D.Float> outEdgeMap = new HashMap<Point2D.Float, Point2D.Float>();
         while( stringTokenizer.hasMoreTokens() )
         { 
             float x  = Float.parseFloat( stringTokenizer.nextToken() );
@@ -68,8 +68,8 @@ public final class EuclideanShortestPathVertex extends Vertex<Point2D.Float, Mes
     {
         // compute currently known minimum distance from source to me
         Float minDistance = isSource() ? (float) 0.0 : Float.MAX_VALUE;
-        Message<?, Float> minDistanceMessage = new Message<Point2D.Float, Float>( getVertexId(), minDistance );
-        for ( Message<?, Float> message : getMessageQ() )
+        Message<Point2D.Float, Float> minDistanceMessage = new Message<Point2D.Float, Float>( getVertexId(), minDistance );
+        for ( Message<Point2D.Float, Float> message : getMessageQ() )
         {
             if ( message.getMessageValue() < minDistanceMessage.getMessageValue() )
             {
@@ -77,7 +77,7 @@ public final class EuclideanShortestPathVertex extends Vertex<Point2D.Float, Mes
             }
         }
         
-        if ( minDistanceMessage.getMessageValue() < ((Message<Point2D.Float, Float>) getVertexValue() ).getMessageValue() )
+        if ( minDistanceMessage.getMessageValue() < getVertexValue().getMessageValue() )
         {
             // found a new shorter path from the source to me
             setVertexValue( minDistanceMessage ); // update my value: the shortest path to me
@@ -105,13 +105,13 @@ public final class EuclideanShortestPathVertex extends Vertex<Point2D.Float, Mes
     @Override
     public String output() 
     {
-        StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append( getVertexId() );
-        stringBuffer.append( " : ");
-        stringBuffer.append(  getVertexValue().getVertexId() );
-        stringBuffer.append( " --- ");
-        stringBuffer.append( getVertexValue().getMessageValue() );
-        return new String( stringBuffer );
+        StringBuilder string = new StringBuilder();
+        string.append( getVertexId() );
+        string.append( " : ");
+        string.append(  getVertexValue().getVertexId() );
+        string.append( " - ");
+        string.append( getVertexValue().getMessageValue() );
+        return new String( string );
     }
     
     /*

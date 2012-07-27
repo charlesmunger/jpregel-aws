@@ -6,7 +6,7 @@ import java.io.Serializable;
  *
  * @author Pete Cappello
  */
-public class Combiner<MessageValueType> implements Serializable
+public class Combiner<VertexIdType, MessageValueType> implements Serializable
 {            
-    protected Message<?, MessageValueType> combine( Message<?, MessageValueType> currentMessage, Message<?, MessageValueType> newMessage ) { return null; } 
+    protected Message<VertexIdType, MessageValueType> combine( Message<VertexIdType, MessageValueType> currentMessage, Message<VertexIdType, MessageValueType> newMessage ) { return null; } 
 }

@@ -29,12 +29,12 @@ public final class Job implements Serializable
     private FileSystem fileSystem;
 
     /*
-     * @param numParts - this is a Job attribute so that we can conveniently 
-     * modify it per Job, to find a good value that appears to be primarily a 
-     * function of graph problem type.
+     * @param numParts - a Job attribute so that we can conveniently modify it
+     * per Job, to find a good value that appears to be primarily a function of 
+     * graph structure and size, and possibly problem type (e.g., shortest path)
      */
     public Job( String jobName, String jobDirectoryName, Vertex vertexFactory, 
-            int numParts, boolean workerIsMultithreaded, //Combiner combiner, 
+                int numParts, boolean workerIsMultithreaded, 
                 WorkerWriter workerWriter, GraphMaker workerGraphMaker,
                 MasterGraphMaker reader, Writer writer )
     {
@@ -67,12 +67,10 @@ public final class Job implements Serializable
         writer                = job.getWriter();
     }  
         
-    public FileSystem getFileSystem()    { return fileSystem; }
+    public FileSystem getFileSystem() { return fileSystem; }
     
-    public int        getNumParts()      { return numParts; }
-    
-//    public int        getPartId( Vertex vertex ) { return getPartId( vertex.getVertexId() ); }
-    
+    public int        getNumParts()   { return numParts; }
+            
     public int        getPartId( Object vertexId ) { return vertexFactory.getPartId( vertexId, getNumParts() ); }
     
     public Vertex     getVertexFactory() { return vertexFactory; }
@@ -140,19 +138,19 @@ public final class Job implements Serializable
     
     public String toString()
     {
-        StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append("Job:\n\t");
-        stringBuffer.append("Name: ").append(jobName).append("\n\t");
-        stringBuffer.append("Directory name: ").append(jobDirectoryName).append("\n\t");
-        stringBuffer.append("Number of parts: ").append(numParts).append("\n\t");
-        stringBuffer.append("Worker is multithreaded: ").append(workerIsMultithreaded).append("\n\t");
-        stringBuffer.append("Step Aggregator: ").append(stepAggregator.getClass().getCanonicalName()).append("\n\t");
-        stringBuffer.append("Problem Aggregator: ").append(problemAggregator.getClass().getCanonicalName()).append("\n\t");
-        stringBuffer.append("Vertex factory: ").append(vertexFactory.getClass().getCanonicalName()).append("\n\t");
-        stringBuffer.append("Worker writer: ").append(workerWriter.getClass().getCanonicalName()).append("\n\t");
-        stringBuffer.append("Worker graph maker: ").append(workerGraphMaker.getClass().getCanonicalName()).append("\n\t");
-        stringBuffer.append("Master graph maker: ").append(masterGraphMaker.getClass().getCanonicalName()).append("\n\t");
-        stringBuffer.append("Writer: ").append(writer.getClass().getCanonicalName()).append("\n\t");
-        return new String( stringBuffer );
+        StringBuilder string = new StringBuilder();
+        string.append("Job:\n\t");
+        string.append("Name: ").append(jobName).append("\n\t");
+        string.append("Directory name: ").append(jobDirectoryName).append("\n\t");
+        string.append("Number of parts: ").append(numParts).append("\n\t");
+        string.append("Worker is multithreaded: ").append(workerIsMultithreaded).append("\n\t");
+        string.append("Step Aggregator: ").append(stepAggregator.getClass().getCanonicalName()).append("\n\t");
+        string.append("Problem Aggregator: ").append(problemAggregator.getClass().getCanonicalName()).append("\n\t");
+        string.append("Vertex factory: ").append(vertexFactory.getClass().getCanonicalName()).append("\n\t");
+        string.append("Worker writer: ").append(workerWriter.getClass().getCanonicalName()).append("\n\t");
+        string.append("Worker graph maker: ").append(workerGraphMaker.getClass().getCanonicalName()).append("\n\t");
+        string.append("Master graph maker: ").append(masterGraphMaker.getClass().getCanonicalName()).append("\n\t");
+        string.append("Writer: ").append(writer.getClass().getCanonicalName()).append("\n\t");
+        return new String( string );
     }
 }

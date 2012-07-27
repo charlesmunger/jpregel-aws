@@ -2,7 +2,6 @@ package clients;
 
 import static java.lang.System.out;
 
-import java.rmi.RemoteException;
 import vertex.TestMutabilityVertex;
 import masterGraphMakers.StandardMasterGraphMaker;
 import masterOutputMakers.StandardMasterOutputMaker;
@@ -25,7 +24,7 @@ public class TestMutabilityClient
     /**
      * @param args the command line arguments
      */
-    public static void main( String[] args ) throws RemoteException
+    public static void main( String[] args ) throws Exception
     {
         String  jobName               = "Test Graph Mutability Features";
         String  jobDirectoryName      = args[0];
@@ -49,16 +48,9 @@ public class TestMutabilityClient
                   jobDirectoryName, 
                   vertexFactory, numParts, workerIsMultithreaded,  
                   workerWriter, workerGraphMaker, reader, writer );
-        try
-        {
-            boolean isEc2Master = false;
-            Client.run( job, isEc2Master, numWorkers);
-        } 
-        catch ( Exception exception )
-        {
-            exception.printStackTrace();
-            System.exit(1);
-        }
+        System.out.println( job );
+        boolean isEc2Master = false;
+        Client.run( job, isEc2Master, numWorkers);
         System.exit( 0 );
     }
 }

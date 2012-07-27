@@ -1,11 +1,10 @@
 package clients;
 
-import java.rmi.RemoteException;
 import masterGraphMakers.GridMasterGraphMaker;
 import masterOutputMakers.StandardMasterOutputMaker;
-import system.*;
+import system.Client;
+import system.Job;
 import system.aggregators.IntegerSumAggregator;
-import system.combiners.FloatMinCombiner;
 import vertex.EuclideanShortestPathVertex;
 import workerGraphMakers.GridWorkerGraphMaker;
 import workerOutputMakers.StandardWorkerOutputMaker;
@@ -19,10 +18,10 @@ public class Euclidean2DGridShortestPathLocalClient
     /**
      * @param args [0]: Job directory name
      */
-    public static void main( String[] args ) throws RemoteException
+    public static void main( String[] args ) throws Exception
     {
         int numWorkers = 2 * 2; // should be n * n, for some natural number n
-        int computeThreadsPerWorker = 2;
+        int computeThreadsPerWorker = Runtime.getRuntime().availableProcessors();
         int partsPerComputeThread = 2;
         int numParts = numWorkers * computeThreadsPerWorker * partsPerComputeThread;        
         Job job = new Job(
@@ -39,16 +38,8 @@ public class Euclidean2DGridShortestPathLocalClient
         job.setProblemAggregator( new IntegerSumAggregator() );
         System.out.println( "Euclidean2DGridShortestPathMacClient: \n  numWorkers: " 
                 + numWorkers + "\n  numParts: " + numParts + "\n  " + job );
-        try
-        {
-            boolean   isEc2Master = false;
-            Client.run( job, isEc2Master, numWorkers); //TODO fix this
-        } 
-        catch ( Exception exception )
-        {
-            exception.printStackTrace();
-            System.exit(1);
-        }
+        boolean isEc2Master = false;
+        Client.run( job, isEc2Master, numWorkers);
         System.exit( 0 );
     }
 }

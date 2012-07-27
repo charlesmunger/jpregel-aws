@@ -1,9 +1,10 @@
 package masterGraphMakers;
 
-import JpAws.S3MasterInputMaker;
-import java.io.*;
 import static java.lang.System.err;
 import static java.lang.System.exit;
+
+import JpAws.S3MasterInputMaker;
+import java.io.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import system.FileSystem;
@@ -13,11 +14,8 @@ import system.MasterGraphMaker;
  *
  * @author Pete Cappello
  */
-public class G1MasterGraphMaker implements MasterGraphMaker 
+public class BinaryTreeMasterGraphMaker implements MasterGraphMaker
 {
-    /**
-     *
-     */
     @Override
     public void make(FileSystem fileSystem, int numWorkers) 
     {
@@ -41,7 +39,7 @@ public class G1MasterGraphMaker implements MasterGraphMaker
             } 
             catch (FileNotFoundException ex) 
             {
-                System.out.println("Error getting local filesystem input stream: " + ex.getLocalizedMessage());
+                System.err.println("Error getting local filesystem input stream: " + ex.getLocalizedMessage());
             }
             dataInputStream = new DataInputStream(fileInputStream);
             bufferedReader = new BufferedReader(new InputStreamReader(dataInputStream));
@@ -57,7 +55,7 @@ public class G1MasterGraphMaker implements MasterGraphMaker
         } 
         catch (IOException ex) 
         {
-            System.out.println("Error reading lines from file" + ex.getLocalizedMessage());
+            System.err.println("Error reading lines from file" + ex.getLocalizedMessage());
         }
         int numV = Integer.parseInt(line);
         if ( ! isEc2 ) 
@@ -72,7 +70,7 @@ public class G1MasterGraphMaker implements MasterGraphMaker
                 System.out.println("Error closing input streams"+ex.getLocalizedMessage());
             }
         }
-        int vertexNum = 0;
+        int vertexNum = 1;
         for ( int fileNum = 1; fileNum <= numWorkers; fileNum++) 
         {
             // open file for output in "in" directory
@@ -83,44 +81,37 @@ public class G1MasterGraphMaker implements MasterGraphMaker
             } 
             catch (FileNotFoundException ex) 
             {
-                System.out.println("Error getting output file stream: " + ex.getMessage());
+                System.err.println("Error getting output file stream: " + ex.getMessage());
                 System.exit(1);
             }
             DataOutputStream dataOutputStream = new DataOutputStream(fileOutputStream);
             BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(dataOutputStream));
 
-            int linesPerFile = numV / numWorkers;
+            int verticesPerFile = numV / numWorkers;
             if (fileNum <= numV % numWorkers) 
             {
-                linesPerFile++;
+                verticesPerFile++;
             }
-
-            for (int lineNum = 0; lineNum < linesPerFile; lineNum++)
-            {
-                // create line for vertex whose number is vertexNum
-                StringBuilder string = new StringBuilder();
-                string.append(vertexNum).append(' ');
-                for (int targetVertexNum = vertexNum + 1; targetVertexNum < numV; targetVertexNum++)
-                {
-                    string.append(targetVertexNum).append(' ');
-                    int value = (targetVertexNum == vertexNum + 1) ? -1 : 1;
-                    string.append(value).append(' ');
-                }
-                String lines = new String(string);
-                try 
-                {
-                    // append line to output file
-                    bufferedWriter.write(lines);
-                    bufferedWriter.newLine();
-                } 
-                catch (IOException ex) 
-                {
-                    System.out.println("Error writing lines to file: " + ex.getLocalizedMessage());
-                }
-                vertexNum++;
-            }
+            
+            //output line: startVertexId stopVertexId
+            StringBuilder string = new StringBuilder();
+            string.append(vertexNum).append(' ');
+            vertexNum += ( verticesPerFile - 1 );
+            string.append( vertexNum++ ).append(' ');
+            string.append( numV );
+            System.out.println("BinaryTreeMasterGraphMaker.make: worker: " + fileNum
+                    + " " + string );
             try 
             {
+                bufferedWriter.write( new String(string) );
+                bufferedWriter.newLine();
+            } 
+            catch (IOException ex) 
+            {
+                System.err.println("Error writing line to file: " + ex.getLocalizedMessage());
+            }
+            try 
+            {   // close worker input file
                 bufferedWriter.close();
                 dataOutputStream.close();
                 fileOutputStream.close();
@@ -141,7 +132,7 @@ public class G1MasterGraphMaker implements MasterGraphMaker
         } 
         catch (IOException ex) 
         {
-            System.out.println("Error closing bufferedReader: " + ex.getMessage());
+            System.err.println("Error closing bufferedReader: " + ex.getMessage());
         }
     }
 }

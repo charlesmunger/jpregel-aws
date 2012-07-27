@@ -20,7 +20,7 @@ import system.Vertex;
 public class TestMutabilityVertex extends Vertex<Integer, Message, OutEdge, Integer>
 {
 //    public TestMutabilityVertex( Integer vertexId, Map<Object, OutEdge> outEdgeMap, Combiner<Integer> combiner )
-    public TestMutabilityVertex( Integer vertexId, Map<Object, OutEdge> outEdgeMap )
+    public TestMutabilityVertex( Integer vertexId, Map<Integer, OutEdge> outEdgeMap )
     {
 //        super( vertexId, outEdgeMap, combiner );
         super( vertexId, outEdgeMap );
@@ -39,7 +39,7 @@ public class TestMutabilityVertex extends Vertex<Integer, Message, OutEdge, Inte
             exit( 1 );
         }
         int vertexId = Integer.parseInt( stringTokenizer.nextToken() );
-        Map<Object, OutEdge> outEdgeMap = new HashMap<Object, OutEdge>();
+        Map<Integer, OutEdge> outEdgeMap = new HashMap<Integer, OutEdge>();
         while( stringTokenizer.hasMoreTokens() )
         { 
             int target  = Integer.parseInt( stringTokenizer.nextToken() );
@@ -84,18 +84,18 @@ public class TestMutabilityVertex extends Vertex<Integer, Message, OutEdge, Inte
     @Override
     public String output() 
     {
-        StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append( getVertexId() );
-        stringBuffer.append( " : ");
-//        stringBuffer.append( ((Message)  getVertexValue() ).getMessageValue() );
+        StringBuilder string = new StringBuilder();
+        string.append( getVertexId() );
+        string.append( " : ");
+//        string.append( ((Message)  getVertexValue() ).getMessageValue() );
         for ( OutEdge outEdge : getOutEdgeValues() )
             {
-                stringBuffer.append( outEdge.getVertexId() );
-                stringBuffer.append( " ");
-                stringBuffer.append( outEdge.getEdgeValue() );
-                stringBuffer.append( " ");
+                string.append( outEdge.getVertexId() );
+                string.append( " ");
+                string.append( outEdge.getEdgeValue() );
+                string.append( " ");
             }
-        return new String( stringBuffer );
+        return new String( string );
     }
     
     protected boolean isSource() { return getVertexId() == 0; }

@@ -17,7 +17,7 @@ public class PageRankVertex extends Vertex<Integer, Double, OutEdge, Double>
     public static Combiner combiner = new IntegerMinCombiner();
     
 //    public PageRankVertex( Integer vertexId, Map<Object, OutEdge> outEdgeMap, Combiner<Integer> combiner )
-    public PageRankVertex( Integer vertexId, Map<Object, OutEdge> outEdgeMap )
+    public PageRankVertex( Integer vertexId, Map<Integer, OutEdge> outEdgeMap )
     {
 //        super( vertexId, outEdgeMap, combiner );
         super( vertexId, outEdgeMap );
@@ -34,7 +34,7 @@ public class PageRankVertex extends Vertex<Integer, Double, OutEdge, Double>
         double sum = 0 ; 
         if ( getSuperStep() >= 1 ) 
         {
-            Iterator<Message<?, Double>> messageSetIterator = getMessageIterator();
+            Iterator<Message<Integer, Double>> messageSetIterator = getMessageIterator();
 
             while ( messageSetIterator.hasNext() )
             {
@@ -66,18 +66,17 @@ public class PageRankVertex extends Vertex<Integer, Double, OutEdge, Double>
 	@Override
 	public String output() 
         {
-            StringBuffer stringBuffer = new StringBuffer();
-            stringBuffer.append( getVertexId() );
-            stringBuffer.append( " : ");
-//            stringBuffer.append( ((Message)  getVertexValue() ).getVertexId() );
-//            stringBuffer.append( " ");
-//            stringBuffer.append( ((Message) getVertexValue() ).getMessageValue() );
-            stringBuffer.append( getVertexValue() );
-            return new String( stringBuffer );
+            StringBuilder string = new StringBuilder();
+            string.append( getVertexId() );
+            string.append( " : ");
+//            string.append( ((Message)  getVertexValue() ).getVertexId() );
+//            string.append( " ");
+//            string.append( ((Message) getVertexValue() ).getMessageValue() );
+            string.append( getVertexValue() );
+            return new String( string );
 	}
 
 	@Override
-//	public Vertex make(String line, Combiner combiner)
         public Vertex make(String line)
         {
             StringTokenizer stringTokenizer = new StringTokenizer( line );
@@ -105,7 +104,7 @@ public class PageRankVertex extends Vertex<Integer, Double, OutEdge, Double>
             vertexId++ ; 
             }
 
-            Map<Object, OutEdge> outEdgeMap = new HashMap<Object, OutEdge>(); 
+            Map<Integer, OutEdge> outEdgeMap = new HashMap<Integer, OutEdge>(); 
             /*while( stringTokenizer.hasMoreTokens() )
             {
                     int target = Integer.parseInt( stringTokenizer.nextToken() );
@@ -113,7 +112,6 @@ public class PageRankVertex extends Vertex<Integer, Double, OutEdge, Double>
                 outEdgeMap.put( target, new OutEdge( target, weight ) );
             } */
 
-//            return new PageRankVertex( vertexId, outEdgeMap, combiner );			
             return new PageRankVertex( vertexId, outEdgeMap );			
 	}
         

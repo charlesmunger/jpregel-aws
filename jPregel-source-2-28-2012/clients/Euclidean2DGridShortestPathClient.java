@@ -16,12 +16,12 @@ import workerOutputMakers.StandardWorkerOutputMaker;
  *
  * @author Pete Cappello
  */
-public class Euclidean2DGridShortestPathClient
+public class Euclidean2DGridShortestPathClient 
 {
     /**
      * @param args the command line arguments
      */
-    public static void main( String[] args ) throws RemoteException
+    public static void main( String[] args ) throws Exception
     {
         String  jobName               = "Euclidean 2D Grid Shortest Path";
         String  jobDirectoryName      = args[0];
@@ -46,17 +46,9 @@ public class Euclidean2DGridShortestPathClient
                 workerWriter, 
                            workerGraphMaker, reader, writer );
         job.setProblemAggregator( new IntegerSumAggregator() );
-        try
-        {
-            boolean   isEc2Master = false;
-            System.out.println("Euclidean2DGridShortestPathClient.main: about to invoke Client.run");
-            Client.run( job, isEc2Master, numWorkers); //TODO fix this
-        }
-        catch ( Exception exception )
-        {
-            exception.printStackTrace();
-            System.exit(1);
-        }
+        boolean   isEc2Master = false;
+        System.out.println("Euclidean2DGridShortestPathClient.main: about to invoke Client.run");
+        Client.run( job, isEc2Master, numWorkers); 
         System.exit( 0 );
     }
 }

@@ -9,5 +9,8 @@ package system;
  */
 public interface MasterGraphMaker extends java.io.Serializable
 {
+    /*
+     * @return number of vertices in graph
+     */
     void make( FileSystem fileSystem, int numWorkers );
 }

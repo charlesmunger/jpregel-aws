@@ -1,6 +1,5 @@
 package clients;
 
-import java.rmi.RemoteException;
 import masterGraphMakers.G1MasterGraphMaker;
 import masterOutputMakers.StandardMasterOutputMaker;
 import system.*;
@@ -17,7 +16,7 @@ public class ShortestPathEc2Client extends Client
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws RemoteException 
+    public static void main(String[] args) throws Exception 
     {
         String jobName = "ShortestPath";
         String jobDirectoryName = args[0];
@@ -34,16 +33,8 @@ public class ShortestPathEc2Client extends Client
                 jobDirectoryName,
                 vertexFactory, numParts, workerIsMultithreaded, 
                 workerWriter, workerGraphMaker, reader, writer);
-        try
-        {
-            Client.run(job, isEc2Master, numWorkers);
-        }
-        catch ( Exception exception )
-        {
-            exception.printStackTrace();
-            System.exit( 1 );
-        }
-                
+        System.out.println( job );
+        Client.run(job, isEc2Master, numWorkers);     
         System.exit(0);
     }
 }

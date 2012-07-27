@@ -1,6 +1,7 @@
 package system;
  
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
@@ -11,7 +12,8 @@ public final class Part
     private final int partId;
     private final Job job;
     
-    private Map<Object, Vertex> vertexIdToVertexMap = Collections.synchronizedMap( new HashMap<Object, Vertex>() );   
+//    private Map<Object, Vertex> vertexIdToVertexMap = Collections.synchronizedMap( new HashMap<Object, Vertex>() );
+    private Map<Object, Vertex> vertexIdToVertexMap =  new ConcurrentHashMap<Object, Vertex>(); 
     private SuperStepToActiveSetMap superstepToActiveSetMap = new SuperStepToActiveSetMap();
     
     // superStep parameters

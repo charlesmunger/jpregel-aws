@@ -18,7 +18,7 @@ import workerOutputMakers.StandardWorkerOutputMaker;
 
 public class PageRankEc2Client extends Client
 {
-    public static void main( String[] args ) throws RemoteException
+    public static void main( String[] args ) throws Exception
     {
         String    jobName               = "PageRank";
         String    jobDirectoryName      = args[0];
@@ -38,15 +38,7 @@ public class PageRankEc2Client extends Client
                 jobDirectoryName, 
                 vertexFactory, numParts, workerIsMultithreaded,  
                 workerWriter, workerGraphMaker, reader, writer );
-        try
-        {
-            Client.run( job, isEc2Master, numWorkers);    
-        }
-        catch ( Exception exception )
-        {
-            exception.printStackTrace();
-            System.exit( 1 );
-        }
+        Client.run( job, isEc2Master, numWorkers);    
         System.exit( 0 );
     }
 }

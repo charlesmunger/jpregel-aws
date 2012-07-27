@@ -1,6 +1,5 @@
 package clients;
 
-import java.rmi.RemoteException;
 import masterGraphMakers.G1MasterGraphMaker;
 import masterOutputMakers.StandardMasterOutputMaker;
 import system.*;
@@ -20,7 +19,7 @@ public class ShortestPathLocalClient
      *             [1]: Number of Workers
      *             [2]: true if and only if worker is to be multi-threaded
      */
-    public static void main(String[] args) throws RemoteException 
+    public static void main(String[] args) throws Exception 
     {
         int numWorkers = Integer.parseInt(args[1]);
         int numParts = numWorkers * 2 * 2; // numWorkers * ComputeThreads/Worker * Parts/ComputeThread
@@ -37,15 +36,8 @@ public class ShortestPathLocalClient
         job.setProblemAggregator(new IntegerSumAggregator());
         job.setStepAggregator(new IntegerSumAggregator());
         System.out.println("ShortestPathLocalClient.main: numWorkers: " + numWorkers + "\n " + job );
-        try 
-        {
-            boolean isEc2Master = false;
-            Client.run(job, isEc2Master, numWorkers);
-        } catch (Exception exception) 
-        {
-            exception.printStackTrace();
-            System.exit(1);
-        }
+        boolean isEc2Master = false;
+        Client.run(job, isEc2Master, numWorkers);
         System.exit(0);
     }
 }

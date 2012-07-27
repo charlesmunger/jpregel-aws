@@ -1,33 +1,36 @@
 package system;
 
-import java.util.HashMap;
-import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
  * @author Pete Cappello
  */
-final public class NonNullMap<MessageValueType> extends HashMap<Long, MessageQ<MessageValueType>>
+//final public class NonNullMap<MessageValueType> extends HashMap<Long, MessageQ<MessageValueType>>
+final public class NonNullMap<VertexIdType, MessageValueType> extends ConcurrentHashMap<Long, MessageQ<VertexIdType, MessageValueType>>
 {
     private Combiner combiner;
     
     public NonNullMap( Combiner combiner ) { this.combiner = combiner; }
         
-    synchronized public MessageQ<MessageValueType> get( Long key )
+//    synchronized public MessageQ<MessageValueType> get( Long key )
+    public MessageQ<VertexIdType, MessageValueType> get( Long key )
     {
-        MessageQ<MessageValueType> value = super.get( key );
+        MessageQ<VertexIdType, MessageValueType> value = super.get( key );
         if ( value == null )
         {
-            value = new MessageQ<MessageValueType>( combiner );
+            value = new MessageQ<VertexIdType, MessageValueType>( combiner );
             super.put( key, value );
         }
         return value;
     }
     
-    synchronized public MessageQ<MessageValueType> put( Long key, MessageQ<MessageValueType> value )
+//    synchronized public MessageQ<MessageValueType> put( Long key, MessageQ<MessageValueType> value )
+    public MessageQ<VertexIdType, MessageValueType> put( Long key, MessageQ<VertexIdType, MessageValueType> value )
     {
         return super.put( key, value );
     }
     
-    synchronized public MessageQ<MessageValueType> remove( Long key ) { return super.remove( key ); }
+//    synchronized public MessageQ<MessageValueType> remove( Long key ) { return super.remove( key ); }
+    public MessageQ<VertexIdType, MessageValueType> remove( Long key ) { return super.remove( key ); }
 }

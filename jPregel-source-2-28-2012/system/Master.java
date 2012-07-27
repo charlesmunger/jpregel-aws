@@ -2,12 +2,7 @@ package system;
 
 import static java.lang.System.out;
 
-import java.io.IOException;
-import java.rmi.AlreadyBoundException;
-import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -23,7 +18,6 @@ import jicosfoundation.ServiceImpl;
 import jicosfoundation.ServiceName;
 import system.commands.CommandComplete;
 
-import JpAws.WorkerMachines;
 import system.commands.*;
 
 /**
@@ -42,11 +36,10 @@ import system.commands.*;
  * Ant tasks for Amazon Web Services jar files from
  *  https://github.com/crispywalrus/aws-tasks
  * 
- * Code mobility: jPregel comes with several job subclasses (e.g., shortest path).
- * The Master class path includes all these subclasses. By using a code base, 
- * a client can define a job that is not in the Master's classpath, by setting a
- * code base. These classes then can be downloaded by the Master via its RMI 
- * class loader.
+ * Code mobility: jPregel comes with several vertex subclasses.
+ * The Master/Worker jar includes all these subclasses. By using a code base, 
+ * a client can define a vertex subclass that is not in the Master's class path.
+ * These classes then are downloaded by the Master via its RMI class loader.
  * 
  * @author Pete Cappello
  */
@@ -139,40 +132,41 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     }
 
     /*
-     * @param masterJob - what job type & instance to run
-     * @param isEc2 - run mode: EC2 (true) | development (false)
+     * @param Job   - problem and instance parameters
+     * @param isEc2 - run mode: EC2 (true) | local (false)
      */
-    public JobRunData run(Job job, boolean isEc2) {
+    public JobRunData run(Job job, boolean isEc2) 
+    {
         // all Workers have registered with Master
         assert integerToWorkerMap.size() == numRegisteredWorkers.get();
 
         JobRunData jobRunData = new JobRunData(job, integerToWorkerMap.size());
 
         // broadcaast to workers: set your Job & FileSystem
-//        WorkerJob workerJob = job.getWorkerJob();
         String jobDirectoryName = job.getJobDirectoryName();
         FileSystem fileSystem = makeFileSystem(isEc2, jobDirectoryName);
         numUnfinishedWorkers = integerToWorkerMap.size();
         commandExeutionIsComplete = false;
         Command command = new SetJob(job, isEc2);
-        System.out.println("Master.run: about to broadcast SetJob command.");
         broadcast(command, this);
-        System.out.println("Master.run: finished broadcast of SetJob command.");
+
         // while workers SetJob, read Job input file, write Worker input files
         job.readJobInputFile(fileSystem, integerToWorkerMap.size());
 
-        // wait for all workers to SetJob before proceeding
-        try {
-            synchronized (this) {
-                if (!commandExeutionIsComplete) {
+        try 
+        {   // wait for all workers to SetJob before proceeding
+            synchronized (this) 
+            {
+                if (!commandExeutionIsComplete) 
+                {
                     wait(); // until numUnfinishedWorkers == 0 for SetJob
                 }
             }
-        } catch (InterruptedException ignore) {
-        }
+        } 
+        catch (InterruptedException ignore) {}
         jobRunData.setEndTimeSetWorkerJobAndMakeWorkerFiles();
 
-        // broadcaast to workers: read your input file
+        // broadcaast to workers: set job & read your input file
         barrierComputation(new ReadWorkerInputFile());
         jobRunData.setEndTimeReadWorkerInputFile();
 
@@ -189,7 +183,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
             stepAggregator = job.makeStepAggregator(); // initialize stepAggregator
             barrierComputation(startSuperStep); // broadcaast to workers: start a super step
             // BEGIN Progress monitoring
-            if (superStep % 1 == 0) 
+            if (superStep % 10 == 0) 
             {
                 long endStepTime = System.currentTimeMillis();
                 long elapsedTime = endStepTime - startStepTime;
