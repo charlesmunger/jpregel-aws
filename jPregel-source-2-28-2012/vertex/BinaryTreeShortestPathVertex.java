@@ -61,16 +61,11 @@ public final class BinaryTreeShortestPathVertex extends Vertex<Integer, Message<
         Message<Integer, Integer> minDistanceMessage = new Message<Integer, Integer>( getVertexId(), minDistance );
         for ( Message<Integer, Integer> message : getMessageQ() )
         {
-//            System.out.println("In MIN loop: incoming msg: " + message);
             if ( message.getMessageValue() < minDistanceMessage.getMessageValue() )
             {
                 minDistanceMessage = message;
             }
         }
-        
-//        System.out.println(" step: " + getSuperStep() + " vertex: " + getVertexId()
-//                + " AFTER minDistance: " + minDistanceMessage.getMessageValue()
-//                + " vertexValue minDistance: " + getVertexValue().getMessageValue() );
         
         if ( minDistanceMessage.getMessageValue() <  getVertexValue().getMessageValue() )
         {   // there is a new shorter path from the source to me
@@ -79,7 +74,6 @@ public final class BinaryTreeShortestPathVertex extends Vertex<Integer, Message<
             // To each target vertex: The shortest known path to you through me just got shorter
             for ( Message<Integer, Integer> outEdge : getOutEdgeValues() )            
             {
-//                System.out.println("In SEND loop: minDistanceMessage.getMessageValue(): " + minDistanceMessage.getMessageValue() + " outEdge: " + outEdge );
                 Message<Integer, Integer> message = new Message<Integer, Integer>( getVertexId(), minDistanceMessage.getMessageValue() + outEdge.getMessageValue() );   
                 sendMessage( outEdge.getVertexId(), message );
             }

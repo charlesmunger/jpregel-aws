@@ -12,6 +12,7 @@ public final class Part
     private final int partId;
     private final Job job;
     
+    // TODO Part: vertexIdToVertexMap: Consider constructing w/ a capacity of the Part's size.
 //    private Map<Object, Vertex> vertexIdToVertexMap = Collections.synchronizedMap( new HashMap<Object, Vertex>() );
     private Map<Object, Vertex> vertexIdToVertexMap =  new ConcurrentHashMap<Object, Vertex>(); 
     private SuperStepToActiveSetMap superstepToActiveSetMap = new SuperStepToActiveSetMap();
