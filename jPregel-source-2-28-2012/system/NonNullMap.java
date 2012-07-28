@@ -14,7 +14,7 @@ final public class NonNullMap<VertexIdType, MessageValueType> extends Concurrent
     public NonNullMap( Combiner combiner ) { this.combiner = combiner; }
         
 //    synchronized public MessageQ<VertexIdType, MessageValueType> get( Long key )
-    public MessageQ<VertexIdType, MessageValueType> get( Long key )
+    public MessageQ get( Long key )
     {
         putIfAbsent( key, new MessageQ<VertexIdType, MessageValueType>( combiner ) );
 //        MessageQ<VertexIdType, MessageValueType> value = super.get( key );
@@ -28,11 +28,11 @@ final public class NonNullMap<VertexIdType, MessageValueType> extends Concurrent
     }
     
 //    synchronized public MessageQ<VertexIdType, MessageValueType> put( Long key, MessageQ<VertexIdType, MessageValueType> value )
-    public MessageQ<VertexIdType, MessageValueType> put( Long key, MessageQ<VertexIdType, MessageValueType> value )
-    {
-        return super.put( key, value );
-    }
+//    public MessageQ<VertexIdType, MessageValueType> put( Long key, MessageQ<VertexIdType, MessageValueType> value )
+//    {
+//        return super.put( key, value );
+//    }
     
 //    synchronized public MessageQ<VertexIdType, MessageValueType> remove( Long key ) { return super.remove( key ); }
-    public MessageQ<VertexIdType, MessageValueType> remove( Long key ) { return super.remove( key ); }
+    public MessageQ remove( Long key ) { return super.remove( key ); }
 }

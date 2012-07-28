@@ -163,7 +163,6 @@ public final class Worker extends ServiceImpl
         return ( partId % numWorkers ) + 1;
     }
       
-//    synchronized public void addVertex( Vertex vertex, int partId, String stringVertex )
     synchronized public void addVertex( Vertex vertex, String stringVertex )
     {
         int partId = job.getPartId( vertex.getVertexId() );
@@ -184,7 +183,7 @@ public final class Worker extends ServiceImpl
             }
             numUnacknowledgedAddVertexCommands.getAndIncrement();
             Command command = new AddVertexToWorker( partId, stringVertex, this );
-            sendCommand( workerService, command );
+            sendCommand( workerService, command ); 
         }
     }
     

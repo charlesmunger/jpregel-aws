@@ -109,6 +109,8 @@ public final class Part
         addToActiveSet( superStep, vertex );
     }
     
+    void removeActiveSet( long superStep ) { superstepToActiveSetMap.remove( superStep ); }
+    
     void removeFromActiveSet( long superStep, Vertex vertex )
     {
         superstepToActiveSetMap.get( superStep ).remove( vertex );
