@@ -100,7 +100,7 @@ public class GridWorkerGraphMaker implements GraphMaker
                 stringVertex.append( x ).append( " ").append( y ).append( " ");
                 
                 // make its 2 out edges
-                Map<Object, Point2D.Float> outEdgeMap = new HashMap<Object, Point2D.Float>();
+                Map<Point2D.Float, Point2D.Float> outEdgeMap = new HashMap<Point2D.Float, Point2D.Float>();
                 Point2D.Float target;
                 
                 if ( x < N - 1 )

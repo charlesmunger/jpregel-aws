@@ -13,14 +13,15 @@ public final class Part
     private final Job job;
     
     // TODO Part: vertexIdToVertexMap: Consider constructing w/ a capacity of the Part's size.
-//    private Map<Object, Vertex> vertexIdToVertexMap = Collections.synchronizedMap( new HashMap<Object, Vertex>() );
-    private Map<Object, Vertex> vertexIdToVertexMap =  new ConcurrentHashMap<Object, Vertex>(); 
-    private SuperStepToActiveSetMap superstepToActiveSetMap = new SuperStepToActiveSetMap();
+    private Map<Object, Vertex> vertexIdToVertexMap = new ConcurrentHashMap<Object, Vertex>();
+    private OntoMap<Set<Vertex>> superstepToActiveSetMap = new OntoMap<Set<Vertex>>( new ActiveSet() );
+    // TODO remove SuperStepToActiveSetMap class
     
     // superStep parameters
     private ComputeThread computeThread;
     private long superStep;
     private ComputeInput computeInput;
+    
     // The following 3 parameters are modified by each vertex during its compute method
     private Aggregator outputProblemAggregator;
     private Aggregator outputStepAggregator;
@@ -41,11 +42,8 @@ public final class Part
         vertexIdToVertexMap.put( vertex.getVertexId(), vertex );
         if ( vertex.isSource() )
         {
-            if ( superstepToActiveSetMap == null )
-            {
-                System.out.println("Part.add: superstepToActiveSetMap: " + superstepToActiveSetMap);
-            }
-            superstepToActiveSetMap.get( 0 ).add( vertex );
+            Set<Vertex> activeSet = superstepToActiveSetMap.get( new Long(0) );
+            activeSet.add( vertex );
         }
     }
     
@@ -108,9 +106,7 @@ public final class Part
         vertex.receiveMessageQ( messageQ, superStep );
         addToActiveSet( superStep, vertex );
     }
-    
-    void removeActiveSet( long superStep ) { superstepToActiveSetMap.remove( superStep ); }
-    
+        
     void removeFromActiveSet( long superStep, Vertex vertex )
     {
         superstepToActiveSetMap.get( superStep ).remove( vertex );

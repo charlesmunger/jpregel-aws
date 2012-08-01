@@ -12,13 +12,10 @@ import java.text.SimpleDateFormat;
  */
 public class JobRunData implements java.io.Serializable
 {
-    private static final java.text.DateFormat dateFormatter = new SimpleDateFormat("MMM d, yyyy @ HH:mm:ss" );
     private final String jobName;
     private final long beginRunTime;
     private final Date date;
     private final int numParts;
-    private final boolean workerIsMultithreaded;
-//    private final Combiner combiner;
     private final int numWorkers;
     private final long maxMemory = Runtime.getRuntime().maxMemory();
     
@@ -35,8 +32,6 @@ public class JobRunData implements java.io.Serializable
         jobName   = job.getJobName();
         date      = new Date();
         numParts = job.getNumParts();
-        workerIsMultithreaded = job.getWorkerIsMultithreaded();
-//        combiner = job.getCombiner();
         this.numWorkers = numWorkers;
         beginRunTime = currentTimeMillis();
     }
@@ -55,34 +50,32 @@ public class JobRunData implements java.io.Serializable
     
     public String toString()
     {
-        StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append( '\n' );
-        stringBuffer.append( "\n_____________________________\n" );
-        stringBuffer.append( '\n' );
-        stringBuffer.append( jobName ).append( '\n' );
-        stringBuffer.append( DateFormat.getDateTimeInstance( DateFormat.FULL, 
+        StringBuilder string = new StringBuilder();
+        string.append( '\n' );
+        string.append( "\n_____________________________\n" );
+        string.append( '\n' );
+        string.append( jobName ).append( '\n' );
+        string.append( DateFormat.getDateTimeInstance( DateFormat.FULL, 
                                                              DateFormat.FULL ).format( date ) );
-        stringBuffer.append( "\n   " ).append( numWorkers ).append( " Workers" );
-        stringBuffer.append( "\n   " ).append( maxMemory / 1000  ).append( " Maximum memory (KB)" );
-        stringBuffer.append( "\n   " ).append( numParts ).append( " Parts" );
-        stringBuffer.append( "\n   Workers are ").append( workerIsMultithreaded ? "" : "NOT").append( " multithreaded" );
-        stringBuffer.append( numSuperSteps ).append( " super steps\n   " );
-
-        stringBuffer.append( "\nElapsed times in milliseconds: \n   " );
-        stringBuffer.append( endTimeRun - beginRunTime ).append( " : Overall run time\n   " );
-        stringBuffer.append( endTimeSetWorkerJobAndMakeWorkerFiles - beginRunTime );
-                stringBuffer.append( " : Set WorkerJob & make Worker files\n   " );
-        stringBuffer.append( endTimeReadWorkerInputFile - endTimeSetWorkerJobAndMakeWorkerFiles );
-        stringBuffer.append( " : Read Worker input files\n   " );
-        stringBuffer.append( endTimeComputation - endTimeReadWorkerInputFile );
-        stringBuffer.append( " : Computation\n   " );
-        stringBuffer.append( (endTimeComputation - endTimeReadWorkerInputFile) / ( numSuperSteps + 1 ) );
-        stringBuffer.append( " : average per super step \n   " );
-        stringBuffer.append(  endTimeWriteWorkerOutputFiles - endTimeComputation );
-        stringBuffer.append( " : Write Worker output files\n   " );
+        string.append( "\n   " ).append( numWorkers ).append( " Workers" );
+        string.append( "\n   " ).append( maxMemory / 1000  ).append( " Maximum memory (KB)" );
+        string.append( "\n   " ).append( numParts ).append( " Parts" );
+        string.append( "\n   ").append( numSuperSteps ).append( " super steps   " );
+        string.append( "\nElapsed times in milliseconds: \n   " );
+        string.append( endTimeRun - beginRunTime ).append( " : Overall run time\n   " );
+        string.append( endTimeSetWorkerJobAndMakeWorkerFiles - beginRunTime );
+        string.append( " : Set WorkerJob & make Worker files\n   " );
+        string.append( endTimeReadWorkerInputFile - endTimeSetWorkerJobAndMakeWorkerFiles );
+        string.append( " : Read Worker input files\n   " );
+        string.append( endTimeComputation - endTimeReadWorkerInputFile );
+        string.append( " : Computation\n   " );
+        string.append( (endTimeComputation - endTimeReadWorkerInputFile) / ( numSuperSteps + 1 ) );
+        string.append( " : average per super step \n   " );
+        string.append(  endTimeWriteWorkerOutputFiles - endTimeComputation );
+        string.append( " : Write Worker output files\n   " );
         
-        stringBuffer.append( "\n_____________________________\n" );
-        return new String( stringBuffer );
+        string.append( "\n_____________________________\n" );
+        return new String( string );
     }
     
     public String commaSeparatedValues()

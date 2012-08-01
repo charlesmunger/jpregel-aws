@@ -61,8 +61,9 @@ abstract public class Vertex<VertexIdType, VertexValueType, OutEdgeType, Message
      * This is no longer a Set<OutEdgeType> in preparation for implementing OutEdge deletion.
      */
     private Map<VertexIdType, OutEdgeType> outEdgeMap;
-    private NonNullMap<VertexIdType, MessageValueType> superstepToMessageQMap;
-//    private NonNullMap<MessageValueType> superstepToInboxMap;
+//    private NonNullMap<VertexIdType, MessageValueType> superstepToMessageQMap;
+    private OntoMap<MessageQ<VertexIdType, MessageValueType>> superstepToMessageQMap;
+//    private OntoMap<MessageValueType> superstepToInboxMap;
             
     public Vertex() { vertexId = null; }
           
@@ -70,7 +71,8 @@ abstract public class Vertex<VertexIdType, VertexValueType, OutEdgeType, Message
     {
         this.vertexId   = vertexId;
         this.outEdgeMap = outEdgeMap;
-        superstepToMessageQMap = new NonNullMap<VertexIdType, MessageValueType>( combiner );
+//        superstepToMessageQMap = new NonNullMap<VertexIdType, MessageValueType>( combiner );
+        superstepToMessageQMap = new OntoMap<MessageQ<VertexIdType, MessageValueType>>( new MessageQ( combiner ) );
     }
     
     /* _________________________________________

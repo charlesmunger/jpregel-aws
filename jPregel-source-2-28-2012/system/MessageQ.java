@@ -6,7 +6,9 @@ import java.util.LinkedList;
  *
  * @author Pete Cappello
  */
-final public class MessageQ<VertexIdType, MessageValueType> extends LinkedList<Message<VertexIdType, MessageValueType>>
+final public class MessageQ<VertexIdType, MessageValueType> 
+             extends    LinkedList<Message<VertexIdType, MessageValueType>>
+             implements Factory
 {
     private Combiner<VertexIdType, MessageValueType> combiner; // == null: Combining is disabled
         
@@ -31,5 +33,11 @@ final public class MessageQ<VertexIdType, MessageValueType> extends LinkedList<M
         }
         assert combiner == null || ( isEmpty() && messageQ.size() == 1 );
         return super.addAll( messageQ );
+    }
+
+    @Override
+    public MessageQ<VertexIdType, MessageValueType> make() 
+    {
+        return new MessageQ<VertexIdType, MessageValueType>( combiner );
     }
 }

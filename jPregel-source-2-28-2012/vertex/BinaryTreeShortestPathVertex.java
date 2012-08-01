@@ -67,7 +67,7 @@ public final class BinaryTreeShortestPathVertex extends Vertex<Integer, Message<
             }
         }
         
-        if ( minDistanceMessage.getMessageValue() <  getVertexValue().getMessageValue() )
+        if ( minDistanceMessage.getMessageValue() < getVertexValue().getMessageValue() )
         {   // there is a new shorter path from the source to me
             setVertexValue( minDistanceMessage ); // update my value: the shortest path to me
 
@@ -87,10 +87,8 @@ public final class BinaryTreeShortestPathVertex extends Vertex<Integer, Message<
     {
         StringBuilder string = new StringBuilder();
         string.append( getVertexId() );
-        string.append( " : ");
-        string.append(  getVertexValue().getVertexId() );
-        string.append( " - ");
-        string.append( getVertexValue().getMessageValue() );
+        string.append( " : ").append( getVertexValue().getVertexId() );
+        string.append( " - ").append( getVertexValue().getMessageValue() );
         return new String( string );
     }
     
