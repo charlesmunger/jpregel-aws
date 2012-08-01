@@ -95,7 +95,7 @@ public final class Worker extends ServiceImpl
     private int        deltaNumVertices;
     
     // coordination variables
-    private boolean haveMultipleComputeThreads = true;
+//    private boolean haveMultipleComputeThreads = true;
     private boolean thereIsANextStep;
     private AtomicInteger numUnacknowledgedAddVertexCommands = new AtomicInteger();
     private AtomicInteger numUnacknowledgedSendVertexIdToMessageQMaps = new AtomicInteger();
@@ -120,10 +120,10 @@ public final class Worker extends ServiceImpl
         super.register ( master );
         
         int numAvailableProcessors = Runtime.getRuntime().availableProcessors();
-        if ( ! haveMultipleComputeThreads )
-        {
-            numAvailableProcessors = 1;
-        }
+//        if ( ! haveMultipleComputeThreads )
+//        {
+//            numAvailableProcessors = 1;
+//        }
            
         System.out.println("Worker.constructor: Available processors: " + numAvailableProcessors ) ; 
         computeThreads = new ComputeThread[ numAvailableProcessors ];
