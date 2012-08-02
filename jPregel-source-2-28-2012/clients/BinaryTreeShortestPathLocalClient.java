@@ -29,7 +29,6 @@ public class BinaryTreeShortestPathLocalClient
                 args[0],                            // jobDirectoryName, 
                 new BinaryTreeShortestPathVertex(), // vertexFactory, 
                 numParts, 
-//                true,                               // workerIsMultithreaded, 
                 new StandardWorkerOutputMaker(),    // WorkerWriter, 
                 new BinaryTreeWorkerGraphMaker(),   // WorkerGraphMaker, !! Make for binart tree
                 new BinaryTreeMasterGraphMaker(),   // MasterGraphMaker !! Make for binart tree
