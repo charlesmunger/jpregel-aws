@@ -23,11 +23,11 @@ public class Euclidean2DGridShortestPathClient
      */
     public static void main( String[] args ) throws Exception
     {
-        String  jobName               = "Euclidean 2D Grid Shortest Path";
-        String  jobDirectoryName      = args[0];
-        int     numWorkers            = 1;
-        boolean workerIsMultithreaded = false;
-        int     numParts = numWorkers * (( workerIsMultithreaded) ? 2 : 1 ) * 1; // numWorkers * ComputeThrads/Worker * Parts/ComputeThread
+        String  jobName             = "Euclidean 2D Grid Shortest Path";
+        String  jobDirectoryName    = args[0];
+        int     numWorkers          = 1;
+        int computeThreadsPerWorker = Runtime.getRuntime().availableProcessors();
+        int     numParts = numWorkers * computeThreadsPerWorker * 2; // numWorkers * ComputeThrads/Worker * Parts/ComputeThread
         Vertex vertexFactory        = new EuclideanShortestPathVertex();
         WorkerWriter workerWriter   = new StandardWorkerOutputMaker();
         GraphMaker workerGraphMaker = new GridWorkerGraphMaker();
@@ -38,13 +38,10 @@ public class Euclidean2DGridShortestPathClient
                 + "\n jobDirectoryName: " + jobDirectoryName
                 + "\n numParts: " + numParts
                 + "\n numWorkers: " + numWorkers
-                + "\n workerIsMultithreaded: " + workerIsMultithreaded
                 );
         
         Job job = new Job( jobName, jobDirectoryName, vertexFactory, numParts, 
-                           workerIsMultithreaded,  
-                workerWriter, 
-                           workerGraphMaker, reader, writer );
+                workerWriter, workerGraphMaker, reader, writer );
         job.setProblemAggregator( new IntegerSumAggregator() );
         boolean   isEc2Master = false;
         System.out.println("Euclidean2DGridShortestPathClient.main: about to invoke Client.run");

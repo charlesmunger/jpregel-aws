@@ -26,8 +26,7 @@ public class EuclideanShortestPathLocalClient
     public static void main( String[] args ) throws Exception
     {
         int     numWorkers              = Integer.parseInt(     args[1] );
-        boolean isMultithreaded         = Boolean.parseBoolean( args[2] );
-        int     computeThreadsPerWorker = isMultithreaded ? Runtime.getRuntime().availableProcessors() : 1;
+        int     computeThreadsPerWorker = Runtime.getRuntime().availableProcessors();
         int     partsPerComputeThread   = 2;
         int     numParts                = numWorkers * computeThreadsPerWorker * partsPerComputeThread;
         boolean isEc2Run = false;
@@ -38,7 +37,6 @@ public class EuclideanShortestPathLocalClient
                 args[0],                              // Job directory name
                 new EuclideanShortestPathVertex(),    // Vertex factory
                 numParts, 
-                Boolean.parseBoolean( args[2] ) ,     // Worker Is Multithreaded
                 new StandardWorkerOutputMaker(),      // WorkerWriter
                 new StandardWorkerGraphMaker(),       // WorkerGraphMaker
                 new StandardMasterGraphMaker(),       // MasterGraphMaker

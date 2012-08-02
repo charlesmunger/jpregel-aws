@@ -29,7 +29,6 @@ public class Euclidean2DGridShortestPathLocalClient
                 args[0],                           // jobDirectoryName, 
                 new EuclideanShortestPathVertex(), // vertexFactory, 
                 numParts, 
-                true,                              // workerIsMultithreaded, 
                 new StandardWorkerOutputMaker(),   // WorkerWriter, 
                 new GridWorkerGraphMaker(),        // WorkerGraphMaker, 
                 new GridMasterGraphMaker(),        // MasterGraphMaker

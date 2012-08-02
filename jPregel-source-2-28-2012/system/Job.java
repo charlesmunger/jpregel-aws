@@ -33,16 +33,20 @@ public final class Job implements Serializable
      * per Job, to find a good value that appears to be primarily a function of 
      * graph structure and size, and possibly problem type (e.g., shortest path)
      */
-    public Job( String jobName, String jobDirectoryName, Vertex vertexFactory, 
-                int numParts, boolean workerIsMultithreaded, 
-                WorkerWriter workerWriter, GraphMaker workerGraphMaker,
-                MasterGraphMaker reader, Writer writer )
+    public Job( String jobName, 
+                String jobDirectoryName, 
+                Vertex vertexFactory, 
+                int numParts, 
+                WorkerWriter workerWriter, 
+                GraphMaker workerGraphMaker,
+                MasterGraphMaker reader, 
+                Writer writer 
+            )
     {
         this.jobName               = jobName;
         this.jobDirectoryName      = jobDirectoryName;
         this.vertexFactory         = vertexFactory;
         this.numParts              = numParts;
-//        this.workerIsMultithreaded = workerIsMultithreaded;
         this.workerWriter          = workerWriter;
         this.workerGraphMaker      = workerGraphMaker;
         this.masterGraphMaker      = reader;
@@ -58,7 +62,6 @@ public final class Job implements Serializable
         jobDirectoryName      = job.getJobDirectoryName();
         vertexFactory         = job.getVertexFactory();
         numParts              = job.getNumParts();
-//        workerIsMultithreaded = job.getWorkerIsMultithreaded();
         stepAggregator        = job.getStepAggregator();
         problemAggregator     = job.getProblemAggregator();
         workerWriter          = job.getWorkerWriter();
@@ -86,8 +89,6 @@ public final class Job implements Serializable
     
     String           getJobDirectoryName()      { return jobDirectoryName; }
         
-//    boolean          getWorkerIsMultithreaded() { return workerIsMultithreaded; }
-
     Aggregator       getProblemAggregator()     { return problemAggregator; }
     
     Aggregator       getStepAggregator()        { return stepAggregator; }    
@@ -143,7 +144,6 @@ public final class Job implements Serializable
         string.append("Name: ").append(jobName).append("\n\t");
         string.append("Directory name: ").append(jobDirectoryName).append("\n\t");
         string.append("Number of parts: ").append(numParts).append("\n\t");
-//        string.append("Worker is multithreaded: ").append(workerIsMultithreaded).append("\n\t");
         string.append("Step Aggregator: ").append(stepAggregator.getClass().getCanonicalName()).append("\n\t");
         string.append("Problem Aggregator: ").append(problemAggregator.getClass().getCanonicalName()).append("\n\t");
         string.append("Vertex factory: ").append(vertexFactory.getClass().getCanonicalName()).append("\n\t");

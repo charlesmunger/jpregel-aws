@@ -24,7 +24,6 @@ public class PageRankEc2Client extends Client
         String    jobDirectoryName      = args[0];
         int       numParts              = Integer.parseInt( args[1] );
         int       numWorkers            = Integer.parseInt( args[2] );
-        boolean   workerIsMultithreaded = Boolean.parseBoolean( args[3]);
         boolean   isEc2Master           = true;
         String imageIdMaster = args[4] ; 
         String imageIdWorker = args[5] ; 
@@ -36,7 +35,7 @@ public class PageRankEc2Client extends Client
         
         Job job = new Job( jobName,
                 jobDirectoryName, 
-                vertexFactory, numParts, workerIsMultithreaded,  
+                vertexFactory, numParts,  
                 workerWriter, workerGraphMaker, reader, writer );
         Client.run( job, isEc2Master, numWorkers);    
         System.exit( 0 );
