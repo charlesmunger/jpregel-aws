@@ -11,5 +11,7 @@ nb-configuration.xml
 *.war
 *.ear
 *.pem
+*.AWSkey
 .DS_STORE
 log.log
+nbproject/private/
