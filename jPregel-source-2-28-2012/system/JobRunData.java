@@ -61,7 +61,7 @@ public class JobRunData implements java.io.Serializable
         string.append( "\n   " ).append( maxMemory / 1000  ).append( " Maximum memory (KB)" );
         string.append( "\n   " ).append( numParts ).append( " Parts" );
         string.append( "\n   ").append( numSuperSteps ).append( " super steps   " );
-        string.append( "\nElapsed times in milliseconds: \n   " );
+        string.append( "\n\nElapsed times in milliseconds: \n   " );
         string.append( endTimeRun - beginRunTime ).append( " : Overall run time\n   " );
         string.append( endTimeSetWorkerJobAndMakeWorkerFiles - beginRunTime );
         string.append( " : Set WorkerJob & make Worker files\n   " );

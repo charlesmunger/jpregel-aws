@@ -1,9 +1,9 @@
 package vertex;
 
-import java.awt.geom.Point2D;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.regex.Pattern;
 import system.Combiner;
 import system.Job;
 import system.Message;
@@ -17,6 +17,8 @@ public final class BinaryTreeShortestPathVertex extends Vertex<Integer, Message<
 {
     private static int      numVertices;
     public  static Combiner combiner;
+    
+//    private Pattern regex = Pattern.compile(" ");
         
     public BinaryTreeShortestPathVertex() {}
     
@@ -28,25 +30,29 @@ public final class BinaryTreeShortestPathVertex extends Vertex<Integer, Message<
     
     synchronized public Vertex make( String line )
     {
+//        String[] tokenArray = regex.split(line, 2);
+//        Integer vertexId = Integer.parseInt( tokenArray[0] );
+//        numVertices      = Integer.parseInt( tokenArray[1] );
+        
+        // Here, tokenizer is faster than split
         StringTokenizer stringTokenizer = new StringTokenizer( line );
         Integer vertexId = Integer.parseInt( stringTokenizer.nextToken() );
-        
+        numVertices      = Integer.parseInt( stringTokenizer.nextToken() );
+
         Integer initialKnownDistance = ( vertexId == 1 ) ? 0 : Integer.MAX_VALUE;
         Message<Integer, Integer> vertexValue = new Message<Integer, Integer>( 1, initialKnownDistance );
         
-        numVertices = Integer.parseInt( stringTokenizer.nextToken() );
-        Map<Integer, Message<Integer, Integer>> outEdgeMap = new HashMap<Integer, Message<Integer, Integer>>();
-        Integer targetVertexId = 2 * vertexId;
-        
+        Map<Integer, Message<Integer, Integer>> outEdgeMap = new HashMap<Integer, Message<Integer, Integer>>( 2 );
+        Integer targetVertexId = 2 * vertexId; // << 1;
         if ( targetVertexId <= numVertices )
         {   // make OutEdge for left child
-            Message<Integer, Integer> outEdge = new Message<Integer, Integer>(targetVertexId, 1 );
+            Message<Integer, Integer> outEdge = new Message<Integer, Integer>( targetVertexId, 1 );
             outEdgeMap.put( targetVertexId, outEdge );
 
             if ( targetVertexId < numVertices )
             {   // make OutEdge for right child
-                outEdge = new Message<Integer, Integer>(targetVertexId + 1, 1 );
-                outEdgeMap.put( targetVertexId + 1, outEdge );
+                outEdge = new Message<Integer, Integer>( ++targetVertexId, 1 );
+                outEdgeMap.put( targetVertexId, outEdge );
             }
         }
         

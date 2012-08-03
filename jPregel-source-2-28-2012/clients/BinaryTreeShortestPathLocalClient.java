@@ -20,18 +20,18 @@ public class BinaryTreeShortestPathLocalClient
      */
     public static void main( String[] args ) throws Exception
     {
-        int numWorkers = 1; 
+        int numWorkers = 2; 
         int computeThreadsPerWorker = Runtime.getRuntime().availableProcessors();
         int partsPerComputeThread = 2;
         int numParts = numWorkers * computeThreadsPerWorker * partsPerComputeThread;        
         Job job = new Job(
                 "Binary Tree Shortest Path",        // jobName
-                args[0],                            // jobDirectoryName, 
-                new BinaryTreeShortestPathVertex(), // vertexFactory, 
+                args[0],                            // jobDirectoryName
+                new BinaryTreeShortestPathVertex(), // vertexFactory
                 numParts, 
-                new StandardWorkerOutputMaker(),    // WorkerWriter, 
-                new BinaryTreeWorkerGraphMaker(),   // WorkerGraphMaker, !! Make for binart tree
-                new BinaryTreeMasterGraphMaker(),   // MasterGraphMaker !! Make for binart tree
+                new StandardWorkerOutputMaker(),    // WorkerWriter
+                new BinaryTreeWorkerGraphMaker(),   // WorkerGraphMaker
+                new BinaryTreeMasterGraphMaker(),   // MasterGraphMaker
                 new StandardMasterOutputMaker()     // Writer 
                 );
 //        System.out.println("JVM data model: " + System.getProperty("sun.arch.data.model"));

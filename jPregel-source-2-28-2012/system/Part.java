@@ -12,17 +12,16 @@ public final class Part
     private final int partId;
     private final Job job;
     
-    // TODO Part: vertexIdToVertexMap: Consider constructing w/ a capacity of the Part's size.
-    private Map<Object, Vertex> vertexIdToVertexMap = new ConcurrentHashMap<Object, Vertex>();
+    // TODO Part: vertexIdToVertexMap: What is a good initial capacity? 
+    private Map<Object, Vertex> vertexIdToVertexMap = new ConcurrentHashMap<Object, Vertex>( 8000 );
     private OntoMap<Set<Vertex>> superstepToActiveSetMap = new OntoMap<Set<Vertex>>( new ActiveSet() );
-    // TODO remove SuperStepToActiveSetMap class
     
     // superStep parameters
     private ComputeThread computeThread;
     private long superStep;
     private ComputeInput computeInput;
     
-    // The following 3 parameters are modified by each vertex during its compute method
+    // superStep parameters modified by each vertex.compute()
     private Aggregator outputProblemAggregator;
     private Aggregator outputStepAggregator;
     private int numMessagesSent; 
@@ -61,14 +60,13 @@ public final class Part
         numMessagesSent   = 0;
         outputStepAggregator    = job.makeStepAggregator();
         outputProblemAggregator = job.makeProblemAggregator();
-        Set<Vertex> currentActiveSet = superstepToActiveSetMap.get( superStep     );
-        Set<Vertex>    nextActiveSet = superstepToActiveSetMap.get( superStep + 1 );
-        for ( Vertex vertex : currentActiveSet )
+        Set<Vertex> activeSet = superstepToActiveSetMap.get( superStep );
+        for ( Vertex vertex : activeSet )
         {
             vertex.compute();
-            vertex.removeMessageQ( superStep ); // MessageQ is garbage
+            vertex.removeMessageQ( superStep );      // MessageQ now is garbage
         }
-        superstepToActiveSetMap.remove( superStep ); // current activeSet now is garbage
+        superstepToActiveSetMap.remove( superStep ); // active vertex set now is garbage
         boolean thereIsNextStep = numMessagesSent > 0;
         return new ComputeOutput( thereIsNextStep, outputStepAggregator, outputProblemAggregator );
     }

@@ -170,11 +170,11 @@ public final class Worker extends ServiceImpl
         {
             Service workerService = workerNumToWorkerMap.get( workerNum );
 //            out.println("Worker.addVertex: REMOTE: myWorkerNum: " + myWorkerNum + " workerNum: " + workerNum + " partId: " + partId + " vertexId: " + vertex.getVertexId() + " stringVertex: " + stringVertex);
-            if ( workerService == null )
-            {
-                err.println("Worker.addVertex: NULL Worker: workerNum: " + workerNum );
-                exit( 1 );
-            }
+//            if ( workerService == null )
+//            {
+//                err.println("Worker.addVertex: NULL Worker: workerNum: " + workerNum );
+//                exit( 1 );
+//            }
             numUnacknowledgedAddVertexCommands.getAndIncrement();
             Command command = new AddVertexToWorker( partId, stringVertex, this );
             sendCommand( workerService, command ); 

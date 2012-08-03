@@ -17,6 +17,7 @@ import vertex.BinaryTreeShortestPathVertex;
  */
 public class BinaryTreeWorkerGraphMaker implements GraphMaker
 {
+    // TODO WorkerGraphMakers: Perhaps multithreading would speed them up.
     @Override
     public int makeGraph(Worker worker) 
     {
@@ -49,15 +50,21 @@ public class BinaryTreeWorkerGraphMaker implements GraphMaker
             
             // read file
             String line = bufferedReader.readLine();
-            System.out.println(" Worker: " + workerNum + " input line: " + line);
+            bufferedReader.close();
+            if ( ! isEc2 )
+            { 
+                dataInputStream.close();
+                fileInputStream.close(); 
+            } 
             
             // extract startVertexId, stopVertexId
             StringTokenizer stringTokenizer = new StringTokenizer( line );
             int startVertexId = getToken( stringTokenizer );
             int stopVertexId  = getToken( stringTokenizer );
-            numVertices = getToken( stringTokenizer );
-            System.out.println("workerNum: " + workerNum + ", startVertexId: " + startVertexId 
-                    + ", stopVertexId: " + stopVertexId  + ", numVertices: " + numVertices );
+            numVertices       = getToken( stringTokenizer );
+            System.out.println("BinaryTreeWorkerGraphMaker.make: workerNum: " + workerNum 
+                    + ", startVertexId: " + startVertexId 
+                    + ", stopVertexId: "  + stopVertexId  + ", numVertices: " + numVertices );
                         
             // construct vertices
             for ( int vertexId = startVertexId; vertexId <= stopVertexId; vertexId++ )
@@ -70,17 +77,17 @@ public class BinaryTreeWorkerGraphMaker implements GraphMaker
                 Message<Integer, Integer> minDistanceMessage = new Message<Integer, Integer>( 0, initialKnownDistance );
                 
                 // initiaize out edges (children)
-                Map<Integer, Message<Integer, Integer>> outEdgeMap = new HashMap<Integer, Message<Integer, Integer>>();
+                Map<Integer, Message<Integer, Integer>> outEdgeMap = new HashMap<Integer, Message<Integer, Integer>>( 2 );
                 Integer targetVertexId = 2 * vertexId;
                 if ( targetVertexId <= numVertices )
                 {   // make OutEdge for left child
-                    Message<Integer, Integer> outEdge = new Message<Integer, Integer>(targetVertexId, 1 );
+                    Message<Integer, Integer> outEdge = new Message<Integer, Integer>( targetVertexId, 1 );
                     outEdgeMap.put( targetVertexId, outEdge );
 
                     if ( targetVertexId < numVertices )
                     {   // make OutEdge for right child
-                        outEdge = new Message<Integer, Integer>(targetVertexId + 1, 1 );
-                        outEdgeMap.put( targetVertexId + 1, outEdge );
+                        outEdge = new Message<Integer, Integer>( ++targetVertexId, 1 );
+                        outEdgeMap.put( targetVertexId, outEdge );
                     }
                 }
                 
@@ -88,12 +95,6 @@ public class BinaryTreeWorkerGraphMaker implements GraphMaker
                 String vertexString = new String( stringVertex );
                 worker.addVertex( vertex, vertexString );
             }
-            bufferedReader.close();
-            if ( ! isEc2 )
-            { 
-                dataInputStream.close();
-                fileInputStream.close(); 
-            } 
         }
         catch ( Exception exception )
         {

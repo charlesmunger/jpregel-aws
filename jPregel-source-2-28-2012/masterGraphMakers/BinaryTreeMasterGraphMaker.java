@@ -11,6 +11,16 @@ import system.FileSystem;
 import system.MasterGraphMaker;
 
 /**
+ * Makes a complete binary tree with N nodes.
+ * If N != 2^m -1, for some natural number m, then some leaves are missing.
+ * The shortest path from the root to a deepest leaf is log_2 N.
+ * 
+ * It produces files that have 1 line of the form:
+ * N blockSize v  
+ * where 0 <= v < N - 1 and blockSize = ceiling ( N / numWorkers )
+ * 
+ * The worker reading the file creates vertices and out edges for
+ * vertices v, v + 1, v + 2, ..., v + blockSize - 1, with their edges.
  *
  * @author Pete Cappello
  */
@@ -70,8 +80,8 @@ public class BinaryTreeMasterGraphMaker implements MasterGraphMaker
                 System.out.println("Error closing input streams"+ex.getLocalizedMessage());
             }
         }
-        int vertexNum = 1;
-        for ( int fileNum = 1; fileNum <= numWorkers; fileNum++) 
+//        int vertexNum = 1;
+        for ( int vertexNum = 1, fileNum = 1; fileNum <= numWorkers; fileNum++) 
         {
             // open file for output in "in" directory
             FileOutputStream fileOutputStream = null;
@@ -93,14 +103,13 @@ public class BinaryTreeMasterGraphMaker implements MasterGraphMaker
                 verticesPerFile++;
             }
             
-            //output line: startVertexId stopVertexId
+            // output line: startVertexId stopVertexId
             StringBuilder string = new StringBuilder();
-            string.append(vertexNum).append(' ');
+            string.append( vertexNum ).append(' ');
             vertexNum += ( verticesPerFile - 1 );
             string.append( vertexNum++ ).append(' ');
             string.append( numV );
-            System.out.println("BinaryTreeMasterGraphMaker.make: worker: " + fileNum
-                    + " " + string );
+            System.out.println("BinaryTreeMasterGraphMaker.make: worker: " + fileNum + " " + string );
             try 
             {
                 bufferedWriter.write( new String(string) );
