@@ -1,13 +1,13 @@
 package workerGraphMakers;
 
-import static java.lang.System.err;
-import static java.lang.System.exit;
-
 import JpAws.WorkerGraphFileIO;
 import java.io.*;
+import static java.lang.System.err;
+import static java.lang.System.exit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
+import system.FileSystem;
 import system.*;
 import vertex.BinaryTreeShortestPathVertex;
 
@@ -67,6 +67,7 @@ public class BinaryTreeWorkerGraphMaker implements GraphMaker
                     + ", stopVertexId: "  + stopVertexId  + ", numVertices: " + numVertices );
                         
             // construct vertices
+            //TODO If we were to do this in parallel, we should make a ThreadPoolExecutorService.
             for ( int vertexId = startVertexId; vertexId <= stopVertexId; vertexId++ )
             {
                 StringBuilder stringVertex = new StringBuilder();

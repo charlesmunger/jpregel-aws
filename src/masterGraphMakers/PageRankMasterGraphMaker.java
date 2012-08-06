@@ -32,11 +32,9 @@ public class PageRankMasterGraphMaker implements MasterGraphMaker
             boolean isEc2 = fileSystem.getFileSystem() ; 
             if (isEc2) 
             {
-                //System.out.println(" G1MasterGraphMaker.read() : jus entered isEc2") ;
                 jobDirectoryName = fileSystem.getJobDirectory() ; 
                 S3MasterInputMaker masterFileMaker = new S3MasterInputMaker () ; 
                 bufferedReader = masterFileMaker.FileInput(jobDirectoryName) ;  
-                //System.out.println(" G1MasterGraphMaker.read() : exiting isEc2" + jobDirectoryName) ;
             }
             else
             {
@@ -86,7 +84,7 @@ public class PageRankMasterGraphMaker implements MasterGraphMaker
                         string.append( targetVertexNum ).append( ' ' );
                         int value = ( targetVertexNum == vertexNum + 1 ) ? -1 : 1;
                         string.append( value ).append( ' ' );
-                    } */
+                    } */ ///TODO is this safe to remove?
                     String lines = new String( string );
 
                     // append line to output file

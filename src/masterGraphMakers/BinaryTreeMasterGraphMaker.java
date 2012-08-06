@@ -80,7 +80,6 @@ public class BinaryTreeMasterGraphMaker implements MasterGraphMaker
                 System.out.println("Error closing input streams"+ex.getLocalizedMessage());
             }
         }
-//        int vertexNum = 1;
         for ( int vertexNum = 1, fileNum = 1; fileNum <= numWorkers; fileNum++) 
         {
             // open file for output in "in" directory

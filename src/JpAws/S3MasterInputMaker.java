@@ -19,7 +19,7 @@ public class S3MasterInputMaker implements S3FileSystem {
 
     @Override
     public BufferedReader FileInput(String jobDirectoryName) {
-        String bucketName = jobDirectoryName; //+ "/input";
+        String bucketName = jobDirectoryName;
         S3ObjectInputStream objectContent = s3.getObject(bucketName, "input").getObjectContent();
         return new BufferedReader(new InputStreamReader(objectContent));
     }
