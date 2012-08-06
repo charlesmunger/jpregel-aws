@@ -13,13 +13,11 @@ import system.MasterGraphMaker;
  *
  * @author Pete Cappello
  */
-public class G1MasterGraphMaker implements MasterGraphMaker 
+public class G1MasterGraphMaker implements MasterGraphMaker
 {
-    /**
-     *
-     */
+
     @Override
-    public void make(FileSystem fileSystem, int numWorkers) 
+    public void make(FileSystem fileSystem, int numWorkers)
     {
         BufferedReader bufferedReader = null;
         DataInputStream dataInputStream = null;
@@ -27,19 +25,17 @@ public class G1MasterGraphMaker implements MasterGraphMaker
         String jobDirectoryName = null;
 
         boolean isEc2 = fileSystem.getFileSystem();
-        if ( isEc2 ) 
+        if (isEc2)
         {
             jobDirectoryName = fileSystem.getJobDirectory();
             S3MasterInputMaker masterFileMaker = new S3MasterInputMaker();
             bufferedReader = masterFileMaker.FileInput(jobDirectoryName);
-        } 
-        else // use local file system
+        } else // use local file system
         {
-            try 
+            try
             {
                 fileInputStream = fileSystem.getFileInputStream();
-            } 
-            catch (FileNotFoundException ex) 
+            } catch (FileNotFoundException ex)
             {
                 System.out.println("Error getting local filesystem input stream: " + ex.getLocalizedMessage());
             }
@@ -47,41 +43,38 @@ public class G1MasterGraphMaker implements MasterGraphMaker
             bufferedReader = new BufferedReader(new InputStreamReader(dataInputStream));
         }
         String line = null;
-        try 
+        try
         {
-            if ( ( line = bufferedReader.readLine() ) == null ) 
+            if ((line = bufferedReader.readLine()) == null)
             {
                 err.println("WorkerFileWriter1: Error: input file has no lines.");
                 exit(1);
             }
-        } 
-        catch (IOException ex) 
+        } catch (IOException ex)
         {
             System.out.println("Error reading lines from file" + ex.getLocalizedMessage());
         }
         int numV = Integer.parseInt(line);
-        if ( ! isEc2 ) 
+        if (!isEc2)
         {
-            try 
+            try
             {
                 fileInputStream.close();
                 dataInputStream.close();
-            } 
-            catch (IOException ex) 
+            } catch (IOException ex)
             {
-                System.out.println("Error closing input streams"+ex.getLocalizedMessage());
+                System.out.println("Error closing input streams" + ex.getLocalizedMessage());
             }
         }
         int vertexNum = 0;
-        for ( int fileNum = 1; fileNum <= numWorkers; fileNum++) 
+        for (int fileNum = 1; fileNum <= numWorkers; fileNum++)
         {
             // open file for output in "in" directory
             FileOutputStream fileOutputStream = null;
-            try 
+            try
             {
                 fileOutputStream = fileSystem.getWorkerInputFileOutputStream(fileNum);
-            } 
-            catch (FileNotFoundException ex) 
+            } catch (FileNotFoundException ex)
             {
                 System.out.println("Error getting output file stream: " + ex.getMessage());
                 System.exit(1);
@@ -90,7 +83,7 @@ public class G1MasterGraphMaker implements MasterGraphMaker
             BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(dataOutputStream));
 
             int linesPerFile = numV / numWorkers;
-            if (fileNum <= numV % numWorkers) 
+            if (fileNum <= numV % numWorkers)
             {
                 linesPerFile++;
             }
@@ -107,39 +100,36 @@ public class G1MasterGraphMaker implements MasterGraphMaker
                     string.append(value).append(' ');
                 }
                 String lines = new String(string);
-                try 
+                try
                 {
                     // append line to output file
                     bufferedWriter.write(lines);
                     bufferedWriter.newLine();
-                } 
-                catch (IOException ex) 
+                } catch (IOException ex)
                 {
                     System.out.println("Error writing lines to file: " + ex.getLocalizedMessage());
                 }
                 vertexNum++;
             }
-            try 
+            try
             {
                 bufferedWriter.close();
                 dataOutputStream.close();
                 fileOutputStream.close();
-            } 
-            catch (IOException ex) 
+            } catch (IOException ex)
             {
                 Logger.getLogger(G1MasterGraphMaker.class.getName()).log(Level.SEVERE, null, ex);
             }
-            if (isEc2) 
+            if (isEc2)
             {
                 S3MasterInputMaker masterFileMaker = new S3MasterInputMaker(fileNum);
                 masterFileMaker.UploadFilesOntoS3(jobDirectoryName);
             }
-        }   
-        try 
+        }
+        try
         {
             bufferedReader.close();
-        } 
-        catch (IOException ex) 
+        } catch (IOException ex)
         {
             System.out.println("Error closing bufferedReader: " + ex.getMessage());
         }
