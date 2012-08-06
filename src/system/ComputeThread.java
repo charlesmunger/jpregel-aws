@@ -24,9 +24,10 @@ public class ComputeThread extends Thread
     { 
         this.worker = worker;
         this.computeThreadNum = computeThreadNum;
-        start(); 
+        start(); //TODO fix this - object is not guaranteed to be constructed until method ends
     }
         
+    @Override
     public void run()
     {
         while ( true )
