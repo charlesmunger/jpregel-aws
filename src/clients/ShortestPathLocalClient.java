@@ -17,7 +17,6 @@ public class ShortestPathLocalClient
     /**
      * @param args [0]: Job Directory
      *             [1]: Number of Workers
-     *             [2]: true if and only if worker is to be multi-threaded
      */
     public static void main(String[] args) throws Exception 
     {
