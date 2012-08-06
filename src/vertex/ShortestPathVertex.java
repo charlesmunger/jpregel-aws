@@ -24,12 +24,11 @@ import system.combiners.IntegerMinCombiner;
  */
 public final class ShortestPathVertex extends Vertex<Integer, Message<Integer, Integer>, OutEdge, Integer>
 {
-    private static Combiner combiner = new IntegerMinCombiner(); //TODO hides a field
-    
     public ShortestPathVertex( Integer vertexId, Map<Integer, OutEdge> outEdgeMap )
     {
         super( vertexId, outEdgeMap );
         setVertexValue( new Message<Integer, Integer>( vertexId, Integer.MAX_VALUE ) );
+        combiner = new IntegerMinCombiner();
     }
     
     public ShortestPathVertex() {}

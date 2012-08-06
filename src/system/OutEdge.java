@@ -6,23 +6,20 @@ package system;
  */
 public class OutEdge
 {
-    private int targetVertexId;
-    private int edgeValue;
+    private Integer targetVertexId;
+    private Integer edgeValue;
     
-    public OutEdge( int targetVertexId, int edgeValue )
+    public OutEdge( Integer targetVertexId, Integer edgeValue )
     {
         this.targetVertexId = targetVertexId;
         this.edgeValue      = edgeValue;
     }
     
-    public OutEdge(int targetVertexId)
-    { 
-        this.targetVertexId = targetVertexId;
-
-    }
-    public int  getVertexId()  { return targetVertexId; }
+    public OutEdge(Integer targetVertexId) { this.targetVertexId = targetVertexId; }
     
-    public int  getEdgeValue() { return edgeValue; }
+    public Integer  getVertexId()  { return targetVertexId; }
     
-    public void setEdgeValue( double vertexValue ) { this.edgeValue = edgeValue; } //TODO this is almost certainly a bug
+    public Integer  getEdgeValue() { return edgeValue; }
+    
+    public void setEdgeValue( Integer vertexValue ) { this.edgeValue = edgeValue; }
 }

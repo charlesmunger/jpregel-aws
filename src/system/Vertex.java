@@ -20,8 +20,8 @@ import java.util.Map;
 /**
  * !! Is it safe & faster to make MessageQ thread-safe & remove synchronization of receive methods?
  * 
- * I currently am of the opinion that vertex does not need the bit of state 
- * explicitly designating it active/inactive. Instead I will:
+ * I currently think that vertex does not need the bit of state designating it 
+ * active/inactive. Instead I:
  * 
  *  1. make it the responsibility of the graph maker to add source vertices in 
  *     the active set for the initial super step;
@@ -31,8 +31,8 @@ import java.util.Map;
  * The opinion assumes that a vertex has no basis for activity unless it 
  * receives a message; otherwise nothing has changed since it last sent messages 
  * to other vertices. This assumption implies that changing the superStep does 
- * not in and of itself constitute a state change for the vertex. If I encounter 
- * an algorithm that falsifies this assumption, I will revise this view. 
+ * not itself constitute a state change for the vertex. If I encounter an 
+ * algorithm that falsifies this assumption, I will revise this view. 
  * 
  * In the meantime, the compute method no longer needs to vote to halt.
  * This method thus has been removed from the API.
