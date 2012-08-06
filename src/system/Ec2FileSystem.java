@@ -13,6 +13,8 @@ public class Ec2FileSystem extends FileSystem {
 
     Ec2FileSystem(String jobDirectoryName, boolean isEc2) {
         super(jobDirectoryName, isEc2);
+        (new File(jobDirectoryName + "/in/")).mkdirs();
+        (new File(jobDirectoryName + "/out/")).mkdirs();
     }
 
     @Override
@@ -33,7 +35,6 @@ public class Ec2FileSystem extends FileSystem {
 
     @Override
     public FileOutputStream getWorkerInputFileOutputStream(int WorkerNum) throws FileNotFoundException {
-        (new File(jobDirectoryName + "/in/")).mkdirs();
         return new FileOutputStream(jobDirectoryName + "/in/" + WorkerNum);
     }
 
@@ -44,7 +45,6 @@ public class Ec2FileSystem extends FileSystem {
 
     @Override
     public FileOutputStream getWorkerOutputFileOutputStream(int WorkerNum) throws FileNotFoundException {
-        (new File(jobDirectoryName + "/out/")).mkdirs();
         String fileName = jobDirectoryName + "/out/" + WorkerNum;
         return new FileOutputStream(fileName);
     }
