@@ -1,5 +1,6 @@
 package system;
 
+import java.io.IOException;
 import java.io.Serializable;
 
 /**
@@ -8,5 +9,5 @@ import java.io.Serializable;
  */
 public interface WorkerWriter extends Serializable
 {
-    void write( FileSystem fileSystem, Worker worker );
+    void write( FileSystem fileSystem, Worker worker ) throws IOException;
 }
