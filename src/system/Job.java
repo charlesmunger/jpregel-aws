@@ -1,5 +1,6 @@
 package system;
 
+import java.io.IOException;
 import java.io.Serializable;
 
 /**
@@ -106,7 +107,7 @@ public final class Job implements Serializable
      */
     public int  makeGraph( Worker worker )      { return workerGraphMaker.makeGraph( worker ); }
     
-    public void makeOutputFile( Worker worker ) { workerWriter.write( fileSystem, worker ); }
+    public void makeOutputFile( Worker worker ) throws IOException { workerWriter.write( fileSystem, worker ); }
 
     Aggregator  makeStepAggregator()            { return stepAggregator.make(); }
     

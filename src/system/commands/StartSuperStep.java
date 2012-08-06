@@ -26,6 +26,7 @@ public class StartSuperStep implements Command
         worker.startSuperStep( computeInput );
     } 
     
+    @Override
     public String toString()
     {
         return "StartSuperStep: ComputeInput: " + computeInput.toString();

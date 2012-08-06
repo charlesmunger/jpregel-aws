@@ -21,5 +21,6 @@ public class IntegerSumAggregator extends Aggregator<Integer>
     @Override
     public Aggregator make() { return new IntegerSumAggregator(); }
     
+    @Override
     public String toString() { return get().toString(); }
 }

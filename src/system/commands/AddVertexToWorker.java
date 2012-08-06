@@ -1,14 +1,11 @@
 package system.commands;
 
-import static java.lang.System.out;
 
 import jicosfoundation.Command;
 import jicosfoundation.Proxy;
 import jicosfoundation.Service;
 import jicosfoundation.ServiceImpl;
-import system.Vertex;
 import system.Worker;
-import system.ProxyWorker;
 
 /**
  *

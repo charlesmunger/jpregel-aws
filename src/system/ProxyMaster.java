@@ -33,7 +33,6 @@ package system;
 import jicosfoundation.Proxy;
 import jicosfoundation.RemoteExceptionHandler;
 import jicosfoundation.Service;
-import jicosfoundation.ServiceName;
 
 
 public final class ProxyMaster extends Proxy 
@@ -52,6 +51,7 @@ public final class ProxyMaster extends Proxy
         this.master = master;
     }  
     
+    @Override
     public void evict() 
     {
         if ( ! kill )

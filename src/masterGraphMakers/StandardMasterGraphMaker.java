@@ -4,7 +4,6 @@ import JpAws.S3MasterInputMaker;
 import java.io.*;
 import static java.lang.System.err;
 import static java.lang.System.exit;
-
 import system.FileSystem;
 import system.MasterGraphMaker;
 

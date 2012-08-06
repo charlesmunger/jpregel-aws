@@ -14,7 +14,7 @@ import system.combiners.IntegerMinCombiner;
 
 public class PageRankVertex extends Vertex<Integer, Double, OutEdge, Double> 
 {
-    public static Combiner combiner = new IntegerMinCombiner();
+    public static Combiner combiner = new IntegerMinCombiner(); //TODO hides a field
     
 //    public PageRankVertex( Integer vertexId, Map<Object, OutEdge> outEdgeMap, Combiner<Integer> combiner )
     public PageRankVertex( Integer vertexId, Map<Integer, OutEdge> outEdgeMap )
@@ -88,7 +88,7 @@ public class PageRankVertex extends Vertex<Integer, Double, OutEdge, Double>
             int vertexId = Integer.parseInt( stringTokenizer.nextToken() );
             setVertexValue( 1.0 / getNumVertices() ) ; 
             int endVertexValue = Integer.parseInt( stringTokenizer.nextToken() ); 
-            int numVertices  = Integer.parseInt( stringTokenizer.nextToken() ); 
+            int numVertices  = Integer.parseInt( stringTokenizer.nextToken() ); //TODO hides a field
 
             while(vertexId <= endVertexValue)
             {
@@ -118,5 +118,6 @@ public class PageRankVertex extends Vertex<Integer, Double, OutEdge, Double>
         /*
          * Unused method
          */
+    @Override
         protected boolean isSource() { return false; }
 }

@@ -8,7 +8,6 @@ import static java.lang.System.out;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
-import system.Combiner;
 import system.Message;
 import system.OutEdge;
 import system.Vertex;
@@ -30,6 +29,7 @@ public class TestMutabilityVertex extends Vertex<Integer, Message, OutEdge, Inte
     public TestMutabilityVertex() {}
     
 //    public Vertex make( String line, Combiner combiner )
+    @Override
     public Vertex make( String line )
     {
         StringTokenizer stringTokenizer = new StringTokenizer( line );

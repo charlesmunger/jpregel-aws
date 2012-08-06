@@ -1,18 +1,9 @@
 package clients;
 
-import java.rmi.RemoteException;
-
-import vertex.PageRankVertex;
 import masterGraphMakers.G1MasterGraphMaker;
 import masterOutputMakers.StandardMasterOutputMaker;
-import system.Client;
-import system.Combiner;
-import system.GraphMaker;
-import system.Job;
-import system.MasterGraphMaker;
-import system.Vertex;
-import system.WorkerWriter;
-import system.Writer;
+import system.*;
+import vertex.PageRankVertex;
 import workerGraphMakers.StandardWorkerGraphMaker;
 import workerOutputMakers.StandardWorkerOutputMaker;
 

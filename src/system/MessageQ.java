@@ -14,6 +14,7 @@ final public class MessageQ<VertexIdType, MessageValueType>
         
     MessageQ( Combiner<VertexIdType, MessageValueType> combiner ) { this.combiner = combiner; } 
     
+    @Override
     synchronized public boolean add( Message<VertexIdType, MessageValueType> message )
     {
         if ( ! isEmpty() && combiner != null ) 

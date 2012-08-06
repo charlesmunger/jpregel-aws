@@ -1,13 +1,10 @@
 package clients;
 
-import JpAws.Machine;
 import static java.lang.System.out;
-import java.rmi.RemoteException;
 import masterGraphMakers.GridMasterGraphMaker;
 import masterOutputMakers.StandardMasterOutputMaker;
 import system.*;
 import system.aggregators.IntegerSumAggregator;
-import system.combiners.FloatMinCombiner;
 import vertex.EuclideanShortestPathVertex;
 import workerGraphMakers.GridWorkerGraphMaker;
 import workerOutputMakers.StandardWorkerOutputMaker;

@@ -10,6 +10,7 @@ import system.Message;
  */
 public class FloatMinCombiner extends Combiner<Point2D.Float, Float>
 {
+    @Override
     protected Message combine( Message<Point2D.Float, Float> currentMessage, Message<Point2D.Float, Float> newMessage ) 
     {
         return ( currentMessage.getMessageValue() <= newMessage.getMessageValue() ) ? currentMessage : newMessage;

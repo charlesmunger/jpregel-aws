@@ -3,8 +3,8 @@ package system.commands;
 import jicosfoundation.Command;
 import jicosfoundation.Proxy;
 import jicosfoundation.ServiceImpl;
-import system.Worker;
 import system.Job;
+import system.Worker;
 
 /**
  *

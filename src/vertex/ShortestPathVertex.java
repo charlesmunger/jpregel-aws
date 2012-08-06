@@ -24,7 +24,7 @@ import system.combiners.IntegerMinCombiner;
  */
 public final class ShortestPathVertex extends Vertex<Integer, Message<Integer, Integer>, OutEdge, Integer>
 {
-    private static Combiner combiner = new IntegerMinCombiner();
+    private static Combiner combiner = new IntegerMinCombiner(); //TODO hides a field
     
     public ShortestPathVertex( Integer vertexId, Map<Integer, OutEdge> outEdgeMap )
     {
@@ -34,6 +34,7 @@ public final class ShortestPathVertex extends Vertex<Integer, Message<Integer, I
     
     public ShortestPathVertex() {}
     
+    @Override
     public Vertex make( String line )
     {
         StringTokenizer stringTokenizer = new StringTokenizer( line );
@@ -103,5 +104,6 @@ public final class ShortestPathVertex extends Vertex<Integer, Message<Integer, I
         return new String( string );
     }
     
+    @Override
     protected boolean isSource() { return getVertexId() == 0; }
 }

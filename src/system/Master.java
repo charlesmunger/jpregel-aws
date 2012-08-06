@@ -83,7 +83,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     {
         // Establish Master as a Jicos Service
         super(command2DepartmentArray);
-        super.setService(this);
+        super.setService(this); //TODO leaking partially constructed object
         super.setDepartments(departments);
     }
 

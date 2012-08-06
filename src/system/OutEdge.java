@@ -24,5 +24,5 @@ public class OutEdge
     
     public int  getEdgeValue() { return edgeValue; }
     
-    public void setEdgeValue( double vertexValue ) { this.edgeValue = edgeValue; }
+    public void setEdgeValue( double vertexValue ) { this.edgeValue = edgeValue; } //TODO this is almost certainly a bug
 }

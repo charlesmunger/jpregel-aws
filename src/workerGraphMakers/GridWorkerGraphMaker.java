@@ -13,23 +13,14 @@ package workerGraphMakers;
 
 import JpAws.WorkerGraphFileIO;
 import java.awt.geom.Point2D;
+import java.io.*;
 import static java.lang.System.exit;
 import static java.lang.System.out;
-
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
-import system.Combiner;
 import system.FileSystem;
-import system.GraphMaker;
-import system.Vertex;
-import system.Worker;
-import system.Job;
+import system.*;
 import vertex.EuclideanShortestPathVertex;
 
 /**
@@ -38,6 +29,7 @@ import vertex.EuclideanShortestPathVertex;
  */
 public class GridWorkerGraphMaker implements GraphMaker
 {
+    @Override
     public int makeGraph( Worker worker ) 
     {
         int workerNum       = worker.getWorkerNum();

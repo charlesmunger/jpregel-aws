@@ -1,14 +1,11 @@
 package clients;
 
-import java.rmi.RemoteException;
-import vertex.EuclideanShortestPathVertex;
 import masterGraphMakers.StandardMasterGraphMaker;
 import masterOutputMakers.StandardMasterOutputMaker;
 import system.Client;
-import system.Combiner;
 import system.Job;
 import system.aggregators.IntegerSumAggregator;
-import system.combiners.FloatMinCombiner;
+import vertex.EuclideanShortestPathVertex;
 import workerGraphMakers.StandardWorkerGraphMaker;
 import workerOutputMakers.StandardWorkerOutputMaker;
 

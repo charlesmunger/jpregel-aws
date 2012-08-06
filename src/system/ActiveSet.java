@@ -13,5 +13,6 @@ public class ActiveSet extends HashSet<Vertex> implements Factory
     @Override
     public Set<Vertex> make() { return Collections.synchronizedSet( new HashSet<Vertex>() ); }
     
+    @Override
     public boolean add( Vertex vertex ) { return super.add( vertex ); }
 }

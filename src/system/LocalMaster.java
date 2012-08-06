@@ -13,6 +13,7 @@ public class LocalMaster extends Master
     
     public LocalMaster() throws RemoteException {}
     
+    @Override
     public void constructWorkers( int numWorkers, String masterDomainName ) throws RemoteException
     {
         workers = new Worker[ numWorkers ];
@@ -24,6 +25,7 @@ public class LocalMaster extends Master
     
     public void startWorkers( int numWorkers, String masterDomainName ) throws RemoteException {}
     
+    @Override
     public void shutdown() {}
     
     public void stopWorkers() {}

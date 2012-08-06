@@ -9,6 +9,7 @@
 //       destined for the same worker). Is this best?
 package system;
 
+import java.io.IOException;
 import static java.lang.System.err;
 import static java.lang.System.exit;
 import static java.lang.System.out;
@@ -24,6 +25,8 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import jicosfoundation.Command;
 import jicosfoundation.CommandSynchronous;
 import jicosfoundation.DefaultRemoteExceptionHandler;
@@ -110,12 +113,12 @@ public final class Worker extends ServiceImpl
     {
         // set Jicos Service attributes
         super( command2DepartmentArray );
-        super.setService( this );
+        super.setService( this ); //TODO leaking partially constructed object
         super.setDepartments( departments );
         
         masterProxy = new ProxyMaster( master, this, REMOTE_EXCEPTION_HANDLER );
         CommandSynchronous command = new RegisterWorker( serviceName() ); 
-        myWorkerNum = (Integer) master.executeCommand( this, command );
+        myWorkerNum = (Integer) master.executeCommand( this, command ); //TODO leaking partially constructed object
         super.register ( master );
         
         int numAvailableProcessors = Runtime.getRuntime().availableProcessors();
@@ -342,6 +345,7 @@ public final class Worker extends ServiceImpl
      }
     
     // Command: ShutdownWorker
+    @Override
     public void shutdown()
     {
         out.println("Worker.shutdown: shutting down.");
@@ -360,7 +364,13 @@ public final class Worker extends ServiceImpl
     // Command: WriteWorkerOutputFile
     public void writeWorkerOutputFile()
     {        
-        job.makeOutputFile( this );        
+        try
+        {
+            job.makeOutputFile( this );
+        } catch (IOException ex)
+        {
+            Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
+        }
         Command command = new CommandComplete( myWorkerNum );
         masterProxy.execute( command );
     }
@@ -443,7 +453,7 @@ public final class Worker extends ServiceImpl
         }
         String masterDomainName = args[0];
         Service master = getMaster( masterDomainName );          
-        new Worker( master ); // why is this not garbage immediately?
+        new Worker( master ); // why is this not garbage immediately? TODO because the worker constructor is registering itself with a service.
         out.println( "Worker: Ready." );
     }
     
@@ -490,7 +500,13 @@ public final class Worker extends ServiceImpl
     
     public void output()
     {
-        job.makeOutputFile( this );
+        try
+        {
+            job.makeOutputFile( this );
+        } catch (IOException ex)
+        {
+            Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
+        }
         Command command = new CommandComplete( myWorkerNum );
         masterProxy.execute( command );   
     }

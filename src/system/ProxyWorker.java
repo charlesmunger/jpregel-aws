@@ -31,7 +31,6 @@
 
 package system;
 
-import java.util.concurrent.atomic.AtomicInteger;
 import jicosfoundation.DefaultRemoteExceptionHandler;
 import jicosfoundation.Proxy;
 import jicosfoundation.RemoteExceptionHandler;

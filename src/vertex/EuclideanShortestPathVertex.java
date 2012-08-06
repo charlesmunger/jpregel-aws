@@ -24,7 +24,7 @@ import system.combiners.FloatMinCombiner;
  */
 public final class EuclideanShortestPathVertex extends Vertex<Point2D.Float, Message<Point2D.Float, Float>, Point2D.Float, Float>
 {
-    public static Combiner combiner = new FloatMinCombiner();
+    public static Combiner combiner = new FloatMinCombiner(); //TODO this field hids another
     
     public EuclideanShortestPathVertex( Point2D.Float vertexId, Map<Point2D.Float, Point2D.Float> outEdgeMap )
     {
@@ -34,6 +34,7 @@ public final class EuclideanShortestPathVertex extends Vertex<Point2D.Float, Mes
     
     public EuclideanShortestPathVertex() {} // needed to make vertexFactory
     
+    @Override
     public Vertex make( String line )
     {
         StringTokenizer stringTokenizer = new StringTokenizer( line );
@@ -117,12 +118,14 @@ public final class EuclideanShortestPathVertex extends Vertex<Point2D.Float, Mes
     /*
      * Would prefer to map square subgrids to a part.
      */
+    @Override
     public int getPartId( Point2D.Float vertexId, int numParts )
     {
         int row = (int) vertexId.getX();
         return row % numParts;
     }
     
+    @Override
     protected boolean isSource()
     {
         Point2D.Float vertex = (Point2D.Float) getVertexId();

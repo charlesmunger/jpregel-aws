@@ -1,10 +1,8 @@
 package system;
 
-import java.util.Date;
-
 import static java.lang.System.currentTimeMillis;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  *

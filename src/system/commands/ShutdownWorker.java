@@ -3,7 +3,6 @@ package system.commands;
 import jicosfoundation.Command;
 import jicosfoundation.Proxy;
 import jicosfoundation.ServiceImpl;
-import system.ComputeInput;
 import system.Worker;
 
 /**
@@ -22,5 +21,6 @@ public class ShutdownWorker implements Command
         worker.shutdown();
     } 
     
+    @Override
     public String toString() { return this.getClass().getName(); } 
 }

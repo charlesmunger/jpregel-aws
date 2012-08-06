@@ -3,7 +3,6 @@ package vertex;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.regex.Pattern;
 import system.Combiner;
 import system.Job;
 import system.Message;
@@ -15,7 +14,7 @@ import system.Vertex;
  */
 public final class BinaryTreeShortestPathVertex extends Vertex<Integer, Message<Integer, Integer>, Message<Integer, Integer>, Integer>
 {
-    private static int      numVertices;
+    private static int      numVertices; //TODO these fields hide Vertex's fields.
     public  static Combiner combiner;
     
 //    private Pattern regex = Pattern.compile(" ");
@@ -28,6 +27,7 @@ public final class BinaryTreeShortestPathVertex extends Vertex<Integer, Message<
         setVertexValue( new Message( vertexId, Integer.MAX_VALUE ) );
     }
     
+    @Override
     synchronized public Vertex make( String line )
     {
 //        String[] tokenArray = regex.split(line, 2);
@@ -98,5 +98,6 @@ public final class BinaryTreeShortestPathVertex extends Vertex<Integer, Message<
         return new String( string );
     }
     
+    @Override
     synchronized protected boolean isSource() { return getVertexId() == 1; }
 }

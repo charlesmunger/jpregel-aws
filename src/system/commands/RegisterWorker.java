@@ -32,8 +32,8 @@
 
 package system.commands;
 
-import system.*;
 import jicosfoundation.*;
+import system.Master;
 
 
 public final class RegisterWorker implements CommandSynchronous
@@ -42,11 +42,13 @@ public final class RegisterWorker implements CommandSynchronous
     
     public RegisterWorker( ServiceName workerServiceName ) { this.workerServiceName = workerServiceName; }
     
+    @Override
     public Integer execute( Proxy proxy, RemoteExceptionHandler remoteExceptionHandler ) 
     {
         return null; // Not used
     }
 
+    @Override
     public Integer execute( ServiceImpl myService ) 
     {
         // set Worker information on Master
@@ -54,5 +56,6 @@ public final class RegisterWorker implements CommandSynchronous
         return master.registerWorker( workerServiceName );
     }
     
+    @Override
     public String toString() { return " " + this.getClass() + ": serviceName: " + workerServiceName; }
 }

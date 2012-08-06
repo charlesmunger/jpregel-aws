@@ -22,6 +22,7 @@ public class Ec2Cluster extends Cluster
     private static final int PRIVATE_DOMAIN_NAME = 1;
     private MasterMachines masterMachines;
     
+    @Override
     public synchronized ClientToMaster start(int numWorkers) throws RemoteException
     {
         out.println("Ec2Cluster.start.");
@@ -113,6 +114,7 @@ public class Ec2Cluster extends Cluster
         return master;
     }
     
+    @Override
     public void stop() 
     {
         try 

@@ -8,6 +8,7 @@ import java.rmi.RemoteException;
  */
 public class LocalCluster extends Cluster
 {
+    @Override
     public synchronized ClientToMaster start(int numWorkers) throws RemoteException 
     {
         System.out.println("Cluster.starting.");
@@ -18,6 +19,7 @@ public class LocalCluster extends Cluster
         return master;
     }
 
+    @Override
     public void stop()
     {
         try 
