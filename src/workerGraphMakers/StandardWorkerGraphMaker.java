@@ -28,7 +28,6 @@ public class StandardWorkerGraphMaker implements GraphMaker
             int workerNum       = worker.getWorkerNum();
             Job job = worker.getJob();
             FileSystem fileSystem = job.getFileSystem();
-//            Combiner combiner     = job.getCombiner();
             Vertex vertexFactory  = job.getVertexFactory();
             BufferedReader bufferedReader = null ; 
             DataInputStream dataInputStream =null ; 
@@ -57,7 +56,6 @@ public class StandardWorkerGraphMaker implements GraphMaker
         	   
             for ( String line; ( line = bufferedReader.readLine() ) != null; numVertices++ )
             {
-//                Vertex vertex = vertexFactory.make( line, combiner );
                 Vertex vertex = vertexFactory.make( line );
                 worker.addVertex( vertex, line );
             } 

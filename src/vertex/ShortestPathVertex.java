@@ -22,11 +22,11 @@ import system.combiners.IntegerMinCombiner;
  * 
  * @author Pete Cappello
  */
-public final class ShortestPathVertex extends Vertex<Integer, Message<Integer, Integer>, OutEdge, Integer>
+public final class ShortestPathVertex extends Vertex<Integer, Message<Integer, Integer>, Integer, Integer>
 {
-    public ShortestPathVertex( Integer vertexId, Map<Integer, OutEdge> outEdgeMap )
+    public ShortestPathVertex( Integer vertexId, Map<Integer, Integer> edgeMap )
     {
-        super( vertexId, outEdgeMap );
+        super( vertexId, edgeMap );
         setVertexValue( new Message<Integer, Integer>( vertexId, Integer.MAX_VALUE ) );
         combiner = new IntegerMinCombiner();
     }
@@ -43,14 +43,14 @@ public final class ShortestPathVertex extends Vertex<Integer, Message<Integer, I
             exit( 1 );
         }
         int vertexId = Integer.parseInt( stringTokenizer.nextToken() );
-        Map<Integer, OutEdge> outEdgeMap = new HashMap<Integer, OutEdge>();
+        Map<Integer, Integer> edgeMap = new HashMap<Integer, Integer>();
         while( stringTokenizer.hasMoreTokens() )
         { 
             int target = Integer.parseInt( stringTokenizer.nextToken() );
             int weight = Integer.parseInt( stringTokenizer.nextToken() ); 
-            outEdgeMap.put( target, new OutEdge( target, weight ) );
+            edgeMap.put( target, weight );
         }
-        return new ShortestPathVertex( vertexId, outEdgeMap );
+        return new ShortestPathVertex( vertexId, edgeMap );
     }
     
     @Override
@@ -71,17 +71,16 @@ public final class ShortestPathVertex extends Vertex<Integer, Message<Integer, I
             setVertexValue( minDistanceMessage ); // update my value: the shortest path to me
             
             // To each of my target vertices: The shortest known path to you through me just got shorter 
-            for ( OutEdge outEdge : getOutEdgeValues() )
+            for ( Integer targetVertexId : getEdgeTargets() )
             {
-                Object targetVertexId = outEdge.getVertexId();
-                Object edgeValue = outEdge.getEdgeValue();
+                Integer edgeValue = edgeMap.get( targetVertexId );
                 Message message = new Message( getVertexId(), minDistanceMessage.getMessageValue() + (Integer) edgeValue );
                 sendMessage( targetVertexId, message );
             }
             
             // aggregate number of messages sent in this step & this problem
-            aggregateOutputProblemAggregator( new IntegerSumAggregator( getOutEdgeMapSize() ));
-            aggregateOutputStepAggregator(    new IntegerSumAggregator( getOutEdgeMapSize() ));
+//            aggregateOutputProblemAggregator( new IntegerSumAggregator( getEdgeMapSize() ));
+//            aggregateOutputStepAggregator(    new IntegerSumAggregator( getEdgeMapSize() ));
         }
         
         /* This vote will be overturned, if during this step, a vertex for whom 

@@ -16,13 +16,11 @@ import system.Vertex;
  *
  * @author Pete Cappello
  */
-public class TestMutabilityVertex extends Vertex<Integer, Message, OutEdge, Integer>
+public class TestMutabilityVertex extends Vertex<Integer, Message<Integer, Integer>, Integer, Integer>
 {
-//    public TestMutabilityVertex( Integer vertexId, Map<Object, OutEdge> outEdgeMap, Combiner<Integer> combiner )
-    public TestMutabilityVertex( Integer vertexId, Map<Integer, OutEdge> outEdgeMap )
+    public TestMutabilityVertex( Integer vertexId, Map<Integer, Integer> edgeMap )
     {
-//        super( vertexId, outEdgeMap, combiner );
-        super( vertexId, outEdgeMap );
+        super( vertexId, edgeMap );
         setVertexValue( new Message<Integer, Integer>( vertexId, Integer.MAX_VALUE ) );
     }
     
@@ -39,15 +37,15 @@ public class TestMutabilityVertex extends Vertex<Integer, Message, OutEdge, Inte
             exit( 1 );
         }
         int vertexId = Integer.parseInt( stringTokenizer.nextToken() );
-        Map<Integer, OutEdge> outEdgeMap = new HashMap<Integer, OutEdge>();
+        Map<Integer, Integer> edgeMap = new HashMap<Integer, Integer>();
         while( stringTokenizer.hasMoreTokens() )
         { 
             int target  = Integer.parseInt( stringTokenizer.nextToken() );
             int weight  = Integer.parseInt( stringTokenizer.nextToken() ); 
-            outEdgeMap.put( target, new OutEdge( target, weight ) );
+            edgeMap.put( target, weight );
         }
 //        return new TestMutabilityVertex( vertexId, outEdgeMap, combiner );
-        return new TestMutabilityVertex( vertexId, outEdgeMap );
+        return new TestMutabilityVertex( vertexId, edgeMap );
     }
     
     @Override
@@ -55,7 +53,7 @@ public class TestMutabilityVertex extends Vertex<Integer, Message, OutEdge, Inte
     {
         if ( getSuperStep() == 0 && getVertexId() == 0 )
         {
-            addEdge( new Integer( 2 ), new OutEdge( 2, -1 ) );
+            addEdge( new Integer( 2 ), -1 );
         }
         if ( getSuperStep() == 1 && getVertexId() == 0 )
         {
@@ -88,11 +86,11 @@ public class TestMutabilityVertex extends Vertex<Integer, Message, OutEdge, Inte
         string.append( getVertexId() );
         string.append( " : ");
 //        string.append( ((Message)  getVertexValue() ).getMessageValue() );
-        for ( OutEdge outEdge : getOutEdgeValues() )
+        for ( Integer targetId : edgeMap.keySet() )
             {
-                string.append( outEdge.getVertexId() );
+                string.append( targetId );
                 string.append( " ");
-                string.append( outEdge.getEdgeValue() );
+                string.append( edgeMap.get( targetId ) );
                 string.append( " ");
             }
         return new String( string );

@@ -17,8 +17,8 @@ public final class Job implements Serializable
 {
     private final String   jobName;
     private final String   jobDirectoryName;
+    // TODO Job: Should this be set in client, as it is now?
     private final int      numParts;
-//    private final boolean  workerIsMultithreaded;
     private       Aggregator stepAggregator    = new NullAggregator();
     private       Aggregator problemAggregator = new NullAggregator();
     private final Vertex   vertexFactory;

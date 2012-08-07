@@ -1,4 +1,4 @@
-package vertex;
+ package vertex;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +12,7 @@ import system.Vertex;
  *
  * @author Pete Cappello
  */
-public final class BinaryTreeShortestPathVertex extends Vertex<Integer, Message<Integer, Integer>, Message<Integer, Integer>, Integer>
+public final class BinaryTreeShortestPathVertex extends Vertex<Integer, Message<Integer, Integer>, Integer, Integer>
 {
     private static int      numVertices; //TODO these fields hide Vertex's fields.
     public  static Combiner combiner;
@@ -21,9 +21,9 @@ public final class BinaryTreeShortestPathVertex extends Vertex<Integer, Message<
         
     public BinaryTreeShortestPathVertex() {}
     
-    public BinaryTreeShortestPathVertex( Integer vertexId, Message<Integer, Integer> vertexValue, Map<Integer, Message<Integer, Integer>> outEdgeMap )
+    public BinaryTreeShortestPathVertex( Integer vertexId, Message<Integer, Integer> vertexValue, Map<Integer, Integer> edgeMap )
     { 
-        super( vertexId, outEdgeMap );
+        super( vertexId, edgeMap );
         setVertexValue( new Message( vertexId, Integer.MAX_VALUE ) );
     }
     
@@ -42,21 +42,19 @@ public final class BinaryTreeShortestPathVertex extends Vertex<Integer, Message<
         Integer initialKnownDistance = ( vertexId == 1 ) ? 0 : Integer.MAX_VALUE;
         Message<Integer, Integer> vertexValue = new Message<Integer, Integer>( 1, initialKnownDistance );
         
-        Map<Integer, Message<Integer, Integer>> outEdgeMap = new HashMap<Integer, Message<Integer, Integer>>( 2 );
+        Map<Integer, Integer> edgeMap = new HashMap<Integer, Integer>( 2 );
         Integer targetVertexId = 2 * vertexId; // << 1;
         if ( targetVertexId <= numVertices )
         {   // make OutEdge for left child
-            Message<Integer, Integer> outEdge = new Message<Integer, Integer>( targetVertexId, 1 );
-            outEdgeMap.put( targetVertexId, outEdge );
+            edgeMap.put( targetVertexId, 1 );
 
             if ( targetVertexId < numVertices )
             {   // make OutEdge for right child
-                outEdge = new Message<Integer, Integer>( ++targetVertexId, 1 );
-                outEdgeMap.put( targetVertexId, outEdge );
+                edgeMap.put( ++targetVertexId, 1 );
             }
         }
         
-        return new BinaryTreeShortestPathVertex( vertexId, vertexValue, outEdgeMap );
+        return new BinaryTreeShortestPathVertex( vertexId, vertexValue, edgeMap );
     }
     
     @Override     
@@ -78,10 +76,10 @@ public final class BinaryTreeShortestPathVertex extends Vertex<Integer, Message<
             setVertexValue( minDistanceMessage ); // update my value: the shortest path to me
 
             // To each target vertex: The shortest known path to you through me just got shorter
-            for ( Message<Integer, Integer> outEdge : getOutEdgeValues() )            
+            for ( Integer targetId : edgeMap.keySet() )            
             {
-                Message<Integer, Integer> message = new Message<Integer, Integer>( getVertexId(), minDistanceMessage.getMessageValue() + outEdge.getMessageValue() );   
-                sendMessage( outEdge.getVertexId(), message );
+                Message<Integer, Integer> message = new Message<Integer, Integer>( getVertexId(), minDistanceMessage.getMessageValue() + 1 );   
+                sendMessage( targetId, message );
             }
         }
     }

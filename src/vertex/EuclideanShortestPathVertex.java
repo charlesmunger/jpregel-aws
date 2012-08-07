@@ -24,11 +24,11 @@ import system.combiners.FloatMinCombiner;
  */
 public final class EuclideanShortestPathVertex extends Vertex<Point2D.Float, Message<Point2D.Float, Float>, Point2D.Float, Float>
 {
-    public static Combiner combiner = new FloatMinCombiner(); //TODO this field hids another
+    public static Combiner combiner = new FloatMinCombiner(); //TODO this field hides another
     
-    public EuclideanShortestPathVertex( Point2D.Float vertexId, Map<Point2D.Float, Point2D.Float> outEdgeMap )
+    public EuclideanShortestPathVertex( Point2D.Float vertexId, Map<Point2D.Float, Point2D.Float> edgeMap )
     {
-        super( vertexId, outEdgeMap );
+        super( vertexId, edgeMap );
         setVertexValue( new Message( vertexId, Float.MAX_VALUE ) );
     }
     
@@ -40,28 +40,28 @@ public final class EuclideanShortestPathVertex extends Vertex<Point2D.Float, Mes
         StringTokenizer stringTokenizer = new StringTokenizer( line );
         if ( ! stringTokenizer.hasMoreTokens() )
         {
-            err.println( "EuclideanShortestPathVertex.make: Empty lines are not allowed: line: '" + line +"'");
+            err.println( "EuclideanShortestPathVertex.make: Empty lines are not allowed: line: '" + line + "'");
             exit( 1 );
         }
         float vx  = Float.parseFloat( stringTokenizer.nextToken() );
         float vy  = Float.parseFloat( stringTokenizer.nextToken() );
         Point2D.Float vertexId = new Point2D.Float( vx, vy);
-        Map<Point2D.Float, Point2D.Float> outEdgeMap = new HashMap<Point2D.Float, Point2D.Float>();
+        Map<Point2D.Float, Point2D.Float> edgeMap = new HashMap<Point2D.Float, Point2D.Float>();
         while( stringTokenizer.hasMoreTokens() )
         { 
-            float x  = Float.parseFloat( stringTokenizer.nextToken() );
-            float y  = Float.parseFloat( stringTokenizer.nextToken() );
+            float x = Float.parseFloat( stringTokenizer.nextToken() );
+            float y = Float.parseFloat( stringTokenizer.nextToken() );
             Point2D.Float target = new Point2D.Float( x, y );
-            outEdgeMap.put( target, target );
+            // TODO EuclideanShortestPathVertex extends UnweightedEdgeVertex which extends Vertex
+            edgeMap.put( target, target );
         }
         
         // initialize vertexValue
-        // Cannot use isSource() to compute minDistance; vertex has not been created yet.
         Float minDistance = ( vx == 0.0 && vy == 0.0 ) ? (float) 0.0 : Float.MAX_VALUE;
         Message<Point2D.Float, Float> minDistanceMessage = new Message<Point2D.Float, Float>( new Point2D.Float(), minDistance );
         setVertexValue( minDistanceMessage );
         
-        return new EuclideanShortestPathVertex( vertexId, outEdgeMap );
+        return new EuclideanShortestPathVertex( vertexId, edgeMap );
     }  
 
     @Override     
@@ -84,7 +84,7 @@ public final class EuclideanShortestPathVertex extends Vertex<Point2D.Float, Mes
             setVertexValue( minDistanceMessage ); // update my value: the shortest path to me
             
             // To each target vertex: The shortest known path to you through me just got shorter 
-            for ( Point2D.Float targetVertexId : getOutEdgeValues() )            
+            for ( Point2D.Float targetVertexId : edgeMap.keySet() )            
             {
                 float edgeValue = distance( targetVertexId );
                 Message<Point2D.Float, Float> message = new Message<Point2D.Float, Float>( getVertexId(), minDistanceMessage.getMessageValue() + edgeValue );   
@@ -92,8 +92,8 @@ public final class EuclideanShortestPathVertex extends Vertex<Point2D.Float, Mes
             }
             
             // aggregate number of messages sent in this step & in this problem
-            aggregateOutputProblemAggregator( new IntegerSumAggregator( getOutEdgeMapSize() ));
-            aggregateOutputStepAggregator(    new IntegerSumAggregator( getOutEdgeMapSize() ));
+//            aggregateOutputProblemAggregator( new IntegerSumAggregator( getOutEdgeMapSize() ));
+//            aggregateOutputStepAggregator(    new IntegerSumAggregator( getOutEdgeMapSize() ));
         }
    
         /* This vote will be overturned, if during this step, a vertex for whom 

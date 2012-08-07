@@ -22,8 +22,8 @@ public class ShortestPathLocalClient
     public static void main(String[] args) throws Exception 
     {
         int numWorkers = Integer.parseInt(args[1]);
-        int     computeThreadsPerWorker = Runtime.getRuntime().availableProcessors();
-        int numParts = numWorkers * computeThreadsPerWorker * 2; // numWorkers * ComputeThreads/Worker * Parts/ComputeThread
+        int computeThreadsPerWorker = Runtime.getRuntime().availableProcessors();
+        int numParts = numWorkers * computeThreadsPerWorker * 2;
         Job job = new Job("Shortest Path Problem", // jobName
                   args[0],                         // jobDirectoryName
                   new ShortestPathVertex(),        // vertexFactory, 

@@ -48,29 +48,26 @@ import java.util.Map;
  *
  * @author Peter Cappello
  */
-abstract public class Vertex<VertexIdType, VertexValueType, OutEdgeType, MessageValueType> implements java.io.Serializable
+abstract public class Vertex<VertexIdType, VertexValueType, EdgeValueType, MessageValueType> implements java.io.Serializable
 {
-    public    static Combiner combiner;
+    public    static Combiner combiner; // null means no combining
     protected static int      numVertices;
     
     private final VertexIdType    vertexId;
     private       VertexValueType vertexValue;
     private       Part            part;
     
-    /*
-     * This is no longer a Set<OutEdgeType> in preparation for implementing OutEdge deletion.
-     */
-    private Map<VertexIdType, OutEdgeType> outEdgeMap;
+    protected Map<VertexIdType, EdgeValueType> edgeMap;
 //    private NonNullMap<VertexIdType, MessageValueType> superstepToMessageQMap;
     private OntoMap<MessageQ<VertexIdType, MessageValueType>> superstepToMessageQMap;
 //    private OntoMap<MessageValueType> superstepToInboxMap;
             
     public Vertex() { vertexId = null; }
           
-    public Vertex( VertexIdType vertexId, Map<VertexIdType, OutEdgeType> outEdgeMap )
+    public Vertex( VertexIdType vertexId, Map<VertexIdType, EdgeValueType> edgeMap )
     {
         this.vertexId   = vertexId;
-        this.outEdgeMap = outEdgeMap;
+        this.edgeMap = edgeMap;
 //        superstepToMessageQMap = new NonNullMap<VertexIdType, MessageValueType>( combiner );
         superstepToMessageQMap = new OntoMap<MessageQ<VertexIdType, MessageValueType>>( new MessageQ( combiner ) );
     }
@@ -80,9 +77,9 @@ abstract public class Vertex<VertexIdType, VertexValueType, OutEdgeType, Message
      *               Begin API
      * _________________________________________
      */   
-    synchronized protected void addEdge( VertexIdType target, OutEdgeType outEdge ) { outEdgeMap.put( target, outEdge ); }
+    synchronized protected void addEdge( VertexIdType target, EdgeValueType edgeValue ) { edgeMap.put( target, edgeValue ); }
 
-    synchronized protected void addEdge( VertexIdType vertexId, Object target, OutEdgeType outEdge ) { }
+    synchronized protected void addEdge( VertexIdType vertexId, Object target, EdgeValueType edgeValue ) { }
 
     synchronized protected void addVertex( VertexIdType vertexId, Object vertexValue ) { /* combiner */ }
 
@@ -122,9 +119,9 @@ abstract public class Vertex<VertexIdType, VertexValueType, OutEdgeType, Message
     
     protected int getNumVertices() { return part.getComputeInput().getNumVertices(); }
     
-    synchronized protected Collection<OutEdgeType> getOutEdgeValues() { return outEdgeMap.values(); }
+    synchronized protected Collection<VertexIdType> getEdgeTargets() { return edgeMap.keySet(); }
     
-    synchronized public int getOutEdgeMapSize() { return outEdgeMap.size(); }
+    synchronized public int getEdgeMapSize() { return edgeMap.size(); }
     
     public int getPartId( VertexIdType vertexId, int numParts ) 
     { 
@@ -139,7 +136,7 @@ abstract public class Vertex<VertexIdType, VertexValueType, OutEdgeType, Message
     
     public abstract Vertex make( String line );
     
-    synchronized protected OutEdgeType removeEdge( VertexIdType vertexId ) { return outEdgeMap.remove( vertexId ); }
+    synchronized protected void removeEdge( VertexIdType vertexId ) { edgeMap.remove( vertexId ); }
 
     synchronized protected void removeEdge( VertexIdType vertexId, Object targetVertexId ) { }
     
