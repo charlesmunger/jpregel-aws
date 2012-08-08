@@ -84,7 +84,7 @@ public final class EuclideanShortestPathVertex extends Vertex<Point2D.Float, Mes
             setVertexValue( minDistanceMessage ); // update my value: the shortest path to me
             
             // To each target vertex: The shortest known path to you through me just got shorter 
-            for ( Point2D.Float targetVertexId : edgeMap.keySet() )            
+            for ( Point2D.Float targetVertexId : getEdgeMap().keySet() )            
             {
                 float edgeValue = distance( targetVertexId );
                 Message<Point2D.Float, Float> message = new Message<Point2D.Float, Float>( getVertexId(), minDistanceMessage.getMessageValue() + edgeValue );   

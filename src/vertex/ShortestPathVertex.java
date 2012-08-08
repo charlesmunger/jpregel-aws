@@ -2,15 +2,11 @@ package vertex;
 
 import static java.lang.System.err;
 import static java.lang.System.exit;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
-import system.Combiner;
 import system.Message;
-import system.OutEdge;
 import system.Vertex;
-import system.aggregators.IntegerSumAggregator;
 import system.combiners.IntegerMinCombiner;
 
 /**
@@ -22,7 +18,7 @@ import system.combiners.IntegerMinCombiner;
  * 
  * @author Pete Cappello
  */
-public final class ShortestPathVertex extends Vertex<Integer, Message<Integer, Integer>, Integer, Integer>
+public class ShortestPathVertex extends Vertex<Integer, Message<Integer, Integer>, Integer, Integer>
 {
     public ShortestPathVertex( Integer vertexId, Map<Integer, Integer> edgeMap )
     {
@@ -73,8 +69,8 @@ public final class ShortestPathVertex extends Vertex<Integer, Message<Integer, I
             // To each of my target vertices: The shortest known path to you through me just got shorter 
             for ( Integer targetVertexId : getEdgeTargets() )
             {
-                Integer edgeValue = edgeMap.get( targetVertexId );
-                Message message = new Message( getVertexId(), minDistanceMessage.getMessageValue() + (Integer) edgeValue );
+                Integer edgeValue = getEdgeMap().get( targetVertexId );
+                Message message = new Message( getVertexId(), minDistanceMessage.getMessageValue() + edgeValue );
                 sendMessage( targetVertexId, message );
             }
             
@@ -97,11 +93,11 @@ public final class ShortestPathVertex extends Vertex<Integer, Message<Integer, I
         string.append( getVertexId() );
         string.append( " : ");
         string.append( getVertexValue().getVertexId() );
-        string.append( " ");
+        string.append( " - ");
         string.append( getVertexValue().getMessageValue() );
         return new String( string );
     }
     
     @Override
-    protected boolean isSource() { return getVertexId() == 0; }
+    protected boolean isSource() { return getVertexId() == 1; }
 }

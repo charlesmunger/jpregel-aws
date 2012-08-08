@@ -78,21 +78,19 @@ public class BinaryTreeWorkerGraphMaker implements GraphMaker
                 Message<Integer, Integer> minDistanceMessage = new Message<Integer, Integer>( 0, initialKnownDistance );
                 
                 // initiaize out edges (children)
-                Map<Integer, Message<Integer, Integer>> outEdgeMap = new HashMap<Integer, Message<Integer, Integer>>( 2 );
+                Map<Integer, Integer> edgeMap = new HashMap<Integer, Integer>( 2 );
                 Integer targetVertexId = 2 * vertexId;
                 if ( targetVertexId <= numVertices )
                 {   // make OutEdge for left child
-                    Message<Integer, Integer> outEdge = new Message<Integer, Integer>( targetVertexId, 1 );
-                    outEdgeMap.put( targetVertexId, outEdge );
+                    edgeMap.put( targetVertexId, 1 );
 
                     if ( targetVertexId < numVertices )
                     {   // make OutEdge for right child
-                        outEdge = new Message<Integer, Integer>( ++targetVertexId, 1 );
-                        outEdgeMap.put( targetVertexId, outEdge );
+                        edgeMap.put( ++targetVertexId, 1 );
                     }
                 }
                 
-                Vertex vertex = new BinaryTreeShortestPathVertex( vertexId, minDistanceMessage, outEdgeMap );
+                Vertex vertex = new BinaryTreeShortestPathVertex( vertexId, minDistanceMessage, edgeMap );
                 String vertexString = new String( stringVertex );
                 worker.addVertex( vertex, vertexString );
             }

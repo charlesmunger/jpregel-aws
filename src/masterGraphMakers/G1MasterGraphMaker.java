@@ -66,7 +66,7 @@ public class G1MasterGraphMaker implements MasterGraphMaker
                 System.out.println("Error closing input streams" + ex.getLocalizedMessage());
             }
         }
-        int vertexNum = 0;
+        int vertexNum = 1;
         for (int fileNum = 1; fileNum <= numWorkers; fileNum++)
         {
             // open file for output in "in" directory
@@ -93,7 +93,7 @@ public class G1MasterGraphMaker implements MasterGraphMaker
                 // create line for vertex whose number is vertexNum
                 StringBuilder string = new StringBuilder();
                 string.append(vertexNum).append(' ');
-                for (int targetVertexNum = vertexNum + 1; targetVertexNum < numV; targetVertexNum++)
+                for (int targetVertexNum = vertexNum + 1; targetVertexNum <= numV; targetVertexNum++)
                 {
                     string.append(targetVertexNum).append(' ');
                     int value = (targetVertexNum == vertexNum + 1) ? -1 : 1;

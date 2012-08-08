@@ -57,7 +57,7 @@ abstract public class Vertex<VertexIdType, VertexValueType, EdgeValueType, Messa
     private       VertexValueType vertexValue;
     private       Part            part;
     
-    protected Map<VertexIdType, EdgeValueType> edgeMap;
+    private Map<VertexIdType, EdgeValueType> edgeMap;
 //    private NonNullMap<VertexIdType, MessageValueType> superstepToMessageQMap;
     private OntoMap<MessageQ<VertexIdType, MessageValueType>> superstepToMessageQMap;
 //    private OntoMap<MessageValueType> superstepToInboxMap;
@@ -92,6 +92,8 @@ abstract public class Vertex<VertexIdType, VertexValueType, EdgeValueType, Messa
     abstract protected boolean isSource();
 
     abstract public String output();
+    
+    protected Map<VertexIdType, EdgeValueType> getEdgeMap() { return edgeMap; }
     
     protected Aggregator getInputStepAggregator()    { return part.getComputeInput().getStepAggregator();    }
     

@@ -86,11 +86,11 @@ public class TestMutabilityVertex extends Vertex<Integer, Message<Integer, Integ
         string.append( getVertexId() );
         string.append( " : ");
 //        string.append( ((Message)  getVertexValue() ).getMessageValue() );
-        for ( Integer targetId : edgeMap.keySet() )
+        for ( Integer targetId : getEdgeMap().keySet() )
             {
                 string.append( targetId );
                 string.append( " ");
-                string.append( edgeMap.get( targetId ) );
+                string.append( getEdgeMap().get( targetId ) );
                 string.append( " ");
             }
         return new String( string );

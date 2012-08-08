@@ -11,42 +11,39 @@ import system.*;
  */
 public class StandardWorkerOutputMaker implements WorkerWriter
 {
-
     private static final long serialVersionUID = 1L;
 
     @Override
     public void write(FileSystem fileSystem, Worker worker) throws IOException
     {
+        // open Worker file for output
+        boolean isEc2 = fileSystem.getFileSystem();
+        String jobDirectoryName = fileSystem.getJobDirectory();
+        int workerNum = worker.getWorkerNum();
 
-            // open Worker file for output
-            boolean isEc2 = fileSystem.getFileSystem();
-            String jobDirectoryName = fileSystem.getJobDirectory();
-            int workerNum = worker.getWorkerNum();
+        FileOutputStream fileOutputStream = fileSystem.getWorkerOutputFileOutputStream(workerNum);
+        DataOutputStream dataOutputStream = new DataOutputStream(fileOutputStream);
+        BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(dataOutputStream));
 
-            FileOutputStream fileOutputStream = fileSystem.getWorkerOutputFileOutputStream(workerNum);
-            DataOutputStream dataOutputStream = new DataOutputStream(fileOutputStream);
-            BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(dataOutputStream));
-            //System.out.println("worker.getParts() + worker.getWorkerNum " + worker.getParts().size() + "  " + worker.getWorkerNum() ) ; 
-
-            for (Part part : worker.getParts())
+        for (Part part : worker.getParts())
+        {
+            for (Vertex vertex : part.getVertices())
             {
-                for (Vertex vertex : part.getVertices())
-                {
-                    bufferedWriter.write(vertex.output());
-                    bufferedWriter.newLine();
-                }
+//                bufferedWriter.write(vertex.output());
+//                bufferedWriter.newLine();
             }
+        }
 
-            // close Worker output file
-            bufferedWriter.close();
-            dataOutputStream.close();
-            fileOutputStream.close();
+        // close Worker output file
+        bufferedWriter.close();
+        dataOutputStream.close();
+        fileOutputStream.close();
 
-            if (isEc2)
-            {
-                WorkerGraphFileIO workerGraph = new WorkerGraphFileIO(workerNum);
-                workerGraph.UploadFilesOntoS3(jobDirectoryName);
-                //S3FileSystem.WorkerUploadFiles(jobDirectoryName, "out", workerNum) ; 
-            }
+        if (isEc2)
+        {
+            WorkerGraphFileIO workerGraph = new WorkerGraphFileIO(workerNum);
+            workerGraph.UploadFilesOntoS3(jobDirectoryName);
+            //S3FileSystem.WorkerUploadFiles(jobDirectoryName, "out", workerNum) ; 
+        }
     }
 }
