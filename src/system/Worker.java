@@ -3,17 +3,14 @@
  *    the Master to avoid sending start super step commands to workers that
  *    have no active parts? Probably not worth the effort.
  */
-// TODO: Worker: Batch add vertex requests?
+// TODO: Worker: Batch the sending of AddVertexToWorker commands?
 //       Currently, when vertices are added during graph construction, a message
 //       is sent for each vertex added (as opposed to batching all such requests
 //       destined for the same worker). Is this best?
 package system;
 
 import java.io.IOException;
-import static java.lang.System.err;
-import static java.lang.System.exit;
 import static java.lang.System.out;
-
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -126,7 +123,15 @@ public final class Worker extends ServiceImpl
         computeThreads = new ComputeThread[ numAvailableProcessors ];
         for ( int i = 0; i < numAvailableProcessors; i++ )
         {
-            computeThreads[i] = new ComputeThread( this, i );
+            computeThreads[i] = new ComputeThread( this );
+        }
+    }
+    
+    void startComputeThreads()
+    {
+        for ( ComputeThread computeThread : computeThreads )
+        {
+            computeThread.start();
         }
     }
      
@@ -453,7 +458,8 @@ public final class Worker extends ServiceImpl
         }
         String masterDomainName = args[0];
         Service master = getMaster( masterDomainName );          
-        new Worker( master ); // why is this not garbage immediately? TODO because the worker constructor is registering itself with a service.
+        Worker worker = new Worker( master );
+        worker.startComputeThreads();
         out.println( "Worker: Ready." );
     }
     

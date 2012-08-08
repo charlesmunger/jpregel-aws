@@ -10,8 +10,6 @@ import java.util.Map;
 public class ComputeThread extends Thread
 {
     private final Worker worker;
-    private final int computeThreadNum;
-    
     private boolean workIsAvailable;
     private Map<Integer, Part> partIdToPartMap;
     private Map<Integer, Map<Object, MessageQ>> workerNumToVertexIdToMessageQMapMap;
@@ -20,12 +18,7 @@ public class ComputeThread extends Thread
     private int deltaNumVertices;
     private long superStep;
         
-    ComputeThread( Worker worker, int computeThreadNum )
-    { 
-        this.worker = worker;
-        this.computeThreadNum = computeThreadNum;
-        start(); //TODO fix this - object is not guaranteed to be constructed until method ends
-    }
+    ComputeThread( Worker worker ) { this.worker = worker; }
         
     @Override
     public void run()

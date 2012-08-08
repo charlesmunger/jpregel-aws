@@ -20,6 +20,7 @@ public class LocalMaster extends Master
         for ( int workerNum = 0; workerNum < numWorkers; workerNum++ )
         {
             workers[ workerNum ] = new Worker( this );
+            workers[ workerNum ].startComputeThreads();
         }
     }
     
