@@ -15,7 +15,7 @@ public final class Part
     private final Job job;
     
     // TODO Part: vertexIdToVertexMap: What is a good initial capacity? 
-    private Map<Object, Vertex> vertexIdToVertexMap = new ConcurrentHashMap<Object, Vertex>( 8000 );
+    private Map<Object, Vertex> vertexIdToVertexMap = new ConcurrentHashMap<Object, Vertex>( 8000 , 0.9f, 2);
     private OntoMap<Set<Vertex>> superstepToActiveSetMap = new OntoMap<Set<Vertex>>( new ActiveSet() );
     
     // superStep parameters

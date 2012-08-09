@@ -9,15 +9,23 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 final public class OntoMap<V> extends ConcurrentHashMap<Long, V>
 {
+
     private Factory<V> factory;
-    
-    public OntoMap( Factory factory ) { this.factory = factory; }
-        
-    public V get( Long key )
+
+    public OntoMap(Factory factory)
     {
-        putIfAbsent( key, factory.make() );
-        return super.get( key );
+        super(100, 0.9f, 2);
+        this.factory = factory;
     }
-    
-    public V remove( Long key ) { return super.remove( key ); }
+
+    public V get(Long key)
+    {
+        putIfAbsent(key, factory.make());
+        return super.get(key);
+    }
+
+    public V remove(Long key)
+    {
+        return super.remove(key);
+    }
 }

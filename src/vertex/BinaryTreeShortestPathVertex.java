@@ -3,7 +3,6 @@
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
-import system.Combiner;
 import system.Job;
 import system.Message;
 import system.Vertex;
@@ -14,9 +13,6 @@ import system.Vertex;
  */
 public final class BinaryTreeShortestPathVertex extends ShortestPathVertex
 {
-    private static int      numVertices; //TODO these fields hide Vertex's fields.
-    public  static Combiner combiner;
-            
     public BinaryTreeShortestPathVertex() {}
     
     public BinaryTreeShortestPathVertex( Integer vertexId, Message<Integer, Integer> vertexValue, Map<Integer, Integer> edgeMap )
