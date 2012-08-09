@@ -7,6 +7,8 @@
 //       Currently, when vertices are added during graph construction, a message
 //       is sent for each vertex added (as opposed to batching all such requests
 //       destined for the same worker). Is this best?
+
+// TODO FIX jicosfoundation Processor thread invokes start() in its constructor
 package system;
 
 import java.io.IOException;
@@ -134,7 +136,8 @@ public final class Worker extends ServiceImpl
             computeThread.start();
         }
     }
-     
+    
+    // TODO convert partIdToPartMap to an OntoMap
     synchronized public void addVertexToPart( int partId, Vertex vertex )
     {
         Part part = partIdToPartMap.get( partId );
@@ -159,37 +162,38 @@ public final class Worker extends ServiceImpl
     
     synchronized public Job getJob() { return job; }
     
-    int getWorkerNum( int partId )
+    public int getWorkerNum( int partId )
     {
         int numWorkers = workerNumToWorkerMap.size();
         return ( partId % numWorkers ) + 1;
     }
       
+    // TODO omit this method by converting all worker graph makers
     synchronized public void addVertex( Vertex vertex, String stringVertex )
     {
         int partId = job.getPartId( vertex.getVertexId() );
         int workerNum = getWorkerNum( partId );
         if ( myWorkerNum == workerNum )
-        {
-            //out.println("Worker.addVertex: LOCAL: workerNum: " + workerNum + " partId: " + partId + " vertexId: " + vertex.getVertexId());
+        {   // vertex is local to this worker
             addVertexToPart( partId, vertex );
         }
         else
-        {
+        {   // vertex belongs to another worker
             Service workerService = workerNumToWorkerMap.get( workerNum );
-//            out.println("Worker.addVertex: REMOTE: myWorkerNum: " + myWorkerNum + " workerNum: " + workerNum + " partId: " + partId + " vertexId: " + vertex.getVertexId() + " stringVertex: " + stringVertex);
-//            if ( workerService == null )
-//            {
-//                err.println("Worker.addVertex: NULL Worker: workerNum: " + workerNum );
-//                exit( 1 );
-//            }
             numUnacknowledgedAddVertexCommands.getAndIncrement();
             Command command = new AddVertexToWorker( partId, stringVertex, this );
             sendCommand( workerService, command ); 
         }
     }
     
-    
+    synchronized public void addRemoteVertex( int workerNum, int partId, String stringVertex )
+    {
+        Service workerService = workerNumToWorkerMap.get( workerNum );
+        numUnacknowledgedAddVertexCommands.getAndIncrement();
+        Command command = new AddVertexToWorker( partId, stringVertex, this );
+        sendCommand( workerService, command ); 
+    }
+           
     synchronized void mergeMap( Map<Integer, Map<Object, MessageQ>> workerNumToVertexIdToMessageQMapMap )
     {
         if ( this.workerNumToVertexIdToMessageQMapMap == null )
@@ -246,8 +250,6 @@ public final class Worker extends ServiceImpl
     synchronized public void addVertexToWorker( int partId, String stringVertex, Service sendingWorker )
     {
         Vertex vertexFactory = job.getVertexFactory();
-//        Combiner combiner    = job.getCombiner();
-//        Vertex vertex = vertexFactory.make( stringVertex, combiner );
         Vertex vertex = vertexFactory.make( stringVertex );
         addVertexToPart( partId, vertex );
         sendCommand( sendingWorker, AddVertexToPartCompleteCommand );
@@ -296,7 +298,7 @@ public final class Worker extends ServiceImpl
         // output part sizes to see how PartId for vertices are distributed
         for ( Part part : partSet )
         {
-            out.println("Worker: " + myWorkerNum  + " PartId: " + part.getPartId() + " size: " + part.getVertexIdToVertexMap().size() );
+            out.println("Worker.processInputFile: worker: " + myWorkerNum  + " PartId: " + part.getPartId() + " size: " + part.getVertexIdToVertexMap().size() );
         }
     }
     

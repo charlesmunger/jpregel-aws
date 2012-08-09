@@ -28,26 +28,23 @@ public final class BinaryTreeShortestPathVertex extends ShortestPathVertex
     @Override
     synchronized public Vertex make( String line )
     {
-        // Here, tokenizer is faster than split
         StringTokenizer stringTokenizer = new StringTokenizer( line );
         Integer vertexId = Integer.parseInt( stringTokenizer.nextToken() );
-        numVertices      = Integer.parseInt( stringTokenizer.nextToken() );
-
+        int numChildren  = Integer.parseInt( stringTokenizer.nextToken() );
+        return make( vertexId, numChildren);
+    }
+    
+    synchronized public Vertex make( Integer vertexId, int numChildren )
+    {
         Integer initialKnownDistance = ( vertexId == 1 ) ? 0 : Integer.MAX_VALUE;
         Message<Integer, Integer> vertexValue = new Message<Integer, Integer>( 1, initialKnownDistance );
-        
-        Map<Integer, Integer> edgeMap = new HashMap<Integer, Integer>( 2 );
-        Integer targetVertexId = 2 * vertexId; // << 1;
-        if ( targetVertexId <= numVertices )
-        {   // make OutEdge for left child
-            edgeMap.put( targetVertexId, 1 );
-
-            if ( targetVertexId < numVertices )
-            {   // make OutEdge for right child
-                edgeMap.put( ++targetVertexId, 1 );
-            }
+        Map<Integer, Integer> edgeMap = new HashMap<Integer, Integer>( numChildren );
+        switch ( numChildren )
+        {
+            case 2: edgeMap.put( 2 * vertexId + 1, 1 );
+            case 1: edgeMap.put( 2 * vertexId,     1 );
+            default: break; // no children
         }
-        
         return new BinaryTreeShortestPathVertex( vertexId, vertexValue, edgeMap );
     }
     

@@ -14,15 +14,12 @@ import system.Worker;
 public class AddVertexToWorker implements Command
 {
     private int    partId;
-//    private Vertex vertex;
     private String vertexString;
     private Service sendingWorker;
     
-//    public AddVertexToWorker( int partId, Vertex vertex, Worker sendingWorker )
     public AddVertexToWorker( int partId, String vertexString, Service sendingWorker )
     {
         this.partId = partId;
-//        this.vertex = vertex;
         this.vertexString = vertexString;
         this.sendingWorker = sendingWorker;
     }
@@ -34,7 +31,6 @@ public class AddVertexToWorker implements Command
     public void execute( ServiceImpl serviceImpl ) throws Exception 
     {
         Worker worker = (Worker) serviceImpl;
-//        worker.addVertexToWorker( partId, vertex, sendingWorker );
         worker.addVertexToWorker( partId, vertexString, sendingWorker );
     }
 }
