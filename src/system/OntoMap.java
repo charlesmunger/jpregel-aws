@@ -14,7 +14,7 @@ final public class OntoMap<V> extends ConcurrentHashMap<Long, V>
 
     public OntoMap(Factory factory)
     {
-        super(100, 0.9f, 2);
+        super(100, 0.9f, 1);
         this.factory = factory;
     }
 
