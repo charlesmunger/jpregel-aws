@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Jpregel-aws by charlesmunger</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/main.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+
+      <header>
+        <h1>Jpregel-aws</h1>
+        <p>jPregel on AWS</p>
+      </header>
+
+      <div id="banner">
+        <span id="logo"></span>
+
+        <a href="https://github.com/charlesmunger/jpregel-aws" class="button fork"><strong>View On GitHub</strong></a>
+        <div class="downloads">
+          <span>Downloads:</span>
+          <ul>
+            <li><a href="https://github.com/charlesmunger/jpregel-aws/zipball/master" class="button">ZIP</a></li>
+            <li><a href="https://github.com/charlesmunger/jpregel-aws/tarball/master" class="button">TAR</a></li>
+          </ul>
+        </div>
+      </div><!-- end banner -->
+
+    <div class="wrapper">
+      <nav>
+        <ul></ul>
+      </nav>
+      <section>
+        <h1>jpregel-aws</h1>
+
+<p>jPregel on AWS</p>
+
+<p>This code is based on a project called jPregel, written by Peter Cappello, and a Java package to run jPregel on AWS, which was written by Varsha Parthasarathy. 
+The latter package has been essentially rewritten by Charles Munger.</p>
+
+<p>To deploy this code:</p>
+
+<ol>
+<li><p>Create an Amazon Web Services account. This requires a credit card. </p></li>
+<li><p>Create two SSH key pairs, named "privatekey" and "masterkey". Save these into privatekey.pem and masterkey.pem, in the jpregel-aws directory. </p></li>
+<li><p>Create a file named key.AWSkey, with your access key on the first line and your secret key on the second.</p></li>
+</ol><p>Specify a Main file with ant:</p>
+
+<p>ant run -propertyfile nbproject/configs/ShortestPath.properties -Dapplication.args="foobucket 10 10 true true"</p>
+
+<p>This project is licensed under the MIT license, which is provided in license.txt.</p>
+      </section>
+      <footer>
+        <p>Project maintained by <a href="https://github.com/charlesmunger">charlesmunger</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
