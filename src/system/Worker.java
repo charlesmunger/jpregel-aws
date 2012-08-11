@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -123,7 +124,7 @@ public final class Worker extends ServiceImpl
         int numAvailableProcessors = Runtime.getRuntime().availableProcessors();
         System.out.println("Worker.constructor: Available processors: " + numAvailableProcessors ) ; 
         computeThreads = new ComputeThread[ numAvailableProcessors ];
-        for ( int i = 0; i < numAvailableProcessors; i++ )
+        for ( int i = 0; i < computeThreads.length; i++ )
         {
             computeThreads[i] = new ComputeThread( this );
         }
@@ -137,7 +138,6 @@ public final class Worker extends ServiceImpl
         }
     }
     
-    // TODO convert partIdToPartMap to an OntoMap
     synchronized public void addVertexToPart( int partId, Vertex vertex )
     {
         Part part = partIdToPartMap.get( partId );

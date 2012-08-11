@@ -4,12 +4,18 @@ import java.io.IOException;
 import java.io.Serializable;
 
 /**
- * Job encapsulates the data structures & method implementations for a 
+ * <p>
+ * Job encapsulates the data structures & methods for a 
  * particular kind of graph problem, as well as parameter values for a 
  * particular instance of such a graph problem.
- * 
- * The number of Workers is an attribute, not of Job, but of the jpregel environment
+ * </p>
+ * <p>
+ * The number of Workers is an attribute, not of Job, but of the cluster on
+ * which jpregel runs.
+ * </p>
+ * <p>
  * Whether or not a Job is run in local mode is an attribute, not of Job, but of the Client
+ * </p>
  * 
  * @author Peter Cappello
  */
@@ -29,8 +35,17 @@ public final class Job implements Serializable
     
     private FileSystem fileSystem;
 
-    /*
-     * @param numParts - a Job attribute so that we can conveniently modify it
+    /**
+     * @param jobName The name used by jpregel when producing job run information.
+     * @param jobDirectoryName
+     *  The relative path to the job directory. 
+     * If it is a local execution, the path is relative to the Netbeans project;
+     * If it is an AWS execution, the path is relative to an S3 bucket.
+     * The <b>job</b> directory is expected to have the input file; 
+     * it will have the output file when the job is complete.
+     * It also is used to contain the intermediate directories <i>in</i> and <i>out</i>.
+     * @param numParts the number of <i>parts</i> for this Job.
+     * This is a Job attribute so that we can conveniently modify it
      * per Job, to find a good value that appears to be primarily a function of 
      * graph structure and size, and possibly problem type (e.g., shortest path)
      */

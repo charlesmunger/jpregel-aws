@@ -78,13 +78,6 @@ public class PageRankMasterGraphMaker implements MasterGraphMaker
                     StringBuilder string = new StringBuilder();
                     int endVertexNum = vertexNum + linesPerFile ; 
                     string.append( vertexNum ).append( ' ' ).append(endVertexNum).append( ' ' ).append(numV) ; 
-
-                    /*for ( int targetVertexNum = vertexNum + 1; targetVertexNum < numV; targetVertexNum++ )
-                    {
-                        string.append( targetVertexNum ).append( ' ' );
-                        int value = ( targetVertexNum == vertexNum + 1 ) ? -1 : 1;
-                        string.append( value ).append( ' ' );
-                    } */ ///TODO is this safe to remove?
                     String lines = new String( string );
 
                     // append line to output file

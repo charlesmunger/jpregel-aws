@@ -16,10 +16,10 @@ import java.util.Map;
 // * - Put RemoveVertex message in Inbox. Use combiners to resolve multiple requests. 
 // *   How to handle request where no such Vertex exists?
 // * - Design and implement Vertex AddVertex conflict "handler". Use combiner concept, where feasible.
-// 
-/**
- * !! Is it safe & faster to make MessageQ thread-safe & remove synchronization of receive methods?
- * 
+
+// * TODO Vertex: ? Is it safe & faster to make MessageQ thread-safe & remove synchronization of receive methods?
+
+/*
  * I currently think that vertex does not need the bit of state designating it 
  * active/inactive. Instead I:
  * 
@@ -58,7 +58,6 @@ abstract public class Vertex<VertexIdType, VertexValueType, EdgeValueType, Messa
     private       Part            part;
     
     private Map<VertexIdType, EdgeValueType> edgeMap;
-//    private NonNullMap<VertexIdType, MessageValueType> superstepToMessageQMap;
     private OntoMap<MessageQ<VertexIdType, MessageValueType>> superstepToMessageQMap;
 //    private OntoMap<MessageValueType> superstepToInboxMap;
             
@@ -68,7 +67,6 @@ abstract public class Vertex<VertexIdType, VertexValueType, EdgeValueType, Messa
     {
         this.vertexId   = vertexId;
         this.edgeMap = edgeMap;
-//        superstepToMessageQMap = new NonNullMap<VertexIdType, MessageValueType>( combiner );
         superstepToMessageQMap = new OntoMap<MessageQ<VertexIdType, MessageValueType>>( new MessageQ( combiner ) );
     }
     
@@ -86,13 +84,22 @@ abstract public class Vertex<VertexIdType, VertexValueType, EdgeValueType, Messa
     protected void aggregateOutputProblemAggregator( Aggregator aggregator ) { part.aggregateOutputProblemAggregator( aggregator ); }
 
     protected void aggregateOutputStepAggregator( Aggregator aggregator ) { part.aggregateOutputStepAggregator( aggregator ); }
-    
+    /*
+     * This method implements the algorithm used to solve the graph problem.
+     */
     abstract protected void compute();
     
+    /**
+     * @return true:  The in-degree of this vertex == 0 <br />
+     *         false: The in-degree of this vertex > 0.
+     */
     abstract protected boolean isSource();
 
     abstract public String output();
     
+    // TODO: Vertex: Omit this method to disallow applications from modifying the edgeMap.
+    //       Replace with 1. Collection<VertexIdType> getEdgeTargetIds()
+    //                    2. EdgeValueType getEdgeValue( VertexIdType targetId )
     protected Map<VertexIdType, EdgeValueType> getEdgeMap() { return edgeMap; }
     
     protected Aggregator getInputStepAggregator()    { return part.getComputeInput().getStepAggregator();    }
@@ -132,6 +139,10 @@ abstract public class Vertex<VertexIdType, VertexValueType, EdgeValueType, Messa
     
     synchronized protected long getSuperStep() { return part.getSuperStep(); }
     
+    /**
+     * 
+     * @return the vertex identifier, which is presumed to be unique for each vertex
+     */
     public VertexIdType getVertexId() { return vertexId; }
         
     public VertexValueType getVertexValue() { return vertexValue; }
