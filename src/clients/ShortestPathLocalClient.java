@@ -27,15 +27,15 @@ public class ShortestPathLocalClient
         Job job = new Job("Shortest Path Problem", // jobName
                   args[0],                         // jobDirectoryName
                   new VertexShortestPath(),        // vertexFactory, 
-                  numParts, 
-                  new WorkerOutputMakerStandard(), // workerWriter,
-                  new WorkerGraphMakerStandard(),  // workerGraphMaker, 
-                  new MasterGraphMakerG1(),        // MasterGraphMaker, 
-                  new MasterOutputMakerStandard()  // Writer
+                  numParts,
+                  new MasterGraphMakerG1(),
+                  new WorkerGraphMakerStandard(),
+                  new MasterOutputMakerStandard(),
+                  new WorkerOutputMakerStandard(),
+                  new AggregatorSumInteger(),   // problem aggregator
+                  new AggregatorSumInteger()    // step    agregator
                 );
-        job.setProblemAggregator(new AggregatorSumInteger());
-        job.setStepAggregator(new AggregatorSumInteger());
-        System.out.println("ShortestPathLocalClient.main: numWorkers: " + numWorkers + "\n " + job );
+        System.out.println(job + "\n         numWorkers: " + numWorkers );
         boolean isEc2Master = false;
         Client.run(job, isEc2Master, numWorkers);
         System.exit(0);

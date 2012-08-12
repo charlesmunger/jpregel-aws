@@ -27,14 +27,14 @@ public class BinaryTreeShortestPathLocalClient
                 "Binary Tree Shortest Path",        // jobName
                 args[0],                            // jobDirectoryName
                 new VertexShortestPathBinaryTree(), // vertexFactory
-                numParts, 
-                new WorkerOutputMakerStandard(),    // WorkerWriter
-                new WorkerGraphMakerBinaryTree(),   // WorkerGraphMaker
-                new MasterGraphMakerBinaryTree(),   // MasterGraphMaker
-                new MasterOutputMakerStandard()     // Writer 
+                numParts,
+                new MasterGraphMakerBinaryTree(),  
+                new WorkerGraphMakerBinaryTree(),   
+                new MasterOutputMakerStandard(),
+                new WorkerOutputMakerStandard()                 
                 );
 //        System.out.println("JVM data model: " + System.getProperty("sun.arch.data.model"));
-        System.out.println( job + "\n  numWorkers: " + numWorkers );
+        System.out.println( job + "\n    numWorkers: " + numWorkers );
         boolean isEc2Master = false;
         Client.run( job, isEc2Master, numWorkers);
         System.exit( 0 );

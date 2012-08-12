@@ -25,22 +25,20 @@ public class TestMutabilityClient
      */
     public static void main( String[] args ) throws Exception
     {
-        String  jobName               = "Test Graph Mutability Features";
-        String  jobDirectoryName      = args[0];
-        int     computeThreadsPerWorker = Runtime.getRuntime().availableProcessors();
-        int     numWorkers            = Integer.parseInt( args[1] );
-        int     numParts = numWorkers * computeThreadsPerWorker * 2; // numWorkers * ComputeThrads/Worker * Parts/ComputeThread
-        WorkerOutputMaker workerWriter = new WorkerOutputMakerStandard();
-        WorkerGraphMaker workerGraphMaker = new WorkerGraphMakerStandard();
-        MasterGraphMaker reader = new MasterGraphMakerStandard();
-        MasterOutputMaker writer = new MasterOutputMakerStandard();
-        VertexImpl vertexFactory = new VertexTestMutability();
-                
-        Job job = new Job( jobName,
-                  jobDirectoryName, 
-                  vertexFactory, numParts,  
-                  workerWriter, workerGraphMaker, reader, writer );
-        System.out.println( "TestMutabilityClient: numWorkers: " + numWorkers + job );
+        int computeThreadsPerWorker = Runtime.getRuntime().availableProcessors();
+        int numWorkers = Integer.parseInt( args[1] );
+        int numParts = numWorkers * computeThreadsPerWorker * 2; 
+        Job job = new Job( 
+                "Test Graph Mutability Features", 
+                args[0],      // jobDirectoryName, 
+                new VertexTestMutability(), 
+                numParts,
+                new MasterGraphMakerStandard(),
+                new WorkerGraphMakerStandard(),
+                new MasterOutputMakerStandard(),
+                new WorkerOutputMakerStandard()
+                );
+        System.out.println( job + "\n        numWorkers: " + numWorkers );
         boolean isEc2Master = false;
         Client.run( job, isEc2Master, numWorkers);
         System.exit( 0 );

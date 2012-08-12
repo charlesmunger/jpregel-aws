@@ -22,23 +22,22 @@ public class ShortestPathEc2Client extends Client
      */
     public static void main(String[] args) throws Exception 
     {
-        String jobName = "ShortestPath";
-        String jobDirectoryName = args[0];
         int numWorkers = Integer.parseInt(args[1]);
-        int     computeThreadsPerWorker = Runtime.getRuntime().availableProcessors();
-        int numParts = numWorkers * computeThreadsPerWorker * 2; // numParts = numWorkers * ComputeThreads/Worker * Parts/ComputeThread;
-        boolean workerIsMultithreaded = Boolean.parseBoolean(args[3]);
+        int computeThreadsPerWorker = Runtime.getRuntime().availableProcessors();
+        int numParts = numWorkers * computeThreadsPerWorker * 2; 
+        
+        Job job = new Job(
+                "ShortestPath",   // jobName,
+                args[0],          // jobDirectoryName,
+                new VertexShortestPath(), 
+                numParts,
+                new MasterGraphMakerG1(),
+                new WorkerGraphMakerStandard(),
+                new MasterOutputMakerStandard(),
+                new WorkerOutputMakerStandard()
+                );
+        System.out.println( job + "\n        numWorkers:" + numWorkers );
         boolean isEc2Master = true;
-        VertexImpl vertexFactory = new VertexShortestPath();
-        WorkerOutputMaker workerWriter = new WorkerOutputMakerStandard();
-        WorkerGraphMaker workerGraphMaker = new WorkerGraphMakerStandard();
-        MasterGraphMaker reader = new MasterGraphMakerG1();
-        MasterOutputMaker writer = new MasterOutputMakerStandard();
-        Job job = new Job(jobName,
-                jobDirectoryName,
-                vertexFactory, numParts,  
-                workerWriter, workerGraphMaker, reader, writer);
-        System.out.println( job );
         Client.run(job, isEc2Master, numWorkers);     
         System.exit(0);
     }

@@ -15,23 +15,23 @@ public class PageRankEc2Client extends Client
 {
     public static void main( String[] args ) throws Exception
     {
-        String    jobName               = "PageRank";
-        String    jobDirectoryName      = args[0];
-        int       numParts              = Integer.parseInt( args[1] );
-        int       numWorkers            = Integer.parseInt( args[2] );
-        boolean   isEc2Master           = true;
-        String imageIdMaster = args[4] ; 
-        String imageIdWorker = args[5] ; 
-        VertexImpl vertexFactory = new VertexPageRank();
-        WorkerOutputMaker workerWriter = new WorkerOutputMakerStandard();
-        WorkerGraphMaker workerGraphMaker = new WorkerGraphMakerStandard();
-        MasterGraphMaker reader = new MasterGraphMakerG1();
-        MasterOutputMaker writer = new MasterOutputMakerStandard();
+        int numParts   = Integer.parseInt( args[1] );
+        int numWorkers = Integer.parseInt( args[2] );
+//        String imageIdMaster = args[4] ; 
+//        String imageIdWorker = args[5] ; 
         
-        Job job = new Job( jobName,
-                jobDirectoryName, 
-                vertexFactory, numParts,  
-                workerWriter, workerGraphMaker, reader, writer );
+        Job job = new Job( 
+                "PageRank",
+                args[0],    // jobDirectoryName, 
+                new VertexPageRank(), 
+                numParts,
+                new MasterGraphMakerG1(),
+                new WorkerGraphMakerStandard(),
+                new MasterOutputMakerStandard(),
+                new WorkerOutputMakerStandard()
+                );
+        System.out.println( job + "\n       numWorkers:" + numWorkers );
+        boolean isEc2Master = true;
         Client.run( job, isEc2Master, numWorkers);    
         System.exit( 0 );
     }

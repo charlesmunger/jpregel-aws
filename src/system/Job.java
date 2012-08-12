@@ -33,10 +33,10 @@ public final class Job implements Serializable
     private       Aggregator stepAggregator    = new AggregatorNull();
     private       Aggregator problemAggregator = new AggregatorNull();
     private final VertexImpl   vertexFactory;
-    private final WorkerOutputMaker workerWriter;
+    private final WorkerOutputMaker workerOutputMaker;
     private final WorkerGraphMaker workerGraphMaker;
     private final MasterGraphMaker masterGraphMaker;
-    private final MasterOutputMaker writer;
+    private final MasterOutputMaker masterOutputMaker;
     
     private FileSystem fileSystem;
 
@@ -57,21 +57,45 @@ public final class Job implements Serializable
     public Job( String jobName, 
                 String jobDirectoryName, 
                 VertexImpl vertexFactory, 
-                int numParts, 
-                WorkerOutputMaker workerWriter, 
+                int numParts,
+                MasterGraphMaker masterGraphMaker,
                 WorkerGraphMaker workerGraphMaker,
-                MasterGraphMaker reader, 
-                MasterOutputMaker writer 
+                MasterOutputMaker masterOutputMaker,
+                WorkerOutputMaker workerOutputMaker
             )
     {
         this.jobName               = jobName;
         this.jobDirectoryName      = jobDirectoryName;
         this.vertexFactory         = vertexFactory;
         this.numParts              = numParts;
-        this.workerWriter          = workerWriter;
+        this.masterGraphMaker      = masterGraphMaker;
         this.workerGraphMaker      = workerGraphMaker;
-        this.masterGraphMaker      = reader;
-        this.writer                = writer;
+        this.masterOutputMaker     = masterOutputMaker;
+        this.workerOutputMaker     = workerOutputMaker;
+    }
+    
+    public Job( String jobName, 
+                String jobDirectoryName, 
+                VertexImpl vertexFactory, 
+                int numParts,
+                MasterGraphMaker masterGraphMaker,
+                WorkerGraphMaker workerGraphMaker,
+                MasterOutputMaker masterOutputMaker,
+                WorkerOutputMaker workerOutputMaker,
+                Aggregator problemAggregator,
+                Aggregator stepAggregator
+            )
+    {
+        this.jobName           = jobName;
+        this.jobDirectoryName  = jobDirectoryName;
+        this.vertexFactory     = vertexFactory;
+        this.numParts          = numParts;
+        this.masterGraphMaker  = masterGraphMaker;
+        this.workerGraphMaker  = workerGraphMaker;
+        this.masterOutputMaker = masterOutputMaker;
+        this.workerOutputMaker = workerOutputMaker;
+        this.problemAggregator = problemAggregator;
+        this.stepAggregator    = stepAggregator;
     }
     
     /*
@@ -83,12 +107,12 @@ public final class Job implements Serializable
         jobDirectoryName      = job.getJobDirectoryName();
         vertexFactory         = job.getVertexFactory();
         numParts              = job.getNumParts();
-        stepAggregator        = job.getStepAggregator();
-        problemAggregator     = job.getProblemAggregator();
-        workerWriter          = job.getWorkerWriter();
-        workerGraphMaker      = job.getWorkerGraphMaker();
         masterGraphMaker      = job.getMasterGraphMaker();
-        writer                = job.getWriter();
+        workerGraphMaker      = job.getWorkerGraphMaker();
+        masterOutputMaker     = job.getWriter();
+        workerOutputMaker     = job.getWorkerWriter();
+        stepAggregator        = job.getStepAggregator();
+        problemAggregator     = job.getProblemAggregator(); 
     }  
         
     FileSystem getFileSystem() { return fileSystem; }
@@ -99,9 +123,9 @@ public final class Job implements Serializable
     
     VertexImpl     getVertexFactory() { return vertexFactory; }
     
-    public void setProblemAggregator( Aggregator problemAggregator ) { this.problemAggregator = problemAggregator; }
-
-    public void setStepAggregator(    Aggregator stepAggregator )    { this.stepAggregator = stepAggregator; }
+//    public void setProblemAggregator( Aggregator problemAggregator ) { this.problemAggregator = problemAggregator; }
+//
+//    public void setStepAggregator(    Aggregator stepAggregator )    { this.stepAggregator = stepAggregator; }
     
     /*
      * Used in JobRunData
@@ -118,16 +142,16 @@ public final class Job implements Serializable
     
     MasterGraphMaker getMasterGraphMaker()      { return masterGraphMaker; }
     
-    WorkerOutputMaker getWorkerWriter()          { return workerWriter; }
+    WorkerOutputMaker getWorkerWriter()          { return workerOutputMaker; }
     
-    MasterOutputMaker       getWriter()                { return writer; }
+    MasterOutputMaker       getWriter()                { return masterOutputMaker; }
     
     /**
      * @return the number of vertices that were constructed.
      */
     int  makeGraph( Worker worker )      { return workerGraphMaker.makeGraph( worker ); }
     
-    void makeOutputFile( Worker worker ) throws IOException { workerWriter.write( fileSystem, worker ); }
+    void makeOutputFile( Worker worker ) throws IOException { workerOutputMaker.write( fileSystem, worker ); }
 
     Aggregator  makeStepAggregator()            { return stepAggregator.make(); }
     
@@ -144,7 +168,7 @@ public final class Job implements Serializable
      */
     void processWorkerOutputFiles( FileSystem fileSystem, int numWorkers )
     {
-        writer.write( fileSystem, numWorkers );
+        masterOutputMaker.write( fileSystem, numWorkers );
     }
     
     /**
@@ -158,20 +182,21 @@ public final class Job implements Serializable
     
     void setFileSystem( FileSystem fileSystem ) { this.fileSystem = fileSystem; }
     
+    @Override
     public String toString()
     {
         StringBuilder string = new StringBuilder();
         string.append("Job:\n\t");
-        string.append("Name:               ").append(jobName).append("\n\t");
-        string.append("Directory name:     ").append(jobDirectoryName).append("\n\t");
-        string.append("Number of parts:    ").append(numParts).append("\n\t");
-        string.append("Step Aggregator:    ").append(stepAggregator.getClass().getCanonicalName()).append("\n\t");
-        string.append("Problem Aggregator: ").append(problemAggregator.getClass().getCanonicalName()).append("\n\t");
-        string.append("Vertex factory:     ").append(vertexFactory.getClass().getCanonicalName()).append("\n\t");
-        string.append("Worker writer:      ").append(workerWriter.getClass().getCanonicalName()).append("\n\t");
-        string.append("Worker graph maker: ").append(workerGraphMaker.getClass().getCanonicalName()).append("\n\t");
-        string.append("Master graph maker: ").append(masterGraphMaker.getClass().getCanonicalName()).append("\n\t");
-        string.append("Writer:             ").append(writer.getClass().getCanonicalName()).append("\n\t");
+        string.append("Name:                ").append(jobName).append("\n\t");
+        string.append("Directory name:      ").append(jobDirectoryName).append("\n\t");
+        string.append("Number of parts:     ").append(numParts).append("\n\t");
+        string.append("Vertex factory:      ").append(vertexFactory.getClass().getCanonicalName()).append("\n\t");
+        string.append("Master graph maker:  ").append(masterGraphMaker.getClass().getCanonicalName()).append("\n\t");
+        string.append("Worker graph maker:  ").append(workerGraphMaker.getClass().getCanonicalName()).append("\n\t");
+        string.append("Master output maker: ").append(masterOutputMaker.getClass().getCanonicalName()).append("\n\t");
+        string.append("Worker output Maker: ").append(workerOutputMaker.getClass().getCanonicalName()).append("\n\t");
+        string.append("Problem aggregator:  ").append(problemAggregator.getClass().getCanonicalName()).append("\n\t");
+        string.append("Step aggregator:     ").append(stepAggregator.getClass().getCanonicalName()).append("\n\t");
         return new String( string );
     }
 }

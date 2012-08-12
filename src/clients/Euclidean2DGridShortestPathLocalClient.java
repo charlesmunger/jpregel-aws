@@ -28,15 +28,15 @@ public class Euclidean2DGridShortestPathLocalClient
                 "Euclidean 2D Grid Shortest Path", // jobName
                 args[0],                           // jobDirectoryName, 
                 new VertexShortestPathEuclidean(), // vertexFactory, 
-                numParts, 
-                new WorkerOutputMakerStandard(),   // WorkerWriter, 
-                new WorkerGraphMakerGrid(),        // WorkerGraphMaker, 
-                new MasterGraphMakerGrid(),        // MasterGraphMaker
-                new MasterOutputMakerStandard()    // Writer 
+                numParts,
+                new MasterGraphMakerGrid(),
+                new WorkerGraphMakerGrid(),
+                new MasterOutputMakerStandard(),
+                new WorkerOutputMakerStandard(),
+                new AggregatorSumInteger(),   // problem aggregator
+                null                          // step    agregator
                 );
-        job.setProblemAggregator( new AggregatorSumInteger() );
-        System.out.println( "Euclidean2DGridShortestPathMacClient: \n  numWorkers: " 
-                + numWorkers + "\n  numParts: " + numParts + "\n  " + job );
+        System.out.println( job +  "\n  numParts: " + numParts );
         boolean isEc2Master = false;
         Client.run( job, isEc2Master, numWorkers);
         System.exit( 0 );

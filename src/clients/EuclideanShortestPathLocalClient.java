@@ -22,25 +22,25 @@ public class EuclideanShortestPathLocalClient
      */
     public static void main( String[] args ) throws Exception
     {
-        int     numWorkers              = Integer.parseInt(     args[1] );
-        int     computeThreadsPerWorker = Runtime.getRuntime().availableProcessors();
-        int     partsPerComputeThread   = 2;
-        int     numParts                = numWorkers * computeThreadsPerWorker * partsPerComputeThread;
-        boolean isEc2Run = false;
-        System.out.println("EuclideanShortestPathLocalClient: numWorkers: " + numWorkers + " isAWS run: " + isEc2Run);
+        int numWorkers = Integer.parseInt( args[1] );
+        int computeThreadsPerWorker = Runtime.getRuntime().availableProcessors();
+        int partsPerComputeThread = 2;
+        int numParts = numWorkers * computeThreadsPerWorker * partsPerComputeThread;
         
         Job job = new Job( 
                 "Euclidean Shortest Path",            // Job name
                 args[0],                              // Job directory name
                 new VertexShortestPathEuclidean(),    // Vertex factory
-                numParts, 
-                new WorkerOutputMakerStandard(),      // WorkerWriter
-                new WorkerGraphMakerStandard(),       // WorkerGraphMaker
-                new MasterGraphMakerStandard(),       // MasterGraphMaker
-                new MasterOutputMakerStandard()       // Writer 
+                numParts,
+                new MasterGraphMakerStandard(),
+                new WorkerGraphMakerStandard(),
+                new MasterOutputMakerStandard(),
+                new WorkerOutputMakerStandard(),
+                new AggregatorSumInteger(),   // problem aggregator
+                null                          // step    agregator
                 );
-        job.setProblemAggregator( new AggregatorSumInteger() );
-        System.out.println( job );    
+        System.out.println( job + "\n    numWorkers: " + numWorkers);
+        boolean isEc2Run = false;
         Client.run( job, isEc2Run, numWorkers); //TODO fix this
         System.exit( 0 );
     }
