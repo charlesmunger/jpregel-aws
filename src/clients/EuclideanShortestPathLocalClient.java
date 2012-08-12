@@ -1,13 +1,13 @@
 package clients;
 
-import masterGraphMakers.StandardMasterGraphMaker;
-import masterOutputMakers.StandardMasterOutputMaker;
+import system.MasterGraphMakerStandard;
+import system.MasterOutputMakerStandard;
 import system.Client;
 import system.Job;
-import system.aggregators.IntegerSumAggregator;
-import vertex.EuclideanShortestPathVertex;
-import workerGraphMakers.StandardWorkerGraphMaker;
-import workerOutputMakers.StandardWorkerOutputMaker;
+import system.AggregatorSumInteger;
+import system.VertexShortestPathEuclidean;
+import system.WorkerGraphMakerStandard;
+import system.WorkerOutputMakerStandard;
 
 /**
  *
@@ -32,14 +32,14 @@ public class EuclideanShortestPathLocalClient
         Job job = new Job( 
                 "Euclidean Shortest Path",            // Job name
                 args[0],                              // Job directory name
-                new EuclideanShortestPathVertex(),    // Vertex factory
+                new VertexShortestPathEuclidean(),    // Vertex factory
                 numParts, 
-                new StandardWorkerOutputMaker(),      // WorkerWriter
-                new StandardWorkerGraphMaker(),       // WorkerGraphMaker
-                new StandardMasterGraphMaker(),       // MasterGraphMaker
-                new StandardMasterOutputMaker()       // Writer 
+                new WorkerOutputMakerStandard(),      // WorkerWriter
+                new WorkerGraphMakerStandard(),       // WorkerGraphMaker
+                new MasterGraphMakerStandard(),       // MasterGraphMaker
+                new MasterOutputMakerStandard()       // Writer 
                 );
-        job.setProblemAggregator( new IntegerSumAggregator() );
+        job.setProblemAggregator( new AggregatorSumInteger() );
         System.out.println( job );    
         Client.run( job, isEc2Run, numWorkers); //TODO fix this
         System.exit( 0 );

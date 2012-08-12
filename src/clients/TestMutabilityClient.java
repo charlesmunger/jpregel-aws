@@ -1,19 +1,18 @@
 package clients;
 
-import static java.lang.System.out;
 
-import vertex.TestMutabilityVertex;
-import masterGraphMakers.StandardMasterGraphMaker;
-import masterOutputMakers.StandardMasterOutputMaker;
+import system.VertexTestMutability;
+import system.MasterGraphMakerStandard;
+import system.MasterOutputMakerStandard;
 import system.Client;
-import system.GraphMaker;
 import system.Job;
-import system.MasterGraphMaker;
-import system.Vertex;
-import system.WorkerWriter;
-import system.Writer;
-import workerGraphMakers.StandardWorkerGraphMaker;
-import workerOutputMakers.StandardWorkerOutputMaker;
+import api.MasterGraphMaker;
+import system.VertexImpl;
+import api.MasterOutputMaker;
+import api.WorkerGraphMaker;
+import api.WorkerOutputMaker;
+import system.WorkerGraphMakerStandard;
+import system.WorkerOutputMakerStandard;
 
 /**
  *
@@ -31,11 +30,11 @@ public class TestMutabilityClient
         int     computeThreadsPerWorker = Runtime.getRuntime().availableProcessors();
         int     numWorkers            = Integer.parseInt( args[1] );
         int     numParts = numWorkers * computeThreadsPerWorker * 2; // numWorkers * ComputeThrads/Worker * Parts/ComputeThread
-        WorkerWriter workerWriter = new StandardWorkerOutputMaker();
-        GraphMaker workerGraphMaker = new StandardWorkerGraphMaker();
-        MasterGraphMaker reader = new StandardMasterGraphMaker();
-        Writer writer = new StandardMasterOutputMaker();
-        Vertex vertexFactory = new TestMutabilityVertex();
+        WorkerOutputMaker workerWriter = new WorkerOutputMakerStandard();
+        WorkerGraphMaker workerGraphMaker = new WorkerGraphMakerStandard();
+        MasterGraphMaker reader = new MasterGraphMakerStandard();
+        MasterOutputMaker writer = new MasterOutputMakerStandard();
+        VertexImpl vertexFactory = new VertexTestMutability();
                 
         Job job = new Job( jobName,
                   jobDirectoryName, 

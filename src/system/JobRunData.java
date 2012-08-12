@@ -5,6 +5,7 @@ import java.text.DateFormat;
 import java.util.Date;
 
 /**
+ * Repository of job quantities &amp; execution time per job phase.
  *
  * @author Pete Cappello
  */
@@ -17,7 +18,6 @@ public class JobRunData implements java.io.Serializable
     private final int numWorkers;
     private final long maxMemory = Runtime.getRuntime().maxMemory();
     
-    private String graphName;
     private long endTimeSetWorkerJobAndMakeWorkerFiles;
     private long endTimeReadWorkerInputFile;
     private long endTimeComputation;
@@ -50,17 +50,17 @@ public class JobRunData implements java.io.Serializable
     {
         StringBuilder string = new StringBuilder();
         string.append( '\n' );
-        string.append( "\n_____________________________\n" );
+        string.append( "\n________________________________________\n" );
         string.append( '\n' );
         string.append( jobName ).append( '\n' );
         string.append( DateFormat.getDateTimeInstance( DateFormat.FULL, 
                                                              DateFormat.FULL ).format( date ) );
         string.append( "\n   " ).append( numWorkers ).append( " Workers" );
-        string.append( "\n   " ).append( maxMemory / 1000  ).append( " Maximum memory (KB)" );
+        string.append( "\n   " ).append( maxMemory / (1024 * 1024) ).append( " Maximum memory (MB)" );
         string.append( "\n   " ).append( numParts ).append( " Parts" );
         string.append( "\n   ").append( numSuperSteps ).append( " super steps   " );
         string.append( "\n\nElapsed times in milliseconds: \n   " );
-        string.append( endTimeRun - beginRunTime ).append( " : Overall run time\n   " );
+        string.append( endTimeRun - beginRunTime ).append( " : Total run time\n   " );
         string.append( endTimeSetWorkerJobAndMakeWorkerFiles - beginRunTime );
         string.append( " : Set WorkerJob & make Worker files\n   " );
         string.append( endTimeReadWorkerInputFile - endTimeSetWorkerJobAndMakeWorkerFiles );
@@ -72,14 +72,23 @@ public class JobRunData implements java.io.Serializable
         string.append(  endTimeWriteWorkerOutputFiles - endTimeComputation );
         string.append( " : Write Worker output files\n   " );
         
-        string.append( "\n_____________________________\n" );
+        string.append( "\n________________________________________\n" );
         return new String( string );
     }
     
     public String commaSeparatedValues()
     {
-        StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append( jobName ).append( ',' );
-        return new String( stringBuffer );
+        StringBuilder string = new StringBuilder();
+        string.append( jobName ).append( ',' );
+        string.append( numWorkers ).append( ',' );
+        string.append( maxMemory ).append( ',' );
+        string.append( numParts ).append( ',' );
+        string.append( numSuperSteps ).append( ',' );
+        string.append( endTimeRun - beginRunTime ).append( ',' );
+        string.append( endTimeSetWorkerJobAndMakeWorkerFiles - beginRunTime ).append( ',' );
+        string.append( endTimeReadWorkerInputFile - endTimeSetWorkerJobAndMakeWorkerFiles ).append( ',' );
+        string.append( endTimeComputation - endTimeReadWorkerInputFile ).append( ',' );
+        string.append( endTimeWriteWorkerOutputFiles - endTimeComputation );
+        return new String( string );
     }
 }

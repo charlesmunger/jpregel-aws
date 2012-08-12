@@ -1,13 +1,17 @@
 package clients;
 
+import api.MasterOutputMaker;
+import api.MasterGraphMaker;
+import api.WorkerGraphMaker;
+import api.WorkerOutputMaker;
 import static java.lang.System.out;
-import masterGraphMakers.GridMasterGraphMaker;
-import masterOutputMakers.StandardMasterOutputMaker;
+import system.MasterGraphMakerGrid;
+import system.MasterOutputMakerStandard;
 import system.*;
-import system.aggregators.IntegerSumAggregator;
-import vertex.EuclideanShortestPathVertex;
-import workerGraphMakers.GridWorkerGraphMaker;
-import workerOutputMakers.StandardWorkerOutputMaker;
+import system.AggregatorSumInteger;
+import system.VertexShortestPathEuclidean;
+import system.WorkerGraphMakerGrid;
+import system.WorkerOutputMakerStandard;
 
 /**
  *
@@ -25,11 +29,11 @@ public class Euclidean2DGridShortestPathClient
         int     numWorkers          = 1;
         int computeThreadsPerWorker = Runtime.getRuntime().availableProcessors();
         int     numParts = numWorkers * computeThreadsPerWorker * 2; // numWorkers * ComputeThrads/Worker * Parts/ComputeThread
-        Vertex vertexFactory        = new EuclideanShortestPathVertex();
-        WorkerWriter workerWriter   = new StandardWorkerOutputMaker();
-        GraphMaker workerGraphMaker = new GridWorkerGraphMaker();
-        MasterGraphMaker reader     = new GridMasterGraphMaker();
-        Writer writer               = new StandardMasterOutputMaker();
+        VertexImpl vertexFactory        = new VertexShortestPathEuclidean();
+        WorkerOutputMaker workerWriter   = new WorkerOutputMakerStandard();
+        WorkerGraphMaker workerGraphMaker = new WorkerGraphMakerGrid();
+        MasterGraphMaker reader     = new MasterGraphMakerGrid();
+        MasterOutputMaker writer               = new MasterOutputMakerStandard();
         
         out.println("Euclidean2DGridShortestPathClient.main: "
                 + "\n jobDirectoryName: " + jobDirectoryName
@@ -39,7 +43,7 @@ public class Euclidean2DGridShortestPathClient
         
         Job job = new Job( jobName, jobDirectoryName, vertexFactory, numParts, 
                 workerWriter, workerGraphMaker, reader, writer );
-        job.setProblemAggregator( new IntegerSumAggregator() );
+        job.setProblemAggregator( new AggregatorSumInteger() );
         boolean   isEc2Master = false;
         System.out.println("Euclidean2DGridShortestPathClient.main: about to invoke Client.run");
         Client.run( job, isEc2Master, numWorkers); 

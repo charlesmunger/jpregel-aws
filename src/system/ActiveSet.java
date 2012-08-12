@@ -8,11 +8,11 @@ import java.util.Set;
  *
  * @author Pete Cappello
  */
-public class ActiveSet extends HashSet<Vertex> implements Factory
+public class ActiveSet extends HashSet<VertexImpl> implements Factory
 {
     @Override
-    public Set<Vertex> make() { return Collections.synchronizedSet( new HashSet<Vertex>() ); }
+    public Set<VertexImpl> make() { return Collections.synchronizedSet( new HashSet<VertexImpl>() ); }
     
     @Override
-    public boolean add( Vertex vertex ) { return super.add( vertex ); }
+    public boolean add( VertexImpl vertex ) { return super.add( vertex ); }
 }

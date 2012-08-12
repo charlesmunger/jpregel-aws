@@ -1,5 +1,6 @@
 package system;
  
+import api.Aggregator;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -14,8 +15,8 @@ public final class Part
     private final int partId;
     private final Job job;
     
-    private Map<Object, Vertex> vertexIdToVertexMap = new ConcurrentHashMap<Object, Vertex>( 8000 , 0.9f, 2);
-    private OntoMap<Set<Vertex>> superstepToActiveSetMap = new OntoMap<Set<Vertex>>( new ActiveSet() );
+    private Map<Object, VertexImpl> vertexIdToVertexMap = new ConcurrentHashMap<Object, VertexImpl>( 8000 , 0.9f, 2);
+    private OntoMap<Set<VertexImpl>> superstepToActiveSetMap = new OntoMap<Set<VertexImpl>>( new ActiveSet() );
     
     // superStep parameters
     private ComputeThread computeThread;
@@ -34,20 +35,20 @@ public final class Part
     }
     
     /*
-     * FIX: For graph mutation (add vertex), also need void addVertexToActiveSet( Long superStep, Vertex vertex )
+     * FIX: For graph mutation (add vertex), also need void addVertexToActiveSet( Long superStep, VertexImpl vertex )
      */
-    void add( Vertex vertex )
+    void add( VertexImpl vertex )
     {
         vertex.setPart( this );
         vertexIdToVertexMap.put( vertex.getVertexId(), vertex );
         if ( vertex.isSource() )
         {
-            Set<Vertex> activeSet = superstepToActiveSetMap.get( new Long(0) );
+            Set<VertexImpl> activeSet = superstepToActiveSetMap.get( new Long(0) );
             activeSet.add( vertex );
         }
     }
     
-    void addToActiveSet( long superStep, Vertex vertex ) { superstepToActiveSetMap.get( superStep ).add( vertex ); }
+    void addToActiveSet( long superStep, VertexImpl vertex ) { superstepToActiveSetMap.get( superStep ).add( vertex ); }
     
     void aggregateOutputProblemAggregator( Aggregator aggregator ) { outputProblemAggregator.aggregate(aggregator); }
     
@@ -61,8 +62,8 @@ public final class Part
         numMessagesSent   = 0;
         outputStepAggregator    = job.makeStepAggregator();
         outputProblemAggregator = job.makeProblemAggregator();
-        Set<Vertex> activeSet = superstepToActiveSetMap.get( superStep );
-        for ( Vertex vertex : activeSet )
+        Set<VertexImpl> activeSet = superstepToActiveSetMap.get( superStep );
+        for ( VertexImpl vertex : activeSet )
         {
             vertex.compute();
             vertex.removeMessageQ( superStep );      // MessageQ now is garbage
@@ -78,17 +79,17 @@ public final class Part
     
     long getSuperStep() { return superStep; }
     
-    Vertex getVertex( int vertexId ) { return vertexIdToVertexMap.get( vertexId ); }
+    VertexImpl getVertex( int vertexId ) { return vertexIdToVertexMap.get( vertexId ); }
     
-    Map<Object, Vertex> getVertexIdToVertexMap() { return vertexIdToVertexMap; }
+    Map<Object, VertexImpl> getVertexIdToVertexMap() { return vertexIdToVertexMap; }
     
-    public Collection<Vertex> getVertices() { return vertexIdToVertexMap.values(); }
+    public Collection<VertexImpl> getVertices() { return vertexIdToVertexMap.values(); }
     
     void incrementNumMessagesSent() { numMessagesSent++; }
     
     synchronized void receiveMessage( Object vertexId, Message message, long superStep )
     {
-        Vertex vertex = vertexIdToVertexMap.get( vertexId );
+        VertexImpl vertex = vertexIdToVertexMap.get( vertexId );
         // BEGIN DEBUG
         if ( vertex == null )
         {
@@ -101,12 +102,12 @@ public final class Part
     
     synchronized void receiveMessageQ( Object vertexId, MessageQ messageQ, long superStep )
     {
-        Vertex vertex = vertexIdToVertexMap.get( vertexId );
+        VertexImpl vertex = vertexIdToVertexMap.get( vertexId );
         vertex.receiveMessageQ( messageQ, superStep );
         addToActiveSet( superStep, vertex );
     }
         
-    void removeFromActiveSet( long superStep, Vertex vertex )
+    void removeFromActiveSet( long superStep, VertexImpl vertex )
     {
         superstepToActiveSetMap.get( superStep ).remove( vertex );
     }

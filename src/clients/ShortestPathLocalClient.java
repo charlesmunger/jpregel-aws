@@ -1,13 +1,13 @@
 package clients;
 
-import masterGraphMakers.G1MasterGraphMaker;
-import masterOutputMakers.StandardMasterOutputMaker;
+import system.MasterGraphMakerG1;
+import system.MasterOutputMakerStandard;
 import system.Client;
 import system.Job;
-import system.aggregators.IntegerSumAggregator;
-import vertex.ShortestPathVertex;
-import workerGraphMakers.StandardWorkerGraphMaker;
-import workerOutputMakers.StandardWorkerOutputMaker;
+import system.AggregatorSumInteger;
+import system.VertexShortestPath;
+import system.WorkerGraphMakerStandard;
+import system.WorkerOutputMakerStandard;
 
 /**
  *
@@ -26,15 +26,15 @@ public class ShortestPathLocalClient
         int numParts = numWorkers * computeThreadsPerWorker * 2;
         Job job = new Job("Shortest Path Problem", // jobName
                   args[0],                         // jobDirectoryName
-                  new ShortestPathVertex(),        // vertexFactory, 
+                  new VertexShortestPath(),        // vertexFactory, 
                   numParts, 
-                  new StandardWorkerOutputMaker(), // workerWriter,
-                  new StandardWorkerGraphMaker(),  // workerGraphMaker, 
-                  new G1MasterGraphMaker(),        // MasterGraphMaker, 
-                  new StandardMasterOutputMaker()  // Writer
+                  new WorkerOutputMakerStandard(), // workerWriter,
+                  new WorkerGraphMakerStandard(),  // workerGraphMaker, 
+                  new MasterGraphMakerG1(),        // MasterGraphMaker, 
+                  new MasterOutputMakerStandard()  // Writer
                 );
-        job.setProblemAggregator(new IntegerSumAggregator());
-        job.setStepAggregator(new IntegerSumAggregator());
+        job.setProblemAggregator(new AggregatorSumInteger());
+        job.setStepAggregator(new AggregatorSumInteger());
         System.out.println("ShortestPathLocalClient.main: numWorkers: " + numWorkers + "\n " + job );
         boolean isEc2Master = false;
         Client.run(job, isEc2Master, numWorkers);

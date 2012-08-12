@@ -1,5 +1,7 @@
 package system;
 
+import api.Aggregator;
+
 /**
  * Immutable
  *

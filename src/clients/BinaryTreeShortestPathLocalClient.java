@@ -1,13 +1,12 @@
 package clients;
 
-import masterGraphMakers.BinaryTreeMasterGraphMaker;
-import masterOutputMakers.StandardMasterOutputMaker;
+import system.MasterGraphMakerBinaryTree;
+import system.MasterOutputMakerStandard;
 import system.Client;
 import system.Job;
-import system.NullAggregator;
-import vertex.BinaryTreeShortestPathVertex;
-import workerGraphMakers.BinaryTreeWorkerGraphMaker;
-import workerOutputMakers.StandardWorkerOutputMaker;
+import system.VertexShortestPathBinaryTree;
+import system.WorkerGraphMakerBinaryTree;
+import system.WorkerOutputMakerStandard;
 
 /**
  *
@@ -27,15 +26,14 @@ public class BinaryTreeShortestPathLocalClient
         Job job = new Job(
                 "Binary Tree Shortest Path",        // jobName
                 args[0],                            // jobDirectoryName
-                new BinaryTreeShortestPathVertex(), // vertexFactory
+                new VertexShortestPathBinaryTree(), // vertexFactory
                 numParts, 
-                new StandardWorkerOutputMaker(),    // WorkerWriter
-                new BinaryTreeWorkerGraphMaker(),   // WorkerGraphMaker
-                new BinaryTreeMasterGraphMaker(),   // MasterGraphMaker
-                new StandardMasterOutputMaker()     // Writer 
+                new WorkerOutputMakerStandard(),    // WorkerWriter
+                new WorkerGraphMakerBinaryTree(),   // WorkerGraphMaker
+                new MasterGraphMakerBinaryTree(),   // MasterGraphMaker
+                new MasterOutputMakerStandard()     // Writer 
                 );
 //        System.out.println("JVM data model: " + System.getProperty("sun.arch.data.model"));
-        job.setProblemAggregator( new NullAggregator() );
         System.out.println( job + "\n  numWorkers: " + numWorkers );
         boolean isEc2Master = false;
         Client.run( job, isEc2Master, numWorkers);

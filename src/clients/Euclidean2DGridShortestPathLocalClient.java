@@ -1,13 +1,13 @@
 package clients;
 
-import masterGraphMakers.GridMasterGraphMaker;
-import masterOutputMakers.StandardMasterOutputMaker;
+import system.MasterGraphMakerGrid;
+import system.MasterOutputMakerStandard;
 import system.Client;
 import system.Job;
-import system.aggregators.IntegerSumAggregator;
-import vertex.EuclideanShortestPathVertex;
-import workerGraphMakers.GridWorkerGraphMaker;
-import workerOutputMakers.StandardWorkerOutputMaker;
+import system.AggregatorSumInteger;
+import system.VertexShortestPathEuclidean;
+import system.WorkerGraphMakerGrid;
+import system.WorkerOutputMakerStandard;
 
 /**
  *
@@ -27,14 +27,14 @@ public class Euclidean2DGridShortestPathLocalClient
         Job job = new Job(
                 "Euclidean 2D Grid Shortest Path", // jobName
                 args[0],                           // jobDirectoryName, 
-                new EuclideanShortestPathVertex(), // vertexFactory, 
+                new VertexShortestPathEuclidean(), // vertexFactory, 
                 numParts, 
-                new StandardWorkerOutputMaker(),   // WorkerWriter, 
-                new GridWorkerGraphMaker(),        // WorkerGraphMaker, 
-                new GridMasterGraphMaker(),        // MasterGraphMaker
-                new StandardMasterOutputMaker()    // Writer 
+                new WorkerOutputMakerStandard(),   // WorkerWriter, 
+                new WorkerGraphMakerGrid(),        // WorkerGraphMaker, 
+                new MasterGraphMakerGrid(),        // MasterGraphMaker
+                new MasterOutputMakerStandard()    // Writer 
                 );
-        job.setProblemAggregator( new IntegerSumAggregator() );
+        job.setProblemAggregator( new AggregatorSumInteger() );
         System.out.println( "Euclidean2DGridShortestPathMacClient: \n  numWorkers: " 
                 + numWorkers + "\n  numParts: " + numParts + "\n  " + job );
         boolean isEc2Master = false;

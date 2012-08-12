@@ -1,11 +1,15 @@
 package clients;
 
-import masterGraphMakers.G1MasterGraphMaker;
-import masterOutputMakers.StandardMasterOutputMaker;
+import api.MasterOutputMaker;
+import api.MasterGraphMaker;
+import api.WorkerGraphMaker;
+import api.WorkerOutputMaker;
+import system.MasterGraphMakerG1;
+import system.MasterOutputMakerStandard;
 import system.*;
-import vertex.ShortestPathVertex;
-import workerGraphMakers.StandardWorkerGraphMaker;
-import workerOutputMakers.StandardWorkerOutputMaker;
+import system.VertexShortestPath;
+import system.WorkerGraphMakerStandard;
+import system.WorkerOutputMakerStandard;
 
 /**
  *
@@ -25,11 +29,11 @@ public class ShortestPathEc2Client extends Client
         int numParts = numWorkers * computeThreadsPerWorker * 2; // numParts = numWorkers * ComputeThreads/Worker * Parts/ComputeThread;
         boolean workerIsMultithreaded = Boolean.parseBoolean(args[3]);
         boolean isEc2Master = true;
-        Vertex vertexFactory = new ShortestPathVertex();
-        WorkerWriter workerWriter = new StandardWorkerOutputMaker();
-        GraphMaker workerGraphMaker = new StandardWorkerGraphMaker();
-        MasterGraphMaker reader = new G1MasterGraphMaker();
-        Writer writer = new StandardMasterOutputMaker();
+        VertexImpl vertexFactory = new VertexShortestPath();
+        WorkerOutputMaker workerWriter = new WorkerOutputMakerStandard();
+        WorkerGraphMaker workerGraphMaker = new WorkerGraphMakerStandard();
+        MasterGraphMaker reader = new MasterGraphMakerG1();
+        MasterOutputMaker writer = new MasterOutputMakerStandard();
         Job job = new Job(jobName,
                 jobDirectoryName,
                 vertexFactory, numParts,  

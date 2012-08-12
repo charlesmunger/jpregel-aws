@@ -1,5 +1,10 @@
 package system;
 
+import api.Aggregator;
+import api.MasterOutputMaker;
+import api.MasterGraphMaker;
+import api.WorkerGraphMaker;
+import api.WorkerOutputMaker;
 import java.io.IOException;
 import java.io.Serializable;
 
@@ -25,25 +30,25 @@ public final class Job implements Serializable
     private final String   jobDirectoryName;
     // TODO Job: Should this be set in client, as it is now?
     private final int      numParts;
-    private       Aggregator stepAggregator    = new NullAggregator();
-    private       Aggregator problemAggregator = new NullAggregator();
-    private final Vertex   vertexFactory;
-    private final WorkerWriter workerWriter;
-    private final GraphMaker workerGraphMaker;
+    private       Aggregator stepAggregator    = new AggregatorNull();
+    private       Aggregator problemAggregator = new AggregatorNull();
+    private final VertexImpl   vertexFactory;
+    private final WorkerOutputMaker workerWriter;
+    private final WorkerGraphMaker workerGraphMaker;
     private final MasterGraphMaker masterGraphMaker;
-    private final Writer writer;
+    private final MasterOutputMaker writer;
     
     private FileSystem fileSystem;
 
     /**
      * @param jobName The name used by jpregel when producing job run information.
-     * @param jobDirectoryName
-     *  The relative path to the job directory. 
-     * If it is a local execution, the path is relative to the Netbeans project;
+     * @param jobDirectoryName The relative path to the job directory. 
+     * If it is a local execution, the path is relative to the Netbeans project
+     * (e.g., "examples/ShortestPath/test");
      * If it is an AWS execution, the path is relative to an S3 bucket.
-     * The <b>job</b> directory is expected to have the input file; 
-     * it will have the output file when the job is complete.
-     * It also is used to contain the intermediate directories <i>in</i> and <i>out</i>.
+     * The job directory is expected to have the <i>input</i> file; 
+     * it will have the <i>output</i> file when the job is complete.
+     * It also is used to contain intermediate directories <i>in</i> and <i>out</i>.
      * @param numParts the number of <i>parts</i> for this Job.
      * This is a Job attribute so that we can conveniently modify it
      * per Job, to find a good value that appears to be primarily a function of 
@@ -51,12 +56,12 @@ public final class Job implements Serializable
      */
     public Job( String jobName, 
                 String jobDirectoryName, 
-                Vertex vertexFactory, 
+                VertexImpl vertexFactory, 
                 int numParts, 
-                WorkerWriter workerWriter, 
-                GraphMaker workerGraphMaker,
+                WorkerOutputMaker workerWriter, 
+                WorkerGraphMaker workerGraphMaker,
                 MasterGraphMaker reader, 
-                Writer writer 
+                MasterOutputMaker writer 
             )
     {
         this.jobName               = jobName;
@@ -86,13 +91,13 @@ public final class Job implements Serializable
         writer                = job.getWriter();
     }  
         
-    public FileSystem getFileSystem() { return fileSystem; }
+    FileSystem getFileSystem() { return fileSystem; }
     
-    public int        getNumParts()   { return numParts; }
+    int        getNumParts()   { return numParts; }
             
-    public int        getPartId( Object vertexId ) { return vertexFactory.getPartId( vertexId, getNumParts() ); }
+    int        getPartId( Object vertexId ) { return vertexFactory.getPartId( vertexId, getNumParts() ); }
     
-    public Vertex     getVertexFactory() { return vertexFactory; }
+    VertexImpl     getVertexFactory() { return vertexFactory; }
     
     public void setProblemAggregator( Aggregator problemAggregator ) { this.problemAggregator = problemAggregator; }
 
@@ -109,20 +114,20 @@ public final class Job implements Serializable
     
     Aggregator       getStepAggregator()        { return stepAggregator; }    
     
-    GraphMaker       getWorkerGraphMaker()      { return workerGraphMaker; }
+    WorkerGraphMaker getWorkerGraphMaker()      { return workerGraphMaker; }
     
     MasterGraphMaker getMasterGraphMaker()      { return masterGraphMaker; }
     
-    WorkerWriter getWorkerWriter()          { return workerWriter; }
+    WorkerOutputMaker getWorkerWriter()          { return workerWriter; }
     
-    Writer       getWriter()                { return writer; }
+    MasterOutputMaker       getWriter()                { return writer; }
     
-    /*
+    /**
      * @return the number of vertices that were constructed.
      */
-    public int  makeGraph( Worker worker )      { return workerGraphMaker.makeGraph( worker ); }
+    int  makeGraph( Worker worker )      { return workerGraphMaker.makeGraph( worker ); }
     
-    public void makeOutputFile( Worker worker ) throws IOException { workerWriter.write( fileSystem, worker ); }
+    void makeOutputFile( Worker worker ) throws IOException { workerWriter.write( fileSystem, worker ); }
 
     Aggregator  makeStepAggregator()            { return stepAggregator.make(); }
     
@@ -131,7 +136,7 @@ public final class Job implements Serializable
     /*
      * Process Result
      */
-    public void processMasterOutputFile() {} // !! implement: make file & produce jpeg visualization
+    void processMasterOutputFile() {} // !! implement: make file & produce jpeg visualization
     
     /*
      * Process Worker output files, numbered: 0 <= output file number < numWorkers
@@ -142,9 +147,9 @@ public final class Job implements Serializable
         writer.write( fileSystem, numWorkers );
     }
     
-     /*
-     * Create Worker input files, numbered: 0 <= input file number < numWorkers
-     * put them in directory <jobDirectoryName>/in/
+    /**
+     * Write Worker input files <i>n</i>, for 0 &lt;= n &lt; numWorkers,
+     * in directory <i>jobDirectoryName</i>/in/
      */
     void readJobInputFile( FileSystem fileSystem, int workerSetSize )
     {
@@ -157,16 +162,16 @@ public final class Job implements Serializable
     {
         StringBuilder string = new StringBuilder();
         string.append("Job:\n\t");
-        string.append("Name: ").append(jobName).append("\n\t");
-        string.append("Directory name: ").append(jobDirectoryName).append("\n\t");
-        string.append("Number of parts: ").append(numParts).append("\n\t");
-        string.append("Step Aggregator: ").append(stepAggregator.getClass().getCanonicalName()).append("\n\t");
+        string.append("Name:               ").append(jobName).append("\n\t");
+        string.append("Directory name:     ").append(jobDirectoryName).append("\n\t");
+        string.append("Number of parts:    ").append(numParts).append("\n\t");
+        string.append("Step Aggregator:    ").append(stepAggregator.getClass().getCanonicalName()).append("\n\t");
         string.append("Problem Aggregator: ").append(problemAggregator.getClass().getCanonicalName()).append("\n\t");
-        string.append("Vertex factory: ").append(vertexFactory.getClass().getCanonicalName()).append("\n\t");
-        string.append("Worker writer: ").append(workerWriter.getClass().getCanonicalName()).append("\n\t");
+        string.append("Vertex factory:     ").append(vertexFactory.getClass().getCanonicalName()).append("\n\t");
+        string.append("Worker writer:      ").append(workerWriter.getClass().getCanonicalName()).append("\n\t");
         string.append("Worker graph maker: ").append(workerGraphMaker.getClass().getCanonicalName()).append("\n\t");
         string.append("Master graph maker: ").append(masterGraphMaker.getClass().getCanonicalName()).append("\n\t");
-        string.append("Writer: ").append(writer.getClass().getCanonicalName()).append("\n\t");
+        string.append("Writer:             ").append(writer.getClass().getCanonicalName()).append("\n\t");
         return new String( string );
     }
 }

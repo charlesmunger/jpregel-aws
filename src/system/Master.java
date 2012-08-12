@@ -1,5 +1,6 @@
 package system;
 
+import api.Aggregator;
 import static java.lang.System.out;
 
 import java.rmi.RemoteException;

@@ -71,4 +71,65 @@
     nbproject/build-impl.xml file. 
 
     -->
+    <property name="dist.javadoc-api.dir" value="dist/javadoc-api"/>
+    <property name="includes-api" 
+              value="Job.java,
+                     Vertex.java"
+    />
+    
+    <target depends="init" if="have.sources" name="javadoc-build-api">
+        <delete dir="${dist.javadoc-api.dir}"/>
+        <mkdir dir="${dist.javadoc-api.dir}"/>
+        <condition else="" property="javadoc.endorsed.classpath.cmd.line.arg" value="-J${endorsed.classpath.cmd.line.arg}">
+            <and>
+                <isset property="endorsed.classpath.cmd.line.arg"/>
+                <not>
+                    <equals arg1="${endorsed.classpath.cmd.line.arg}" arg2=""/>
+                </not>
+            </and>
+        </condition>
+        
+        <javadoc author="Pete Cappello" charset="UTF-8" destdir="${dist.javadoc-api.dir}" docencoding="UTF-8" encoding="${javadoc.encoding.used}" failonerror="true" noindex="${javadoc.noindex}" nonavbar="${javadoc.nonavbar}" notree="${javadoc.notree}" private="${javadoc.private}" source="${javac.source}" splitindex="${javadoc.splitindex}" use="${javadoc.use}" useexternalfile="true" version="${javadoc.version}" windowtitle="jpregel API" overview="${src.dir}/overview.html" >
+            <classpath>
+                <path path="${javac.classpath}"/>
+            </classpath>
+            <fileset dir="src">
+                <filename name="**/Aggregator*.java"/>
+            </fileset>
+            <fileset dir="src">
+                <filename name="**/Combiner*.java"/>
+            </fileset>
+            <fileset dir="src">
+                <filename name="**/MasterGraph*.java"/>
+            </fileset>
+            <fileset dir="src">
+                <filename name="**/MasterOutput*.java"/>
+            </fileset>
+            <fileset dir="src">
+                <filename name="**/Vertex*.java"/>
+            </fileset>
+            <fileset dir="src">
+                <filename name="**/WorkerGraphMaker*.java"/>
+            </fileset>
+            <fileset dir="src">
+                <filename name="**/WorkerOutput*.java"/>
+            </fileset>
+            <fileset file="src/system/Client.java"></fileset>
+            <fileset file="src/system/Job.java"></fileset>
+            <arg line="${javadoc.endorsed.classpath.cmd.line.arg}"/>
+        </javadoc>
+        <copy todir="${dist.javadoc-api.dir}">
+            <fileset dir="${src.dir}" excludes="${excludes}" includes="${includes}">
+                <filename name="**/doc-files/**"/>
+            </fileset>
+            <fileset dir="${build.generated.sources.dir}" erroronmissingdir="false">
+                <include name="**/doc-files/**"/>
+            </fileset>
+        </copy>
+    </target>
+    <target depends="init,javadoc-build-api" if="netbeans.home" name="javadoc-browse-api" unless="no.javadoc.preview">
+        <nbbrowse file="${dist.javadoc-api.dir}/index.html"/>
+    </target>
+    <target depends="init,javadoc-build-api,javadoc-browse-api" description="Build Javadoc." name="javadoc-api"/>
+  
 </project>

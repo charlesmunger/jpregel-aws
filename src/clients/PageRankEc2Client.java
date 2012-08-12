@@ -1,11 +1,15 @@
 package clients;
 
-import masterGraphMakers.G1MasterGraphMaker;
-import masterOutputMakers.StandardMasterOutputMaker;
+import api.MasterOutputMaker;
+import api.MasterGraphMaker;
+import api.WorkerGraphMaker;
+import api.WorkerOutputMaker;
+import system.MasterGraphMakerG1;
+import system.MasterOutputMakerStandard;
 import system.*;
-import vertex.PageRankVertex;
-import workerGraphMakers.StandardWorkerGraphMaker;
-import workerOutputMakers.StandardWorkerOutputMaker;
+import system.VertexPageRank;
+import system.WorkerGraphMakerStandard;
+import system.WorkerOutputMakerStandard;
 
 public class PageRankEc2Client extends Client
 {
@@ -18,11 +22,11 @@ public class PageRankEc2Client extends Client
         boolean   isEc2Master           = true;
         String imageIdMaster = args[4] ; 
         String imageIdWorker = args[5] ; 
-        Vertex vertexFactory = new PageRankVertex();
-        WorkerWriter workerWriter = new StandardWorkerOutputMaker();
-        GraphMaker workerGraphMaker = new StandardWorkerGraphMaker();
-        MasterGraphMaker reader = new G1MasterGraphMaker();
-        Writer writer = new StandardMasterOutputMaker();
+        VertexImpl vertexFactory = new VertexPageRank();
+        WorkerOutputMaker workerWriter = new WorkerOutputMakerStandard();
+        WorkerGraphMaker workerGraphMaker = new WorkerGraphMakerStandard();
+        MasterGraphMaker reader = new MasterGraphMakerG1();
+        MasterOutputMaker writer = new MasterOutputMakerStandard();
         
         Job job = new Job( jobName,
                 jobDirectoryName, 

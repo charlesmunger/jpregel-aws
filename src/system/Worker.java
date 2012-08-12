@@ -11,6 +11,7 @@
 // TODO FIX jicosfoundation Processor thread invokes start() in its constructor
 package system;
 
+import api.Aggregator;
 import java.io.IOException;
 import static java.lang.System.out;
 import java.net.MalformedURLException;
@@ -138,7 +139,7 @@ public final class Worker extends ServiceImpl
         }
     }
     
-    synchronized public void addVertexToPart( int partId, Vertex vertex )
+    synchronized public void addVertexToPart( int partId, VertexImpl vertex )
     {
         Part part = partIdToPartMap.get( partId );
         if ( null == part )
@@ -169,7 +170,7 @@ public final class Worker extends ServiceImpl
     }
       
     // TODO omit this method by converting all worker graph makers
-    synchronized public void addVertex( Vertex vertex, String stringVertex )
+    synchronized public void addVertex( VertexImpl vertex, String stringVertex )
     {
         int partId = job.getPartId( vertex.getVertexId() );
         int workerNum = getWorkerNum( partId );
@@ -249,8 +250,8 @@ public final class Worker extends ServiceImpl
     // Command: AddVertexToWorker
     synchronized public void addVertexToWorker( int partId, String stringVertex, Service sendingWorker )
     {
-        Vertex vertexFactory = job.getVertexFactory();
-        Vertex vertex = vertexFactory.make( stringVertex );
+        VertexImpl vertexFactory = job.getVertexFactory();
+        VertexImpl vertex = vertexFactory.make( stringVertex );
         addVertexToPart( partId, vertex );
         sendCommand( sendingWorker, AddVertexToPartCompleteCommand );
     }
@@ -427,7 +428,7 @@ public final class Worker extends ServiceImpl
             sendCommand( worker, command );
         }
         workerNumToVertexIdToMessageQMapMap = null;    
-        sync( numUnacknowledgedSendVertexIdToMessageQMaps ); // wait for Vertex messaging to complete
+        sync( numUnacknowledgedSendVertexIdToMessageQMaps ); // wait for VertexImpl messaging to complete
     }
     
     synchronized void computeThreadComplete( Map<Integer, Map<Object, MessageQ>> workerNumToVertexIdToMessageQMapMapboolean,
