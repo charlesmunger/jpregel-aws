@@ -1,19 +1,9 @@
 package system;
 
+import api.WorkerGraphMaker;
+import java.io.BufferedReader;
 import static java.lang.System.err;
 import static java.lang.System.exit;
-
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-
-import JpAws.WorkerGraphFileIO;
-import api.WorkerGraphMaker;
-import system.FileSystem;
-import system.VertexImpl;
-import system.Worker;
-import system.Job;
 
 public class WorkerGraphMakerPageRank implements WorkerGraphMaker 
 {
@@ -29,28 +19,7 @@ public class WorkerGraphMakerPageRank implements WorkerGraphMaker
             Job job = worker.getJob();
             FileSystem fileSystem = job.getFileSystem();
             VertexImpl vertexFactory  = job.getVertexFactory();
-            BufferedReader bufferedReader = null ; 
-            DataInputStream dataInputStream =null ; 
-            FileInputStream fileInputStream = null ; 
-            String jobDirectoryName = null ; 
-
-            boolean isEc2 = fileSystem.getFileSystem() ; 
-            if (isEc2) 
-            {
-                jobDirectoryName = fileSystem.getJobDirectory() ; 
-                WorkerGraphFileIO workerGraph = new WorkerGraphFileIO(workerNum) ; 
-                bufferedReader = workerGraph.FileInput(jobDirectoryName) ; 
-                //bufferedReader = S3FileSystem.WorkerFileInput(jobDirectoryName, workerNum) ;       
-                //System.out.println(" in StandWorkerGraph.makegraph (): working") ; 
-            }
-            else 
-            {
-                // read file
-    //            fis_read = 1  ; 
-                fileInputStream = fileSystem.getWorkerInputFileInputStream( workerNum );
-                dataInputStream = new DataInputStream( fileInputStream );
-                bufferedReader   = new BufferedReader(new InputStreamReader( dataInputStream ));  
-            } 
+            BufferedReader bufferedReader = fileSystem.getWorkerInputFileInputStream( workerNum );
         
         	/*String strLine;
         	System.out.println ("contents from the file"); 
@@ -65,17 +34,7 @@ public class WorkerGraphMakerPageRank implements WorkerGraphMaker
 //                worker.addVertex( vertex, job.getPartId( vertex ), line );
                 worker.addVertex( vertex, line );
             }
-//            if(fis_read == 1)
-//            { 
-//            dataInputStream.close();
-//            fileInputStream.close(); 
-//            } 
-            bufferedReader.close();
-            if( ! isEc2 )
-            { 
-            dataInputStream.close();
-            fileInputStream.close(); 
-            } 
+            bufferedReader.close(); 
         }
         catch ( Exception exception )
         {
@@ -83,12 +42,7 @@ public class WorkerGraphMakerPageRank implements WorkerGraphMaker
             exception.printStackTrace();
             exit( 1 );
         }
-	    //System.out.println("StandardMasterOutputMasker.write() exiting") ; 
 
         return numVertices;
     }
-		
-		
-	
-
 }

@@ -11,18 +11,15 @@
  */
 package system;
 
-import JpAws.WorkerGraphFileIO;
 import api.WorkerGraphMaker;
 import java.awt.geom.Point2D;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
 import static java.lang.System.exit;
 import static java.lang.System.out;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
-import system.FileSystem;
-import system.*;
-import system.VertexShortestPathEuclidean;
 
 /**
  *
@@ -39,31 +36,13 @@ public class WorkerGraphMakerGrid implements WorkerGraphMaker
         VertexImpl vertexFactory  = job.getVertexFactory();
         int numVertices = 0;
         
-        FileInputStream fileInputStream = null;
-        DataInputStream dataInputStream = null;
-        BufferedReader bufferedReader   = null;
-        
         try
         {
-            boolean isEc2 = fileSystem.getFileSystem() ; 
-            if (isEc2) 
-            {
-                String jobDirectoryName = fileSystem.getJobDirectory() ; 
-                WorkerGraphFileIO workerGraph = new WorkerGraphFileIO(workerNum) ; 
-                bufferedReader = workerGraph.FileInput(jobDirectoryName) ; 
-                //bufferedReader = S3FileSystem.WorkerFileInput(jobDirectoryName, workerNum) ;       
-            }
-            else 
-            {
-                // read file
-                fileInputStream = fileSystem.getWorkerInputFileInputStream( workerNum );
-                dataInputStream = new DataInputStream( fileInputStream );
-                bufferedReader   = new BufferedReader(new InputStreamReader( dataInputStream ));  
-            } 
+            BufferedReader bufferedReader = fileSystem.getWorkerInputFileInputStream( workerNum );
             // read file
-//            FileInputStream fileInputStream = fileSystem.getWorkerInputFileInputStream( workerNum );
-//            DataInputStream dataInputStream = new DataInputStream( fileInputStream );
-//            BufferedReader bufferedReader   = new BufferedReader(new InputStreamReader( dataInputStream ));
+            //            FileInputStream fileInputStream = fileSystem.getWorkerInputFileInputStream( workerNum );
+            //            DataInputStream dataInputStream = new DataInputStream( fileInputStream );
+            //            BufferedReader bufferedReader   = new BufferedReader(new InputStreamReader( dataInputStream ));
             
             String line = bufferedReader.readLine();
             out.println(" Worker: " + workerNum + " input line: " + line);
@@ -119,12 +98,7 @@ public class WorkerGraphMakerGrid implements WorkerGraphMaker
                     worker.addVertex( vertex, vertexString );
                 }
             }
-            bufferedReader.close();
-            if ( ! isEc2 )
-            { 
-                dataInputStream.close();
-                fileInputStream.close(); 
-            } 
+            bufferedReader.close(); 
         }
         catch ( Exception exception )
         {

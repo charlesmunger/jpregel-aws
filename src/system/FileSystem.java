@@ -1,8 +1,8 @@
 package system;
 
-import java.io.FileInputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 
 /**
  * FileSystem encapsulates the data & methods for interacting with a file
@@ -20,30 +20,24 @@ import java.io.FileOutputStream;
 abstract public class FileSystem
 {
     protected String  jobDirectoryName;
-
-    protected boolean isEc2 ; 
     
-    FileSystem( String jobDirectoryName , boolean isEc2 ) { this.jobDirectoryName = jobDirectoryName; this.isEc2 = isEc2 ;  }
+    public FileSystem( String jobDirectoryName) { this.jobDirectoryName = jobDirectoryName;}
     
-    abstract public FileInputStream  getFileInputStream()  throws FileNotFoundException;
+    abstract public BufferedReader  getFileInputStream()  throws FileNotFoundException;
     
-    abstract public FileOutputStream getFileOutputStream() throws FileNotFoundException;
+    abstract public BufferedWriter getFileOutputStream() ;
     
     // Use this to read a Worker input file
-    abstract public FileInputStream  getWorkerInputFileInputStream(   int WorkerNum ) throws FileNotFoundException;
+    abstract public BufferedReader  getWorkerInputFileInputStream(   int WorkerNum ) throws FileNotFoundException;
     
     // Use this to write a Worker input file
-    abstract public FileOutputStream getWorkerInputFileOutputStream(  int WorkerNum ) throws FileNotFoundException;
+    abstract public BufferedWriter getWorkerInputFileOutputStream(  int WorkerNum );
     
     // Use this to read a Worker output file
-    abstract public FileInputStream  getWorkerOutputFileInputStream(  int WorkerNum ) throws FileNotFoundException;
+    abstract public BufferedReader  getWorkerOutputFileInputStream(  int WorkerNum ) throws FileNotFoundException;
     
     // Use this to write a Worker output file
-    abstract public FileOutputStream getWorkerOutputFileOutputStream( int WorkerNum ) throws FileNotFoundException;
-    
-    abstract public boolean getFileSystem()  ; 
-    
-    abstract public String getJobDirectory() ; 
-
-
+    abstract public BufferedWriter getWorkerOutputFileOutputStream( int WorkerNum );
+        
+    public String getJobDirectory() {return jobDirectoryName;}
 }

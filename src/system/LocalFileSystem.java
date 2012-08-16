@@ -1,73 +1,69 @@
 package system;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.*;
 
 /**
- *
- * @author Pete Cappello
+ * Uses a directory path on the local machine.
+ * @author Charles Munger
  */
 public class LocalFileSystem extends FileSystem
 {
 
     LocalFileSystem(String jobDirectoryName)
     {
-        super(jobDirectoryName, false);
+        super(jobDirectoryName);
         new File(jobDirectoryName + "/in/").mkdirs();
         new File(jobDirectoryName + "/out/").mkdirs();
     }
 
     @Override
-    public FileInputStream getFileInputStream() throws FileNotFoundException
+    public BufferedReader getFileInputStream() throws FileNotFoundException
     {
-        return new FileInputStream(jobDirectoryName + "/input");
+        return read(jobDirectoryName + "/input");
     }
 
     @Override
-    public FileInputStream getWorkerInputFileInputStream(int WorkerNum) throws FileNotFoundException
+    public BufferedReader getWorkerInputFileInputStream(int WorkerNum) throws FileNotFoundException
     {
-        return new FileInputStream(jobDirectoryName + "/in/" + WorkerNum);
+        return read(jobDirectoryName + "/in/" + WorkerNum);
     }
 
     @Override
-    public FileOutputStream getWorkerInputFileOutputStream(int WorkerNum) throws FileNotFoundException
+    public BufferedWriter getWorkerInputFileOutputStream(int WorkerNum) 
     {
-        return new FileOutputStream(jobDirectoryName + "/in/" + WorkerNum);
+        return write(jobDirectoryName + "/in/" + WorkerNum);
     }
 
     @Override
-    public FileInputStream getWorkerOutputFileInputStream(int WorkerNum) throws FileNotFoundException
+    public BufferedReader getWorkerOutputFileInputStream(int WorkerNum) throws FileNotFoundException
     {
-        String fileName = jobDirectoryName + "/out/" + WorkerNum;
-        return new FileInputStream(fileName);
+        return read(jobDirectoryName + "/out/" + WorkerNum);
     }
 
     @Override
-    public FileOutputStream getWorkerOutputFileOutputStream(int WorkerNum) throws FileNotFoundException
+    public BufferedWriter getWorkerOutputFileOutputStream(int WorkerNum) 
     {
-        String fileName = jobDirectoryName + "/out/" + WorkerNum;
-        return new FileOutputStream(fileName);
+        return write(jobDirectoryName + "/out/" + WorkerNum);
     }
 
     @Override
-    public FileOutputStream getFileOutputStream() throws FileNotFoundException
+    public BufferedWriter getFileOutputStream() 
     {
-        return new FileOutputStream(jobDirectoryName + "/output");
+        return write(jobDirectoryName + "/output");
     }
-
-    @Override
-    public boolean getFileSystem()
-    {
-        // TODO Auto-generated method stub
-        return false;
+    
+    private BufferedReader read(String path) throws FileNotFoundException {
+        return new BufferedReader(new InputStreamReader(new FileInputStream(path)));
     }
-
-    @Override
-    public String getJobDirectory()
-    {
-        // TODO Auto-generated method stub
-        return null;
+    
+    private BufferedWriter write(String path) {
+        try
+        {
+            return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path)));
+        } catch (FileNotFoundException ex)
+        {
+            System.err.println("Couldn't find file " + path + " to write to");
+            return null;
+        }
     }
 }

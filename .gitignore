@@ -15,3 +15,6 @@ nb-configuration.xml
 .DS_STORE
 log.log
 nbproject/private/
+/examples/BinaryTreeShortestPathLocal/in/
+/examples/BinaryTreeShortestPathLocal/out/
+/examples/BinaryTreeShortestPathLocal/output

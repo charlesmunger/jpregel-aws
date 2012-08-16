@@ -1,14 +1,11 @@
 package system;
 
-import JpAws.WorkerGraphFileIO;
 import api.WorkerGraphMaker;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
 import static java.lang.System.err;
 import static java.lang.System.exit;
 import java.util.StringTokenizer;
-import system.FileSystem;
-import system.*;
-import system.VertexShortestPathBinaryTree;
 
 /**
  *
@@ -27,35 +24,13 @@ public class WorkerGraphMakerBinaryTree implements WorkerGraphMaker
         VertexImpl vertexFactory  = job.getVertexFactory();
         int numVertices = 0;
         
-        FileInputStream fileInputStream = null;
-        DataInputStream dataInputStream = null;
-        BufferedReader bufferedReader   = null;
-        
         try
         {
-            boolean isEc2 = fileSystem.getFileSystem() ; 
-            if (isEc2) 
-            {
-                String jobDirectoryName = fileSystem.getJobDirectory() ; 
-                WorkerGraphFileIO workerGraph = new WorkerGraphFileIO(workerNum) ; 
-                bufferedReader = workerGraph.FileInput(jobDirectoryName) ; 
-                //bufferedReader = S3FileSystem.WorkerFileInput(jobDirectoryName, workerNum) ;       
-            }
-            else 
-            {   // open file locally
-                fileInputStream = fileSystem.getWorkerInputFileInputStream( workerNum );
-                dataInputStream = new DataInputStream( fileInputStream );
-                bufferedReader  = new BufferedReader(new InputStreamReader( dataInputStream ));  
-            }
+            BufferedReader bufferedReader = fileSystem.getWorkerInputFileInputStream( workerNum );
             
             // read file
             String line = bufferedReader.readLine();
             bufferedReader.close();
-            if ( ! isEc2 )
-            { 
-                dataInputStream.close();
-                fileInputStream.close(); 
-            } 
             
             // extract startVertexId, stopVertexId
             StringTokenizer stringTokenizer = new StringTokenizer( line );

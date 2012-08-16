@@ -1,24 +1,13 @@
 package system;
 
+import JpAws.S3FileSystem;
 import api.Aggregator;
 import static java.lang.System.out;
-
 import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-
-
-import jicosfoundation.Command;
-import jicosfoundation.DefaultRemoteExceptionHandler;
-import jicosfoundation.Department;
-import jicosfoundation.Proxy;
-import jicosfoundation.RemoteExceptionHandler;
-import jicosfoundation.Service;
-import jicosfoundation.ServiceImpl;
-import jicosfoundation.ServiceName;
-import system.commands.CommandComplete;
-
+import jicosfoundation.*;
 import system.commands.*;
 
 /**
@@ -298,6 +287,6 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     }
 
     private FileSystem makeFileSystem(boolean isEc2, String jobDirectoryName) {
-        return (isEc2) ? new Ec2FileSystem(jobDirectoryName, isEc2) : new LocalFileSystem(jobDirectoryName);
+        return (isEc2) ? new S3FileSystem(jobDirectoryName) : new LocalFileSystem(jobDirectoryName);
     }
 }

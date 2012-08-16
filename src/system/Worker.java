@@ -11,6 +11,7 @@
 // TODO FIX jicosfoundation Processor thread invokes start() in its constructor
 package system;
 
+import JpAws.S3FileSystem;
 import api.Aggregator;
 import java.io.IOException;
 import static java.lang.System.out;
@@ -19,40 +20,12 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jicosfoundation.Command;
-import jicosfoundation.CommandSynchronous;
-import jicosfoundation.DefaultRemoteExceptionHandler;
-import jicosfoundation.Department;
-import jicosfoundation.Proxy;
-import jicosfoundation.RemoteExceptionHandler;
-import jicosfoundation.Service;
-import jicosfoundation.ServiceImpl;
-import system.commands.AddVertexToWorker;
-import system.commands.AddVertexToPartComplete;
-import system.commands.CommandComplete;
-import system.commands.InputFileProcessingComplete;
-import system.commands.MessageReceived;
-import system.commands.ReadWorkerInputFile;
-import system.commands.WriteWorkerOutputFile;
-import system.commands.RegisterWorker;
-import system.commands.SendMessage;
-import system.commands.SendVertexIdToMessageQMap;
-import system.commands.SetJob;
-import system.commands.SetWorkerMap;
-import system.commands.ShutdownWorker;
-import system.commands.StartSuperStep;
-import system.commands.SuperStepComplete;
-import system.commands.JobSet;
-import system.commands.WorkerMapSet;
+import jicosfoundation.*;
+import system.commands.*;
 
 /**
  *
@@ -231,7 +204,7 @@ public final class Worker extends ServiceImpl
     
     private FileSystem makeFileSystem( boolean isEc2, String jobDirectoryName )
     {
-        return ( isEc2 ) ? new Ec2FileSystem( jobDirectoryName, isEc2 ) : new LocalFileSystem( jobDirectoryName );
+        return ( isEc2 ) ? new S3FileSystem( jobDirectoryName) : new LocalFileSystem( jobDirectoryName );
     }
     
     @Override
