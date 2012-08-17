@@ -1,6 +1,7 @@
 package system;
  
 import api.Aggregator;
+import api.Vertex;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -79,7 +80,7 @@ public final class Part
     
     long getSuperStep() { return superStep; }
     
-    VertexImpl getVertex( int vertexId ) { return vertexIdToVertexMap.get( vertexId ); }
+    Vertex getVertex( int vertexId ) { return vertexIdToVertexMap.get( vertexId ); }
     
     Map<Object, VertexImpl> getVertexIdToVertexMap() { return vertexIdToVertexMap; }
     

@@ -36,7 +36,7 @@ public class BinaryTreeShortestPathLocalClient
 //        System.out.println("JVM data model: " + System.getProperty("sun.arch.data.model"));
         System.out.println( job + "\n    numWorkers: " + numWorkers );
         boolean isEc2Master = false;
-        Client.run( job, isEc2Master, numWorkers);
+       Client.run( job, isEc2Master, numWorkers);
         System.exit( 0 );
     }
 }

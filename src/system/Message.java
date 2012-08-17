@@ -24,7 +24,7 @@ public class Message<VertexIdType, ValueType> implements java.io.Serializable
     
     public VertexIdType getVertexId()     { return vertexId; }
     
-    public ValueType getMessageValue() { return messageValue; }
+    public ValueType    getMessageValue() { return messageValue; }
     
     @Override
     public String toString()

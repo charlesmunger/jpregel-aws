@@ -116,6 +116,7 @@
             </fileset>
             <fileset file="src/system/Client.java"></fileset>
             <fileset file="src/system/Job.java"></fileset>
+            <fileset file="src/system/JobRunData.java"></fileset>
             <arg line="${javadoc.endorsed.classpath.cmd.line.arg}"/>
         </javadoc>
         <copy todir="${dist.javadoc-api.dir}">

@@ -50,7 +50,6 @@ import java.util.Map;
  *
  * @author Peter Cappello
  */
-//abstract public class VertexImpl<VertexIdType, VertexValueType, EdgeValueType, MessageValueType> implements java.io.Serializable
 abstract public class VertexImpl<VertexIdType, VertexValueType, EdgeValueType, MessageValueType> 
 implements Vertex<VertexIdType, VertexValueType, EdgeValueType, MessageValueType>, java.io.Serializable
 {
@@ -83,7 +82,7 @@ implements Vertex<VertexIdType, VertexValueType, EdgeValueType, MessageValueType
     synchronized public void addEdge( VertexIdType target, EdgeValueType edgeValue ) { edgeMap.put( target, edgeValue ); }
 
     @Override
-    synchronized public void addEdge( VertexIdType vertexId, Object target, EdgeValueType edgeValue ) { }
+    synchronized public void addEdge( VertexIdType vertexId, VertexIdType target, EdgeValueType edgeValue ) { }
 
     @Override
     synchronized public void addVertex( VertexIdType vertexId, Object vertexValue ) { /* combiner */ }

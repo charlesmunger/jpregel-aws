@@ -13,7 +13,7 @@ import java.util.StringTokenizer;
  *
  * @author Pete Cappello
  */
-public class VertexTestMutability extends VertexImpl<Integer, Message<Integer, Integer>, Integer, Integer>
+class VertexTestMutability extends VertexImpl<Integer, Message<Integer, Integer>, Integer, Integer>
 {
     public VertexTestMutability( Integer vertexId, Map<Integer, Integer> edgeMap )
     {

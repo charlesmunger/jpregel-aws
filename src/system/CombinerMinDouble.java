@@ -1,8 +1,6 @@
 package system;
 
 import java.awt.geom.Point2D;
-import system.Combiner;
-import system.Message;
 
 /**
  *
