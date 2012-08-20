@@ -11,5 +11,10 @@ nb-configuration.xml
 *.war
 *.ear
 *.pem
+*.AWSkey
 .DS_STORE
 log.log
+nbproject/private/
+/examples/BinaryTreeShortestPathLocal/in/
+/examples/BinaryTreeShortestPathLocal/out/
+/examples/BinaryTreeShortestPathLocal/output
