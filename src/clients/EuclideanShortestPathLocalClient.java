@@ -1,13 +1,6 @@
 package clients;
 
-import system.MasterGraphMakerStandard;
-import system.MasterOutputMakerStandard;
-import system.Client;
-import system.Job;
-import system.AggregatorSumInteger;
-import system.VertexShortestPathEuclidean;
-import system.WorkerGraphMakerStandard;
-import system.WorkerOutputMakerStandard;
+import system.*;
 
 /**
  *
