@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package JpAws;
 
 import datameer.awstasks.aws.ec2.InstanceGroup;

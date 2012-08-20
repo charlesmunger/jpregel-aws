@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package JpAws;
 
 import api.MachineGroup;
@@ -21,7 +17,7 @@ import system.Master;
  *
  * @author charlesmunger
  */
-public abstract class Ec2MachineGroup<T> implements MachineGroup<T>
+ abstract class Ec2MachineGroup<T> implements MachineGroup<T>
 {
 
     private final String[] hostNames;
