@@ -16,12 +16,10 @@ public class Ec2WorkerMachineGroup extends Ec2MachineGroup<Worker>
 {
 
     public static final String JARNAME = "jpregel-aws";
-    private final String heapsize;
 
     public Ec2WorkerMachineGroup(InstanceGroup i, String heapsize)
     {
-        super(i);
-        this.heapsize = heapsize;
+        super(i,heapsize);
     }
 
     @Override
@@ -88,7 +86,8 @@ public class Ec2WorkerMachineGroup extends Ec2MachineGroup<Worker>
                 try
                 {
                     sshClient.executeCommand("java -server -cp " + JARNAME + ":./dist/lib/*"
-                            + " -Djava.security.policy=policy"
+                            + " -Djava.security.policy=policy "
+                            + heapsize
                             + " system.Worker " + args[0], null);
                 } catch (IOException ex)
                 {

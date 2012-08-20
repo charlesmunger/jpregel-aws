@@ -15,9 +15,9 @@ public class Ec2MasterMachineGroup extends Ec2MachineGroup<ClientToMaster>
 
     public static final String JARNAME = "jpregel-aws";
 
-    public Ec2MasterMachineGroup(InstanceGroup i)
+    public Ec2MasterMachineGroup(InstanceGroup i, String heapsize)
     {
-        super(i);
+        super(i, heapsize);
     }
 
     @Override
@@ -81,6 +81,7 @@ public class Ec2MasterMachineGroup extends Ec2MachineGroup<ClientToMaster>
                 {
                     sshClient.executeCommand("java -server -cp " + JARNAME + ":./dist/lib/*"
                             + " -Djava.security.policy=policy"
+                            + heapsize
                             + " JpAws.Ec2Master", System.out);
                 } catch (IOException ex)
                 {

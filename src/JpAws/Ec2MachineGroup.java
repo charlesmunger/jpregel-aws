@@ -22,8 +22,8 @@ import system.Master;
 
     private final String[] hostNames;
     protected final InstanceGroup instanceGroup;
-
-    public Ec2MachineGroup(InstanceGroup i)
+    protected final String heapsize;
+    public Ec2MachineGroup(InstanceGroup i, String heapsize)
     {
         instanceGroup = i;
         List<Instance> instances = (List<Instance>) i.getInstances(true);
@@ -33,6 +33,7 @@ import system.Master;
         {
             hostNames[count++] = instance.getPublicDnsName();
         }
+        this.heapsize = heapsize;
     }
 
     @Override
