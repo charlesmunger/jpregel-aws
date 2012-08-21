@@ -25,6 +25,7 @@ public class Ec2ReservationService implements ReservationService
 
     public Ec2ReservationService()
     {
+        heapSizeMap.put("m1.small", "-Xmx1600m -Xms1600m  ");
         DescribeSecurityGroupsResult describeSecurityGroups = null;
         final DescribeSecurityGroupsRequest req = new DescribeSecurityGroupsRequest().withGroupNames(Ec2Machine.SECURITY_GROUP);
         try

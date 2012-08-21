@@ -81,7 +81,7 @@ public class Ec2MasterMachineGroup extends Ec2MachineGroup<ClientToMaster>
                 try
                 {
                     sshClient.executeCommand("java -server -cp " + JARNAME + ":./dist/lib/*"
-                            + " -Djava.security.policy=policy"
+                            + " -Djava.security.policy=policy "
                             + heapsize
                             + " JpAws.Ec2Master "
                             + args[0], System.out);
