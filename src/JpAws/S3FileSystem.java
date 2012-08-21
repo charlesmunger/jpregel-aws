@@ -52,7 +52,7 @@ public class S3FileSystem extends FileSystem {
 
     @Override
     public BufferedWriter getWorkerOutputFileOutputStream(int WorkerNum)  {
-        return new BufferedWriter(new OutputStreamWriter(inToOut("/out/" + WorkerNum)));
+        return new BufferedWriter(new OutputStreamWriter(inToOut("out/" + WorkerNum)));
     }
     
     private OutputStream inToOut(final String fileName) {
