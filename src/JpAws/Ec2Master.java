@@ -27,8 +27,8 @@ public class Ec2Master extends Master
         System.setSecurityManager(new RMISecurityManager());
         Registry registry = LocateRegistry.createRegistry(Master.PORT);
         ClientToMaster master = new Ec2Master();
-        master.init(Integer.parseInt(args[0]));
         registry.bind(SERVICE_NAME, master);
+        master.init(Integer.parseInt(args[0]));
         System.out.println("Ec2Master: Ready.");
     }
     
