@@ -1,6 +1,5 @@
 package system;
 
-import JpAws.S3FileSystem;
 import api.Aggregator;
 import static java.lang.System.out;
 import java.rmi.RemoteException;
@@ -39,8 +38,8 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     public static final RemoteExceptionHandler REMOTE_EXCEPTION_HANDLER = new DefaultRemoteExceptionHandler();
     
     // ServiceImpl attributes
-    static public String SERVICE_NAME = "Master";
-    static public int PORT = 2048;
+    final static public String SERVICE_NAME = "Master";
+    final static public int PORT = 2048;
     static private final Department[] departments = {ServiceImpl.ASAP_DEPARTMENT};
     static private Class[][] command2DepartmentArray = {
         // ASAP Commands
@@ -73,40 +72,28 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     {
         // Establish Master as a Jicos Service
         super(command2DepartmentArray);
-        super.setService(this); //TODO leaking partially constructed object
-        super.setDepartments(departments);
     }
 
     @Override
-    public synchronized void makeWorkers(int numWorkers, String masterDomainName) throws RemoteException 
+    public synchronized void init(int numWorkers) throws RemoteException 
     {
-        System.out.println("Master.makeWorkers: entered: numWorkers: " + numWorkers);
+        super.setService(this);
+        super.setDepartments(departments);
         numUnfinishedWorkers += numWorkers;
-        //Machine.startWorkers( masterDomainName, numWorkers, null );
-
-        constructWorkers(numWorkers, masterDomainName);
-
         out.println("Master.makeWorkers: waiting for Worker registration to complete");
-
-        // wait for all workers to Register before proceeding
         try 
         {
-            if (numUnfinishedWorkers > 0 && !commandExeutionIsComplete) 
+            while (numUnfinishedWorkers > 0 && !commandExeutionIsComplete) 
             {
                 System.out.println("Master.makeWorkers: about to wait: numUnfinishedWorkers: " + numUnfinishedWorkers);
                 wait(); // until numUnfinishedWorkers == 0
             }
         } 
         catch (InterruptedException ignore) {}
-
-        // broadcaast to workers: set your integerToWorkerMap
-//        Command command = new SetWorkerMap( integerToWorkerMap );
-//        barrierComputation( command );
         setWorkerMap();
     }
     
-    abstract public void constructWorkers(int numWorkers, String masterDomainName) throws RemoteException;
-
+    @Override
     public synchronized void setWorkerMap() 
     {
         // broadcaast to workers: set your integerToWorkerMap
@@ -125,6 +112,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
      * @param Job   - problem and instance parameters
      * @param isEc2 - run mode: EC2 (true) | local (false)
      */
+    @Override
     public JobRunData run(Job job, boolean isEc2) 
     {
         // all Workers have registered with Master
@@ -134,7 +122,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
 
         // broadcaast to workers: set your Job & FileSystem
         String jobDirectoryName = job.getJobDirectoryName();
-        FileSystem fileSystem = makeFileSystem(isEc2, jobDirectoryName);
+        FileSystem fileSystem = makeFileSystem( jobDirectoryName);
         numUnfinishedWorkers = integerToWorkerMap.size();
         commandExeutionIsComplete = false;
         Command command = new SetJob(job, isEc2);
@@ -203,20 +191,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
 
     @Override
     abstract public void shutdown(); 
-//    {        
-//        // shutdown all Worker Services
-//        out.println("Master.shutdown: notifying Worker Services to shutdown.");
-//        //barrierComputation(new ShutdownWorker());
-//        try {
-//            workerMachines.Stop();
-//        } catch (IOException ex) {
-//            System.out.println("Exception shutting down workers. Check webUI for zombie instances.");
-//        }
-//        out.println("Master.shutdown: Worker Services shutdown.");
-//
-//        // shutdown Master
-//        out.println("Master.shutdown: shutting down.");
-//    }
+
 
     /* _____________________________
      *  
@@ -286,7 +261,5 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         }
     }
 
-    private FileSystem makeFileSystem(boolean isEc2, String jobDirectoryName) {
-        return (isEc2) ? new S3FileSystem(jobDirectoryName) : new LocalFileSystem(jobDirectoryName);
-    }
+    public abstract FileSystem makeFileSystem(String jobDirectoryName);
 }

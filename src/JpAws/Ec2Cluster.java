@@ -110,7 +110,7 @@ public class Ec2Cluster extends Cluster
             break;
         }
         
-        master.makeWorkers(numWorkers, domainNames[ PRIVATE_DOMAIN_NAME]);
+        master.init(numWorkers);
         return master;
     }
     

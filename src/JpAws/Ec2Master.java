@@ -7,6 +7,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import system.ClientToMaster;
+import system.FileSystem;
 import system.Master;
 
 
@@ -31,19 +32,6 @@ public class Ec2Master extends Master
     }
     
     @Override
-    public void constructWorkers(int numWorkers, String masterDomainName) 
-    {
-        try 
-        {
-            workerMachines = new WorkerMachines(masterDomainName);
-            workerMachines.start(numWorkers);
-        } 
-        catch (IOException exception) 
-        {
-            exception.printStackTrace();
-        }
-    }
-    
     public void shutdown() 
     {       
         System.out.println("Master.shutdown: notifying Worker Services to shutdown.");
@@ -60,5 +48,11 @@ public class Ec2Master extends Master
 
         // shutdown Master
         System.out.println("Master.shutdown: shutting down.");
+    }
+
+    @Override
+    public FileSystem makeFileSystem(String jobDirectoryName)
+    {
+        return new S3FileSystem(jobDirectoryName);
     }
 }

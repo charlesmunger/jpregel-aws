@@ -14,7 +14,7 @@ public class LocalCluster extends Cluster
         System.out.println("Cluster.starting.");
         
         master = new LocalMaster();
-        master.makeWorkers(numWorkers, null);
+        master.init(numWorkers);
         System.out.println("Cluster.start: workers constructed: " + numWorkers);
         return master;
     }
