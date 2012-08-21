@@ -4,7 +4,12 @@ import datameer.awstasks.aws.ec2.InstanceGroup;
 import datameer.awstasks.aws.ec2.ssh.SshClient;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import system.ClientToMaster;
+import system.Master;
 
 /**
  *
@@ -103,5 +108,47 @@ public class Ec2MasterMachineGroup extends Ec2MachineGroup<ClientToMaster>
     public String getHostname()
     {
         return hostName;
+    }
+
+    @Override
+    public ClientToMaster deploy(String... args) throws IOException
+    {
+        startObject(args);
+        ClientToMaster remoteObject = null;
+        String url = "//" + getHostname() + ":" + Master.PORT + "/" + Master.SERVICE_NAME;
+        for (int i = 0;; i += 5000)
+        {
+            try
+            {
+                remoteObject = (ClientToMaster) Naming.lookup(url);
+            } catch (NotBoundException ex)
+            {
+                tryAgain(i);
+                continue;
+            } catch (RemoteException r)
+            {
+                tryAgain(i);
+                continue;
+            } catch (MalformedURLException ex)
+            {
+            }
+            break;
+        }
+        return remoteObject;
+    }
+
+    private void tryAgain(int i)
+    {
+        if (i > 120000)
+        {
+        }
+        System.out.println("Master not up yet. Trying again in 5 seconds...");
+        try
+        {
+            Thread.sleep(5000);
+        } catch (InterruptedException ex1)
+        {
+            System.out.println("Waiting interrupted, trying again immediately");
+        }
     }
 }

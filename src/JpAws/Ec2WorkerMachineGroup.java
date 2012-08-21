@@ -16,6 +16,7 @@ public class Ec2WorkerMachineGroup extends Ec2MachineGroup<Worker>
 {
 
     public static final String JARNAME = "jpregel-aws.jar";
+    private final String hostName = null;
 
     public Ec2WorkerMachineGroup(InstanceGroup i, String heapsize)
     {
@@ -31,15 +32,7 @@ public class Ec2WorkerMachineGroup extends Ec2MachineGroup<Worker>
         {
             System.out.println("Error fetching jars file - " + jars.getAbsolutePath());
         }
-        try
-        {
-            System.out.println("Waiting");
-            Thread.sleep(30000);
-            System.out.println("Waking");
-        } catch (InterruptedException ex)
-        {
-            System.out.println("Waiting interrupted");
-        }
+        
         final SshClient sshClient = instanceGroup.createSshClient("ec2-user", privateKeyFile, false);
         File thisjar = new File(JARNAME);
         File distjar = new File("dist/" + JARNAME);
@@ -106,6 +99,13 @@ public class Ec2WorkerMachineGroup extends Ec2MachineGroup<Worker>
     @Override
     public String getHostname()
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return hostName;
+    }
+
+    @Override
+    public Worker deploy(String... args) throws IOException
+    {
+        startObject(args);
+        return null;
     }
 }
