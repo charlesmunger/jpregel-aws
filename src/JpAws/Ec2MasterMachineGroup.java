@@ -13,7 +13,7 @@ import system.ClientToMaster;
 public class Ec2MasterMachineGroup extends Ec2MachineGroup<ClientToMaster>
 {
 
-    public static final String JARNAME = "jpregel-aws";
+    public static final String JARNAME = "jpregel-aws.jar";
     private final String hostName;
     public Ec2MasterMachineGroup(InstanceGroup i, String heapsize)
     {

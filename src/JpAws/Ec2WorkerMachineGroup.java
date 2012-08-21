@@ -15,7 +15,7 @@ import system.Worker;
 public class Ec2WorkerMachineGroup extends Ec2MachineGroup<Worker>
 {
 
-    public static final String JARNAME = "jpregel-aws";
+    public static final String JARNAME = "jpregel-aws.jar";
 
     public Ec2WorkerMachineGroup(InstanceGroup i, String heapsize)
     {
