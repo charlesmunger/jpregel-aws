@@ -84,7 +84,7 @@ public class Ec2MasterMachineGroup extends Ec2MachineGroup<ClientToMaster>
                             + " -Djava.security.policy=policy"
                             + heapsize
                             + " JpAws.Ec2Master "
-                            + args.toString(), System.out);
+                            + args[0], System.out);
                 } catch (IOException ex)
                 {
                     System.out.println("Master disconnected " + ex.getLocalizedMessage());
