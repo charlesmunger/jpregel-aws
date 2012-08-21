@@ -21,7 +21,7 @@ public class Ec2MasterMachineGroup extends Ec2MachineGroup<ClientToMaster>
     }
 
     @Override
-    void startObject(String[] args)
+    void startObject(final String[] args)
     {
         File privateKeyFile = PregelAuthenticator.getPrivateKey();
         File jars = new File("jars.tar");
@@ -82,7 +82,8 @@ public class Ec2MasterMachineGroup extends Ec2MachineGroup<ClientToMaster>
                     sshClient.executeCommand("java -server -cp " + JARNAME + ":./dist/lib/*"
                             + " -Djava.security.policy=policy"
                             + heapsize
-                            + " JpAws.Ec2Master", System.out);
+                            + " JpAws.Ec2Master "
+                            + args.toString(), System.out);
                 } catch (IOException ex)
                 {
                     System.out.println("Master disconnected " + ex.getLocalizedMessage());

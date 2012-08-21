@@ -14,7 +14,7 @@ public class ShortestPathEc2DevClient extends Client {
         Ec2ReservationService rs = new Ec2ReservationService();
         MachineGroup master = rs.reserveMaster("m1.small");
         MachineGroup workers = rs.reserveWorkers("m1.small", numWorkers);
-        ClientToMaster deploy = (ClientToMaster) master.deploy(args[0]);
+        ClientToMaster deploy = (ClientToMaster) master.deploy(args[1]);
         workers.deploy(master.getHostname());
         
         int computeThreadsPerWorker = Runtime.getRuntime().availableProcessors();
