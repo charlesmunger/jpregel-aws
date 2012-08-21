@@ -55,7 +55,7 @@ import system.Master;
                 System.out.println("Master not up yet. Trying again in 5 seconds...");
                 try
                 {
-                    wait(5000);
+                    Thread.sleep(5000);
                 } catch (InterruptedException ex1)
                 {
                     System.out.println("Waiting interrupted, trying again immediately");
@@ -70,7 +70,7 @@ import system.Master;
                 System.out.println("Master not up yet. Trying again in 5 seconds...");
                 try
                 {
-                    wait(5000);
+                    Thread.sleep(5000);
                 } catch (InterruptedException ex1)
                 {
                     System.out.println("Waiting interrupted, trying again immediately");
