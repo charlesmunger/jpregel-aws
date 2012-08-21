@@ -115,6 +115,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     @Override
     public JobRunData run(Job job, boolean isEc2) 
     {
+        System.out.println("Run entered");
         // all Workers have registered with Master
         assert integerToWorkerMap.size() == numRegisteredWorkers.get();
 
