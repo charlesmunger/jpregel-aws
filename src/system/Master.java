@@ -83,7 +83,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         out.println("Master.makeWorkers: waiting for Worker registration to complete");
         try 
         {
-            while (numUnfinishedWorkers > 0 && !commandExeutionIsComplete) 
+            if (numUnfinishedWorkers > 0 && !commandExeutionIsComplete) 
             {
                 System.out.println("Master.makeWorkers: about to wait: numUnfinishedWorkers: " + numUnfinishedWorkers);
                 wait(); // until numUnfinishedWorkers == 0
