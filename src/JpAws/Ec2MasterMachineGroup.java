@@ -14,10 +14,11 @@ public class Ec2MasterMachineGroup extends Ec2MachineGroup<ClientToMaster>
 {
 
     public static final String JARNAME = "jpregel-aws";
-
+    private final String hostName;
     public Ec2MasterMachineGroup(InstanceGroup i, String heapsize)
     {
         super(i, heapsize);
+        hostName = i.getInstances(true).get(0).getPublicDnsName();
     }
 
     @Override
@@ -101,6 +102,6 @@ public class Ec2MasterMachineGroup extends Ec2MachineGroup<ClientToMaster>
     @Override
     public String getHostname()
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return hostName;
     }
 }
