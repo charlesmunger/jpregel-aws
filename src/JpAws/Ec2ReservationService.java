@@ -80,7 +80,7 @@ public class Ec2ReservationService extends ReservationServiceImpl
     {
         InstanceGroupImpl instanceGroup = new InstanceGroupImpl(ec2);
 
-        RunInstancesRequest launchConfiguration = new RunInstancesRequest(AMIID, numWorkers, numWorkers)
+        RunInstancesRequest launchConfiguration = new RunInstancesRequest("ami-0da96764", numWorkers, numWorkers)
                 .withKeyName(PregelAuthenticator.getPrivateKeyName())
                 .withInstanceType(instanceType)
                 .withSecurityGroupIds(SECURITY_GROUP);
