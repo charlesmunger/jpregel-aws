@@ -42,6 +42,7 @@ public class Ec2ReservationService extends ReservationServiceImpl
     {
         heapSizeMap.put("m1.small", "-Xmx1600m -Xms1600m  ");
         heapSizeMap.put("cc2.8xlarge","-xmx58000m -Xms58000m");
+        heapSizeMap.put("m1.large","-Xmx7100m -Xms7100m");
         DescribeSecurityGroupsResult describeSecurityGroups = null;
         final DescribeSecurityGroupsRequest req = new DescribeSecurityGroupsRequest().withGroupNames(SECURITY_GROUP);
         try
@@ -67,8 +68,8 @@ public class Ec2ReservationService extends ReservationServiceImpl
     public static ClientToMaster newSmallCluster(int numWorkers) throws Exception
     {
         Ec2ReservationService rs = new Ec2ReservationService();
-        Future<MachineGroup<ClientToMaster>> masterMachine = rs.reserveMaster("m1.small");
-        Future<MachineGroup<Worker>> workers = rs.reserveWorkers("m1.small", numWorkers);
+        Future<MachineGroup<ClientToMaster>> masterMachine = rs.reserveMaster("m1.large");
+        Future<MachineGroup<Worker>> workers = rs.reserveWorkers("m1.large", numWorkers);
         Future<ClientToMaster> deployMaster = masterMachine.get().deploy(Integer.toString(numWorkers));
         workers.get().deploy(masterMachine.get().getHostname());
         return deployMaster.get();
