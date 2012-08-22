@@ -69,7 +69,7 @@ public class Ec2ReservationService extends ReservationServiceImpl
     {
         Ec2ReservationService rs = new Ec2ReservationService();
         Future<MachineGroup<ClientToMaster>> masterMachine = rs.reserveMaster("m1.large");
-        Future<MachineGroup<Worker>> workers = rs.reserveWorkers("m1.large", numWorkers);
+        Future<MachineGroup<Worker>> workers = rs.reserveWorkers("cc2.8xlarge", numWorkers);
         Future<ClientToMaster> deployMaster = masterMachine.get().deploy(Integer.toString(numWorkers));
         workers.get().deploy(masterMachine.get().getHostname());
         return deployMaster.get();
