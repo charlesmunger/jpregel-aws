@@ -1,18 +1,14 @@
 package clients;
 
+import JpAws.Ec2ReservationService;
 import system.*;
 
 /**
  *
- * @author Pete Cappello
+ * @author charlesmunger
  */
-public class ShortestPathEc2Client extends Client 
-{
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) throws Exception 
-    {
+public class ShortestPathEc2Client extends Client {
+    public static void main(String[] args) throws Exception {
         int numWorkers = Integer.parseInt(args[1]);
         int computeThreadsPerWorker = Runtime.getRuntime().availableProcessors();
         int numParts = numWorkers * computeThreadsPerWorker * 2; 
@@ -28,8 +24,8 @@ public class ShortestPathEc2Client extends Client
                 new WorkerOutputMakerStandard()
                 );
         System.out.println( job + "\n        numWorkers:" + numWorkers );
-        boolean isEc2Master = true;
-        Client.run(job, isEc2Master, numWorkers);     
-        System.exit(0);
+        System.out.println(Ec2ReservationService.newSmallCluster(numWorkers).run(job, true));
+        System.out.println("Currently, termination of premade clusters is not implemented.");
+        System.out.println("Please don't forget to terminate via the webui.");
     }
 }

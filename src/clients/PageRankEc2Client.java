@@ -1,5 +1,6 @@
 package clients;
 
+import JpAws.Ec2ReservationService;
 import system.*;
 
 public class PageRankEc2Client extends Client
@@ -20,7 +21,8 @@ public class PageRankEc2Client extends Client
                 );
         System.out.println( job + "\n       numWorkers:" + numWorkers );
         boolean isEc2Master = true;
-        Client.run( job, isEc2Master, numWorkers);    
+        ClientToMaster master = Ec2ReservationService.newSmallCluster(numWorkers);
+        master.run( job, isEc2Master);    
         System.exit( 0 );
     }
 }
