@@ -5,7 +5,6 @@ import datameer.awstasks.aws.ec2.ssh.SshClient;
 import java.io.File;
 import java.io.IOException;
 import java.rmi.Naming;
-import java.util.concurrent.Callable;
 import system.ClientToMaster;
 import system.Master;
 
@@ -25,21 +24,9 @@ public class Ec2MasterMachineGroup extends Ec2MachineGroup<ClientToMaster>
         hostName = i.getInstances(true).get(0).getPrivateDnsName();
     }
 
-    @Override
     void startObject(final String[] args)
     {
         File jars = new File("jars.tar");
-//        if (!jars.exists())
-//        {
-//            try
-//            {
-//                Runtime.getRuntime().exec("tar -zcvf jars.tar ./dist/lib policy key.AWSkey");
-//            } catch (IOException ex)
-//            {
-//                System.out.println("Error tarring jars.");
-//                System.exit(1);
-//            }
-//        }
         try
         {
             System.out.println("Waiting");
@@ -123,31 +110,23 @@ public class Ec2MasterMachineGroup extends Ec2MachineGroup<ClientToMaster>
     }
 
     @Override
-    public Callable<ClientToMaster> syncDeploy(final String... args)
+    public ClientToMaster syncDeploy(String... args)
     {
-        return new Callable<ClientToMaster>()
+        startObject(args);
+        ClientToMaster remoteObject = null;
+        String url = "//" + getHostname() + ":" + Master.PORT + "/" + Master.CLIENT_SERVICE_NAME;
+        for (int i = 0;; i += 5000)
         {
-
-            @Override
-            public ClientToMaster call() throws Exception
+            try
             {
-                startObject(args);
-                ClientToMaster remoteObject = null;
-                String url = "//" + getHostname() + ":" + Master.PORT + "/" + Master.CLIENT_SERVICE_NAME;
-                for (int i = 0;; i += 5000)
-                {
-                    try
-                    {
-                        remoteObject = (ClientToMaster) Naming.lookup(url);
-                    } catch (Exception ex)
-                    {
-                        tryAgain(i);
-                        continue;
-                    } 
-                    break;
-                }
-                return remoteObject;
+                remoteObject = (ClientToMaster) Naming.lookup(url);
+            } catch (Exception ex)
+            {
+                tryAgain(i);
+                continue;
             }
-        };
+            break;
+        }
+        return remoteObject;
     }
 }

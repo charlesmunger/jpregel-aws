@@ -2,7 +2,6 @@ package JpLAN;
 
 import api.MachineGroup;
 import java.io.IOException;
-import java.util.concurrent.Callable;
 import system.Worker;
 
 /**
@@ -38,35 +37,27 @@ public class LANWorkerMachineGroup extends MachineGroup<Worker>
     }
 
     @Override
-    public Callable<Worker> syncDeploy(final String... args)
+    public Worker syncDeploy(final String... args)
     {
-        return new Callable<Worker>()
+        for (int i = 0; i < numWorkers; i++)
         {
-
-            @Override
-            public Worker call() throws Exception
+            new Thread(new Runnable()
             {
-                for (int i = 0; i < numWorkers; i++)
+
+                @Override
+                public void run()
                 {
-                    new Thread(new Runnable()
+                    try
                     {
+                        Runtime.getRuntime().exec("java -server -cp ./dist/jpregel-aws.jar:./dist/lib/*  -Djava.security.policy=policy system.Worker " + args[0]);
 
-                        @Override
-                        public void run()
-                        {
-                            try
-                            {
-                                Runtime.getRuntime().exec("java -server -cp ./dist/jpregel-aws.jar:./dist/lib/*  -Djava.security.policy=policy system.Worker " + args[0]);
-
-                            } catch (IOException ex)
-                            {
-                                System.out.println("Failed to start java process." + ex.getLocalizedMessage());
-                            }
-                        }
-                    }).start();
+                    } catch (IOException ex)
+                    {
+                        System.out.println("Failed to start java process." + ex.getLocalizedMessage());
+                    }
                 }
-                return null;
-            }
-        };
+            }).start();
+        }
+        return null;
     }
 }

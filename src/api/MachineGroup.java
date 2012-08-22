@@ -19,10 +19,17 @@ public abstract class MachineGroup<T>
 {
     private ExecutorService exec = Executors.newCachedThreadPool();
     public abstract String getHostname();
-    public Future<T> deploy(String... args) throws IOException {
-        return exec.submit(syncDeploy(args));
+    public Future<T> deploy(final String... args) throws IOException {
+        return exec.submit(new Callable<T>() {
+
+            @Override
+            public T call() throws Exception
+            {
+                return syncDeploy(args);
+            }
+        });
     }
     public abstract void reset() throws IOException;
     public abstract void terminate() throws IOException;
-    public abstract Callable<T> syncDeploy(String... args);
+    public abstract T syncDeploy(String... args);
 }

@@ -41,8 +41,6 @@ import java.util.List;
     public void terminate() {
         instanceGroup.terminate();
     }
-
-    abstract void startObject(String[] args);
     
     abstract File getKey();
 }
