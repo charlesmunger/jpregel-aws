@@ -41,7 +41,7 @@ public class Ec2ReservationService extends ReservationServiceImpl
     public Ec2ReservationService()
     {
         heapSizeMap.put("m1.small", "-Xmx1600m -Xms1600m  ");
-        heapSizeMap.put("cc2.8xlarge","-Xmx58000m -Xms58000m");
+        heapSizeMap.put("cc2.8xlarge","-Xmx58000m ");
         heapSizeMap.put("m1.large","-Xmx7100m -Xms7100m");
         DescribeSecurityGroupsResult describeSecurityGroups = null;
         final DescribeSecurityGroupsRequest req = new DescribeSecurityGroupsRequest().withGroupNames(SECURITY_GROUP);
