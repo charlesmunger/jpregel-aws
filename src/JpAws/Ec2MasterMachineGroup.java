@@ -28,19 +28,18 @@ public class Ec2MasterMachineGroup extends Ec2MachineGroup<ClientToMaster>
     @Override
     void startObject(final String[] args)
     {
-        File privateKeyFile = PregelAuthenticator.getPrivateKey();
         File jars = new File("jars.tar");
-        if (!jars.exists())
-        {
-            try
-            {
-                Runtime.getRuntime().exec("tar -zcvf jars.tar ./dist/lib policy key.AWSkey");
-            } catch (IOException ex)
-            {
-                System.out.println("Error tarring jars.");
-                System.exit(1);
-            }
-        }
+//        if (!jars.exists())
+//        {
+//            try
+//            {
+//                Runtime.getRuntime().exec("tar -zcvf jars.tar ./dist/lib policy key.AWSkey");
+//            } catch (IOException ex)
+//            {
+//                System.out.println("Error tarring jars.");
+//                System.exit(1);
+//            }
+//        }
         try
         {
             System.out.println("Waiting");
@@ -69,7 +68,6 @@ public class Ec2MasterMachineGroup extends Ec2MachineGroup<ClientToMaster>
         try
         {
             sshClient.uploadFile(jars, "~/jars.tar");
-            sshClient.uploadFile(privateKeyFile, "~/" + privateKeyFile.getName());
             sshClient.executeCommand("tar -zxvf jars.tar", null);
         } catch (IOException ex)
         {
