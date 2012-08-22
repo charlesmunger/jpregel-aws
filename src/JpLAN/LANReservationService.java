@@ -1,6 +1,5 @@
 package JpLAN;
 
-import JpAws.Ec2ReservationService;
 import api.MachineGroup;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
@@ -33,6 +32,7 @@ public class LANReservationService extends ReservationServiceImpl {
         Future<MachineGroup<Worker>> workers = rs.reserveWorkers("m1.small", numWorkers);
         Future<ClientToMaster> deployMaster = masterMachine.get().deploy(Integer.toString(numWorkers));
         workers.get().deploy(masterMachine.get().getHostname());
+        System.out.println("Cluster created with "+ numWorkers +" workers");
         return deployMaster.get();
     }
 }

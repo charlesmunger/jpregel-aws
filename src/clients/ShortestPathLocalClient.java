@@ -1,13 +1,6 @@
 package clients;
 
-import system.MasterGraphMakerG1;
-import system.MasterOutputMakerStandard;
-import system.Client;
-import system.Job;
-import system.AggregatorSumInteger;
-import system.VertexShortestPath;
-import system.WorkerGraphMakerStandard;
-import system.WorkerOutputMakerStandard;
+import system.*;
 
 /**
  *
@@ -37,7 +30,8 @@ public class ShortestPathLocalClient
                 );
         System.out.println(job + "\n         numWorkers: " + numWorkers );
         boolean isEc2Master = false;
-        Client.run(job, isEc2Master, numWorkers);
+        ClientToMaster master = LocalReservationService.newLocalCluster(numWorkers);
+        System.out.println(master.run(job, isEc2Master));
         System.exit(0);
     }
 }

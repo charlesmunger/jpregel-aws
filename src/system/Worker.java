@@ -57,7 +57,7 @@ public final class Worker extends ServiceImpl
     private final static RemoteExceptionHandler REMOTE_EXCEPTION_HANDLER = new DefaultRemoteExceptionHandler(); 
     
     private final Proxy masterProxy;
-    private final int myWorkerNum;
+    private int myWorkerNum;
     private final ComputeThread[] computeThreads;
     
     private Map<Integer, Service> workerNumToWorkerMap;
@@ -82,19 +82,16 @@ public final class Worker extends ServiceImpl
     // constants
     private final Command AddVertexToPartCompleteCommand = new AddVertexToPartComplete();
     private final Command MessageReceived = new MessageReceived();
-    
+    private final Service master;
     Worker( Service master ) throws RemoteException
     {
         // set Jicos Service attributes
         super( command2DepartmentArray );
         super.setService( this ); //TODO leaking partially constructed object
         super.setDepartments( departments );
-        
+        this.master = master;
         masterProxy = new ProxyMaster( master, this, REMOTE_EXCEPTION_HANDLER );
-        CommandSynchronous command = new RegisterWorker( serviceName() ); 
-        myWorkerNum = (Integer) master.executeCommand( this, command ); //TODO leaking partially constructed object
-        super.register ( master );
-        
+                
         int numAvailableProcessors = Runtime.getRuntime().availableProcessors();
         System.out.println("Worker.constructor: Available processors: " + numAvailableProcessors ) ; 
         computeThreads = new ComputeThread[ numAvailableProcessors ];
@@ -102,6 +99,12 @@ public final class Worker extends ServiceImpl
         {
             computeThreads[i] = new ComputeThread( this );
         }
+    }
+    
+    void init() throws RemoteException {
+        CommandSynchronous command = new RegisterWorker( serviceName() ); 
+        myWorkerNum = (Integer) master.executeCommand( this, command ); //TODO leaking partially constructed object
+        super.register ( master );
     }
     
     void startComputeThreads()
