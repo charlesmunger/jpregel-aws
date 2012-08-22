@@ -90,7 +90,7 @@ public class S3FileSystem extends FileSystem
         return new S3Writer(thread, new OutputStreamWriter(out));
     }
 
-    class S3Writer extends BufferedWriter
+    private class S3Writer extends BufferedWriter
     {
 
         private Thread S3threadt;

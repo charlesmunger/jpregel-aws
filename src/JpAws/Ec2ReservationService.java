@@ -7,6 +7,7 @@ import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.*;
 import datameer.awstasks.aws.ec2.InstanceGroupImpl;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -88,5 +89,14 @@ public class Ec2ReservationService implements ReservationService
                 return new Ec2MasterMachineGroup(instanceGroup, heapSizeMap.get(instanceType));
             }
         });
+    }
+    
+   public static ClientToMaster newSmallCluster(int numWorkers) throws InterruptedException, InterruptedException, ExecutionException, IOException {
+        Ec2ReservationService rs = new Ec2ReservationService();
+        Future<MachineGroup<ClientToMaster>> masterMachine = rs.reserveMaster("m1.small");
+        Future<MachineGroup<Worker>> workers = rs.reserveWorkers("m1.small", numWorkers);
+        Future<ClientToMaster> deployMaster = masterMachine.get().deploy(Integer.toString(numWorkers));
+        workers.get().deploy(masterMachine.get().getHostname());
+        return deployMaster.get();
     }
 }
