@@ -78,7 +78,7 @@ public class Ec2WorkerMachineGroup extends Ec2MachineGroup<Worker>
                     sshClient.executeCommand("java -server -cp " + JARNAME + ":./dist/lib/*"
                             + " -Djava.security.policy=policy "
                             + heapsize
-                            + " system.Worker " + args[0], System.out);
+                            + " JpAWS.Ec2Worker " + args[0], System.out);
                 } catch (IOException ex)
                 {
                     System.out.println("Workers terminated");

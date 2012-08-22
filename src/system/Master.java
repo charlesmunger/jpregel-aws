@@ -111,10 +111,9 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
 
     /*
      * @param Job   - problem and instance parameters
-     * @param isEc2 - run mode: EC2 (true) | local (false)
      */
     @Override
-    public JobRunData run(Job job, boolean isEc2) 
+    public JobRunData run(Job job) 
     {
         System.out.println("Run entered");
         // all Workers have registered with Master
@@ -127,7 +126,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         FileSystem fileSystem = makeFileSystem( jobDirectoryName);
         numUnfinishedWorkers = integerToWorkerMap.size();
         commandExeutionIsComplete = false;
-        Command command = new SetJob(job, isEc2);
+        Command command = new SetJob(job);
         broadcast(command, this);
 
         // while workers SetJob, read Job input file, write Worker input files

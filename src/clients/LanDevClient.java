@@ -24,8 +24,7 @@ public class LanDevClient {
                   new AggregatorSumInteger()    // step    agregator
                 );
         System.out.println(job + "\n         numWorkers: " + numWorkers );
-        boolean isEc2Master = false;
-        System.out.println(LANReservationService.newLocalCluster(numWorkers).run(job, isEc2Master));
+        System.out.println(LANReservationService.newLocalCluster(numWorkers).run(job));
         System.exit(0);
     }
 }

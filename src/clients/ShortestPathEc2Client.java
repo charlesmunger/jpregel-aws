@@ -24,7 +24,7 @@ public class ShortestPathEc2Client  {
                 new WorkerOutputMakerStandard()
                 );
         System.out.println( job + "\n        numWorkers:" + numWorkers );
-        System.out.println(Ec2ReservationService.newSmallCluster(numWorkers).run(job, true));
+        System.out.println(Ec2ReservationService.newSmallCluster(numWorkers).run(job));
         System.out.println("Currently, termination of premade clusters is not implemented.");
         System.out.println("Please don't forget to terminate via the webui.");
     }

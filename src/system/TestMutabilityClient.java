@@ -25,9 +25,8 @@ public class TestMutabilityClient
                 new WorkerOutputMakerStandard()
                 );
         System.out.println( job + "\n        numWorkers: " + numWorkers );
-        boolean isEc2Master = false;
         ClientToMaster master = LocalReservationService.newLocalCluster(numWorkers);
-        System.out.println(master.run(job, isEc2Master));
+        System.out.println(master.run(job));
         System.exit( 0 );
     }
 }

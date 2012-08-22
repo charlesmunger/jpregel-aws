@@ -28,7 +28,7 @@ public class BinaryTreeShortestPathLocalClient
                 );
         System.out.println( job + "\n    numWorkers: " + numWorkers );
         ClientToMaster master = LocalReservationService.newLocalCluster(numWorkers);
-        System.out.println(master.run(job, false));
+        System.out.println(master.run(job));
         System.exit( 0 );
     }
 }

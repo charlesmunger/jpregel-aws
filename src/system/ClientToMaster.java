@@ -11,7 +11,7 @@ public interface ClientToMaster extends Remote
 {
     void init( int numWorkers) throws RemoteException;
     
-    JobRunData run( Job job, boolean isEc2 ) throws RemoteException;
+    JobRunData run( Job job) throws RemoteException;
     
     void setWorkerMap() throws RemoteException;
     
