@@ -133,7 +133,7 @@ public class Ec2MasterMachineGroup extends Ec2MachineGroup<ClientToMaster>
             {
                 startObject(args);
                 ClientToMaster remoteObject = null;
-                String url = "//" + getHostname() + ":" + Master.PORT + "/" + Master.SERVICE_NAME;
+                String url = "//" + getHostname() + ":" + Master.PORT + "/" + Master.CLIENT_SERVICE_NAME;
                 for (int i = 0;; i += 5000)
                 {
                     try
