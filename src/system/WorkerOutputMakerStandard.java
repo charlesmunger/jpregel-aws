@@ -22,8 +22,8 @@ public class WorkerOutputMakerStandard implements WorkerOutputMaker
         {
             for (VertexImpl vertex : part.getVertices())
             {
-//                bufferedWriter.write(vertex.output());
-//                bufferedWriter.newLine();
+                bufferedWriter.write(vertex.output());
+                bufferedWriter.newLine();
             }
         }
 
