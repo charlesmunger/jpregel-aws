@@ -1,7 +1,5 @@
 package api;
 
-//TODO: Factor out conditional (isEc2) from file opening in make method.
-
 import system.FileSystem;
 
 //     Put this code in the subclasses of FileSystem. Then, invoke the 
