@@ -438,6 +438,7 @@ public final class Worker extends ServiceImpl
         String masterDomainName = args[0];
         Service master = getMaster( masterDomainName );          
         Worker worker = new Worker( master );
+        worker.init();
         worker.startComputeThreads();
         out.println( "Worker: Ready." );
     }
