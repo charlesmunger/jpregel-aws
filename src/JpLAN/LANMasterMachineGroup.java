@@ -42,16 +42,16 @@ class LANMasterMachineGroup implements MachineGroup<ClientToMaster> {
             @Override
             public void run()
             {
-//                try
-//                {
-//                    Runtime.getRuntime().exec("java -server -cp ./dist/jpregel-aws.jar:./dist/lib/*  -Djava.security.policy=policy JpLAN.LANMaster");
-//                } catch (IOException ex)
-//                {
-//                    System.out.println("Failed to start java process." +ex.getLocalizedMessage());
-//                }
+                try
+                {
+                    Runtime.getRuntime().exec("java -server -cp ./dist/jpregel-aws.jar:./dist/lib/*  -Djava.security.policy=policy JpLAN.LANMaster");
+                } catch (IOException ex)
+                {
+                    System.out.println("Failed to start java process." +ex.getLocalizedMessage());
+                }
             }
         }).start();
-        String url = "//" + getHostname() + ":" + Master.PORT + "/" + Master.SERVICE_NAME;
+        String url = "//" + getHostname() + ":" + Master.PORT + "/" + Master.CLIENT_SERVICE_NAME;
         ClientToMaster remoteObject = null;
         for(int i  = 0;;i+=300) {
             try

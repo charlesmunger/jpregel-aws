@@ -24,6 +24,7 @@ public class LANMaster extends Master {
         ClientToMaster master = new LANMaster();
         registry.bind(SERVICE_NAME, master);
         master.init(Integer.parseInt(args[0]));
+        registry.bind(CLIENT_SERVICE_NAME, master);
         System.out.println("LANMaster ready");
     }
     

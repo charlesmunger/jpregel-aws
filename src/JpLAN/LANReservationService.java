@@ -8,7 +8,7 @@ import api.ReservationService;
  * @author charlesmunger
  */
 public class LANReservationService implements ReservationService{
-
+    
     @Override
     public MachineGroup reserveWorkers(String instanceType, int numberOfWorkers)
     {

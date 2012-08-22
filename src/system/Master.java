@@ -51,6 +51,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
             SuperStepComplete.class
         }
     };
+    public static final String CLIENT_SERVICE_NAME = "ClientToMaster";
     
     // Master attributes
     private Map<Integer, Service> integerToWorkerMap = new HashMap<Integer, Service>();

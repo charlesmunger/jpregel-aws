@@ -32,7 +32,7 @@ public class LanDevClient {
                 );
         System.out.println(job + "\n         numWorkers: " + numWorkers );
         boolean isEc2Master = false;
-        deploy.run(job, isEc2Master);
+        System.out.println(deploy.run(job, isEc2Master));
         System.exit(0);
     }
 }
