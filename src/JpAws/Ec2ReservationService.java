@@ -1,7 +1,6 @@
 package JpAws;
 
 import api.MachineGroup;
-import api.ReservationService;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
@@ -14,13 +13,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 import system.ClientToMaster;
+import system.ReservationServiceImpl;
 import system.Worker;
 
 /**
  *
  * @author charlesmunger
  */
-public class Ec2ReservationService implements ReservationService
+public class Ec2ReservationService extends ReservationServiceImpl
 {
 
     private final AmazonEC2 ec2 = new AmazonEC2Client(PregelAuthenticator.get());
@@ -52,51 +52,35 @@ public class Ec2ReservationService implements ReservationService
         }
     }
 
-    @Override
-    public Future<MachineGroup<Worker>> reserveWorkers(final String instanceType, final int numWorkers)
+    public static ClientToMaster newSmallCluster(int numWorkers) throws InterruptedException, InterruptedException, ExecutionException, IOException
     {
-        return exec.submit(new Callable<MachineGroup<Worker>>()
-        {
-
-            @Override
-            public MachineGroup<Worker> call() throws Exception
-            {
-                InstanceGroupImpl instanceGroup = new InstanceGroupImpl(ec2);
-
-                RunInstancesRequest launchConfiguration = new RunInstancesRequest(Machine.AMIID, numWorkers, numWorkers).withKeyName(PregelAuthenticator.getPrivateKeyName()).withInstanceType(instanceType).withSecurityGroupIds(Ec2Machine.SECURITY_GROUP);
-                System.out.println(launchConfiguration.toString());
-
-                instanceGroup.launch(launchConfiguration, TimeUnit.MINUTES, 5);
-                return new Ec2WorkerMachineGroup(instanceGroup, heapSizeMap.get(instanceType));
-            }
-        });
-    }
-
-    @Override
-    public Future<MachineGroup<ClientToMaster>> reserveMaster(final String instanceType)
-    {
-        return exec.submit(new Callable<MachineGroup<ClientToMaster>>()
-        {
-
-            @Override
-            public MachineGroup<ClientToMaster> call() throws Exception
-            {
-                InstanceGroupImpl instanceGroup = new InstanceGroupImpl(ec2);
-                RunInstancesRequest launchConfiguration = new RunInstancesRequest(Machine.AMIID, 1, 1).withKeyName(PregelAuthenticator.getMasterPrivateKeyName()).withInstanceType(instanceType).withSecurityGroupIds(Ec2Machine.SECURITY_GROUP);
-                System.out.println(launchConfiguration.toString());
-
-                Reservation rs = instanceGroup.launch(launchConfiguration, TimeUnit.MINUTES, 5);
-                return new Ec2MasterMachineGroup(instanceGroup, heapSizeMap.get(instanceType));
-            }
-        });
-    }
-    
-   public static ClientToMaster newSmallCluster(int numWorkers) throws InterruptedException, InterruptedException, ExecutionException, IOException {
         Ec2ReservationService rs = new Ec2ReservationService();
         Future<MachineGroup<ClientToMaster>> masterMachine = rs.reserveMaster("m1.small");
         Future<MachineGroup<Worker>> workers = rs.reserveWorkers("m1.small", numWorkers);
         Future<ClientToMaster> deployMaster = masterMachine.get().deploy(Integer.toString(numWorkers));
         workers.get().deploy(masterMachine.get().getHostname());
         return deployMaster.get();
+    }
+
+    @Override
+    public MachineGroup<Worker> callWorker(String instanceType, int numberOfWorkers)
+    {
+        InstanceGroupImpl instanceGroup = new InstanceGroupImpl(ec2);
+
+        RunInstancesRequest launchConfiguration = new RunInstancesRequest(Machine.AMIID, numberOfWorkers, numberOfWorkers).withKeyName(PregelAuthenticator.getPrivateKeyName()).withInstanceType(instanceType).withSecurityGroupIds(Ec2Machine.SECURITY_GROUP);
+        System.out.println(launchConfiguration.toString());
+
+        instanceGroup.launch(launchConfiguration, TimeUnit.MINUTES, 5);
+        return new Ec2WorkerMachineGroup(instanceGroup, heapSizeMap.get(instanceType));
+    }
+
+    @Override
+    public MachineGroup<ClientToMaster> callMaster(String instanceType)
+    {
+        InstanceGroupImpl instanceGroup = new InstanceGroupImpl(ec2);
+        RunInstancesRequest launchConfiguration = new RunInstancesRequest(Machine.AMIID, 1, 1).withKeyName(PregelAuthenticator.getMasterPrivateKeyName()).withInstanceType(instanceType).withSecurityGroupIds(Ec2Machine.SECURITY_GROUP);
+        System.out.println(launchConfiguration.toString());
+        instanceGroup.launch(launchConfiguration, TimeUnit.MINUTES, 5);
+        return new Ec2MasterMachineGroup(instanceGroup, heapSizeMap.get(instanceType));
     }
 }
