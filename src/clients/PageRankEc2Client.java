@@ -3,7 +3,7 @@ package clients;
 import JpAws.Ec2ReservationService;
 import system.*;
 
-public class PageRankEc2Client extends Client
+public class PageRankEc2Client 
 {
     public static void main( String[] args ) throws Exception
     {

@@ -192,7 +192,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     }
 
     @Override
-    abstract public void shutdown(); 
+    public void shutdown(){} //Master deployment and shutdown is handled at the machine level. 
 
 
     /* _____________________________

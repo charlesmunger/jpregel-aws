@@ -7,7 +7,7 @@ import system.*;
  *
  * @author charlesmunger
  */
-public class ShortestPathEc2Client extends Client {
+public class ShortestPathEc2Client  {
     public static void main(String[] args) throws Exception {
         int numWorkers = Integer.parseInt(args[1]);
         int computeThreadsPerWorker = Runtime.getRuntime().availableProcessors();
