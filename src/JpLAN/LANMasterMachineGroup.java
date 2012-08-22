@@ -3,6 +3,7 @@ package JpLAN;
 import api.MachineGroup;
 import java.io.IOException;
 import java.rmi.Naming;
+import java.util.concurrent.Callable;
 import system.ClientToMaster;
 import system.Master;
 
@@ -10,7 +11,8 @@ import system.Master;
  *
  * @author charlesmunger
  */
-class LANMasterMachineGroup implements MachineGroup<ClientToMaster> {
+class LANMasterMachineGroup extends MachineGroup<ClientToMaster>
+{
 
     public LANMasterMachineGroup()
     {
@@ -35,39 +37,50 @@ class LANMasterMachineGroup implements MachineGroup<ClientToMaster> {
     }
 
     @Override
-    public ClientToMaster deploy(String... args) throws IOException
+    public Callable<ClientToMaster> syncDeploy(String... args)
     {
-        new Thread(new Runnable() {
+        return new Callable<ClientToMaster>()
+        {
 
             @Override
-            public void run()
+            public ClientToMaster call() throws Exception
             {
-                try
+                new Thread(new Runnable()
                 {
-                    Runtime.getRuntime().exec("java -server -cp ./dist/jpregel-aws.jar:./dist/lib/*  -Djava.security.policy=policy JpLAN.LANMaster");
-                } catch (IOException ex)
-                {
-                    System.out.println("Failed to start java process." +ex.getLocalizedMessage());
-                }
-            }
-        }).start();
-        String url = "//" + getHostname() + ":" + Master.PORT + "/" + Master.CLIENT_SERVICE_NAME;
-        ClientToMaster remoteObject = null;
-        for(int i  = 0;;i+=300) {
-            try
-            {
-                 remoteObject = (ClientToMaster) Naming.lookup(url);
-            } catch (Exception ex)
-            {
-                try
-                {
-                    Thread.sleep(300);
-                } catch (InterruptedException ex1){}
-                continue;
-            }
-            break;
-        }
-        return remoteObject;
-    }
 
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            Runtime.getRuntime().exec("java -server -cp ./dist/jpregel-aws.jar:./dist/lib/*  -Djava.security.policy=policy JpLAN.LANMaster");
+                        } catch (IOException ex)
+                        {
+                            System.out.println("Failed to start java process." + ex.getLocalizedMessage());
+                        }
+                    }
+                }).start();
+                String url = "//" + getHostname() + ":" + Master.PORT + "/" + Master.CLIENT_SERVICE_NAME;
+                ClientToMaster remoteObject = null;
+                for (int i = 0;; i += 300)
+                {
+                    try
+                    {
+                        remoteObject = (ClientToMaster) Naming.lookup(url);
+                    } catch (Exception ex)
+                    {
+                        try
+                        {
+                            Thread.sleep(300);
+                        } catch (InterruptedException ex1)
+                        {
+                        }
+                        continue;
+                    }
+                    break;
+                }
+                return remoteObject;
+            }
+        };
+    }
 }
