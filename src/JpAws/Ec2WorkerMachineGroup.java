@@ -4,6 +4,7 @@ import datameer.awstasks.aws.ec2.InstanceGroup;
 import datameer.awstasks.aws.ec2.ssh.SshClient;
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import system.Worker;
@@ -20,7 +21,7 @@ public class Ec2WorkerMachineGroup extends Ec2MachineGroup<Worker>
 
     public Ec2WorkerMachineGroup(InstanceGroup i, String heapsize)
     {
-        super(i,heapsize);
+        super(i, heapsize);
     }
 
     @Override
@@ -32,7 +33,7 @@ public class Ec2WorkerMachineGroup extends Ec2MachineGroup<Worker>
         {
             System.out.println("Error fetching jars file - " + jars.getAbsolutePath());
         }
-        
+
         final SshClient sshClient = instanceGroup.createSshClient("ec2-user", privateKeyFile, false);
         File thisjar = new File(JARNAME);
         File distjar = new File("dist/" + JARNAME);
@@ -103,9 +104,17 @@ public class Ec2WorkerMachineGroup extends Ec2MachineGroup<Worker>
     }
 
     @Override
-    public Worker deploy(String... args) throws IOException
+    public Callable<Worker> syncDeploy(final String... args)
     {
-        startObject(args);
-        return null;
+        return new Callable<Worker>()
+        {
+
+            @Override
+            public Worker call() throws Exception
+            {
+                startObject(args);
+                return null;
+            }
+        };
     }
 }

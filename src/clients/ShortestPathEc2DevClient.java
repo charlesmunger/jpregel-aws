@@ -2,6 +2,7 @@ package clients;
 
 import JpAws.Ec2ReservationService;
 import api.MachineGroup;
+import java.util.concurrent.Future;
 import system.*;
 
 /**
@@ -12,10 +13,10 @@ public class ShortestPathEc2DevClient extends Client {
     public static void main(String[] args) throws Exception {
         int numWorkers = Integer.parseInt(args[1]);
         Ec2ReservationService rs = new Ec2ReservationService();
-        MachineGroup master = rs.reserveMaster("m1.small");
-        MachineGroup workers = rs.reserveWorkers("m1.small", numWorkers);
-        ClientToMaster deploy = (ClientToMaster) master.deploy(args[1]);
-        workers.deploy(master.getHostname());
+        Future<MachineGroup<ClientToMaster>> masterMachine = rs.reserveMaster("m1.small");
+        Future<MachineGroup<Worker>> workers = rs.reserveWorkers("m1.small", numWorkers);
+        Future<ClientToMaster> deployMaster = masterMachine.get().deploy(args[1]);
+        workers.get().deploy(masterMachine.get().getHostname());
         
         int computeThreadsPerWorker = Runtime.getRuntime().availableProcessors();
         int numParts = numWorkers * computeThreadsPerWorker * 2; 
@@ -31,8 +32,8 @@ public class ShortestPathEc2DevClient extends Client {
                 new WorkerOutputMakerStandard()
                 );
         System.out.println( job + "\n        numWorkers:" + numWorkers );
-        deploy.run(job, true);
-        master.terminate();
-        workers.terminate();
+        System.out.println(deployMaster.get().run(job, true));
+        masterMachine.get().terminate();
+        workers.get().terminate();
     }
 }

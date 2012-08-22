@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author charlesmunger
  */
- abstract class Ec2MachineGroup<T> implements MachineGroup<T>
+ abstract class Ec2MachineGroup<T> extends MachineGroup<T>
 {
 
     private final String[] hostNames;

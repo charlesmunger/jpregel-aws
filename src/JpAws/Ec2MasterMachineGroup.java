@@ -4,10 +4,8 @@ import datameer.awstasks.aws.ec2.InstanceGroup;
 import datameer.awstasks.aws.ec2.ssh.SshClient;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.rmi.Naming;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
+import java.util.concurrent.Callable;
 import system.ClientToMaster;
 import system.Master;
 
@@ -20,6 +18,7 @@ public class Ec2MasterMachineGroup extends Ec2MachineGroup<ClientToMaster>
 
     public static final String JARNAME = "jpregel-aws.jar";
     private final String hostName;
+
     public Ec2MasterMachineGroup(InstanceGroup i, String heapsize)
     {
         super(i, heapsize);
@@ -110,33 +109,6 @@ public class Ec2MasterMachineGroup extends Ec2MachineGroup<ClientToMaster>
         return hostName;
     }
 
-    @Override
-    public ClientToMaster deploy(String... args) throws IOException
-    {
-        startObject(args);
-        ClientToMaster remoteObject = null;
-        String url = "//" + getHostname() + ":" + Master.PORT + "/" + Master.SERVICE_NAME;
-        for (int i = 0;; i += 5000)
-        {
-            try
-            {
-                remoteObject = (ClientToMaster) Naming.lookup(url);
-            } catch (NotBoundException ex)
-            {
-                tryAgain(i);
-                continue;
-            } catch (RemoteException r)
-            {
-                tryAgain(i);
-                continue;
-            } catch (MalformedURLException ex)
-            {
-            }
-            break;
-        }
-        return remoteObject;
-    }
-
     private void tryAgain(int i)
     {
         if (i > 120000)
@@ -150,5 +122,34 @@ public class Ec2MasterMachineGroup extends Ec2MachineGroup<ClientToMaster>
         {
             System.out.println("Waiting interrupted, trying again immediately");
         }
+    }
+
+    @Override
+    public Callable<ClientToMaster> syncDeploy(final String... args)
+    {
+        return new Callable<ClientToMaster>()
+        {
+
+            @Override
+            public ClientToMaster call() throws Exception
+            {
+                startObject(args);
+                ClientToMaster remoteObject = null;
+                String url = "//" + getHostname() + ":" + Master.PORT + "/" + Master.SERVICE_NAME;
+                for (int i = 0;; i += 5000)
+                {
+                    try
+                    {
+                        remoteObject = (ClientToMaster) Naming.lookup(url);
+                    } catch (Exception ex)
+                    {
+                        tryAgain(i);
+                        continue;
+                    } 
+                    break;
+                }
+                return remoteObject;
+            }
+        };
     }
 }
