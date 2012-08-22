@@ -22,7 +22,7 @@ public class Ec2MasterMachineGroup extends Ec2MachineGroup<ClientToMaster>
     public Ec2MasterMachineGroup(InstanceGroup i, String heapsize)
     {
         super(i, heapsize);
-        hostName = i.getInstances(true).get(0).getPublicDnsName();
+        hostName = i.getInstances(true).get(0).getPrivateDnsName();
     }
 
     @Override

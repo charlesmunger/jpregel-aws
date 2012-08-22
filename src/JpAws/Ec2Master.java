@@ -29,6 +29,7 @@ public class Ec2Master extends Master
         ClientToMaster master = new Ec2Master();
         registry.bind(SERVICE_NAME, master);
         master.init(Integer.parseInt(args[0]));
+        System.out.println("About to bind");
         registry.bind(CLIENT_SERVICE_NAME, master);
         System.out.println("Ec2Master: Ready.");
     }
