@@ -17,11 +17,10 @@ public class ShortestPathLocalClient
 {
     /**
      * @param args [0]: Job Directory
-     *             [1]: Number of Workers
      */
     public static void main(String[] args) throws Exception 
     {
-        int numWorkers = Integer.parseInt(args[1]);
+        int numWorkers = Integer.parseInt( args[1] );
         int computeThreadsPerWorker = Runtime.getRuntime().availableProcessors();
         int numParts = numWorkers * computeThreadsPerWorker * 2;
         Job job = new Job("Shortest Path Problem", // jobName

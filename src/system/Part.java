@@ -42,6 +42,9 @@ public final class Part
     {
         vertex.setPart( this );
         vertexIdToVertexMap.put( vertex.getVertexId(), vertex );
+        // TODO Modify Part and WorkerGraphMaker classes so that a vertex is put in the initial activeSet
+        // by the WorkerGraphMaker (and may or may not depend on its being a source)
+        // TODO Eliminate isSource() from the Vertex API; it is not, in general, known by the vertex.
         if ( vertex.isSource() )
         {
             Set<VertexImpl> activeSet = superstepToActiveSetMap.get( new Long(0) );
