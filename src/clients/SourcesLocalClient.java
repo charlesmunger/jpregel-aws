@@ -1,7 +1,8 @@
 package clients;
 
-import system.Client;
+import system.ClientToMaster;
 import system.Job;
+import system.LocalReservationService;
 import system.MasterGraphMakerStandard;
 import system.MasterOutputMakerStandard;
 import system.VertexSources;
@@ -34,8 +35,8 @@ public class SourcesLocalClient
                 new WorkerOutputMakerStandard()                 
                 );
         System.out.println( job + "\n    numWorkers: " + numWorkers );
-        boolean isEc2Master = false;
-        Client.run( job, isEc2Master, numWorkers);
+        ClientToMaster master = LocalReservationService.newLocalCluster(numWorkers);
+        System.out.println(master.run(job));
         System.exit( 0 );
     }
 }
