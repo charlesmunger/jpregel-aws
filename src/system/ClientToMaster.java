@@ -9,9 +9,9 @@ import java.rmi.RemoteException;
  */
 public interface ClientToMaster extends Remote
 {
-    void makeWorkers( int numWorkers, String masterDomainName) throws RemoteException;
+    void init( int numWorkers) throws RemoteException;
     
-    JobRunData run( Job job, boolean isEc2 ) throws RemoteException;
+    JobRunData run( Job job) throws RemoteException;
     
     void setWorkerMap() throws RemoteException;
     

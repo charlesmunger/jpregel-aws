@@ -14,26 +14,11 @@ public class LocalMaster extends Master
     public LocalMaster() throws RemoteException {}
     
     @Override
-    public void constructWorkers( int numWorkers, String masterDomainName ) throws RemoteException
-    {
-        workers = new Worker[ numWorkers ];
-        for ( int workerNum = 0; workerNum < numWorkers; workerNum++ )
-        {
-            workers[ workerNum ] = new Worker( this );
-            workers[ workerNum ].startComputeThreads();
-        }
-    }
-    
-    public void startWorkers( int numWorkers, String masterDomainName ) throws RemoteException {}
-    
-    @Override
     public void shutdown() {}
-    
-    public void stopWorkers() {}
-    
-    public static void main(String[] args) throws RemoteException
+
+    @Override
+    public FileSystem makeFileSystem(String jobDirectoryName)
     {
-        ClientToMaster master = new LocalMaster();
-        System.out.println("LocalMaster: Ready.");
+        return new LocalFileSystem(jobDirectoryName);
     }
 }

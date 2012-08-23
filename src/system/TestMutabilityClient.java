@@ -1,19 +1,5 @@
 package system;
 
-
-import system.VertexTestMutability;
-import system.MasterGraphMakerStandard;
-import system.MasterOutputMakerStandard;
-import system.Client;
-import system.Job;
-import api.MasterGraphMaker;
-import system.VertexImpl;
-import api.MasterOutputMaker;
-import api.WorkerGraphMaker;
-import api.WorkerOutputMaker;
-import system.WorkerGraphMakerStandard;
-import system.WorkerOutputMakerStandard;
-
 /**
  *
  * @author Pete Cappello
@@ -39,8 +25,8 @@ public class TestMutabilityClient
                 new WorkerOutputMakerStandard()
                 );
         System.out.println( job + "\n        numWorkers: " + numWorkers );
-        boolean isEc2Master = false;
-        Client.run( job, isEc2Master, numWorkers);
+        ClientToMaster master = LocalReservationService.newLocalCluster(numWorkers);
+        System.out.println(master.run(job));
         System.exit( 0 );
     }
 }

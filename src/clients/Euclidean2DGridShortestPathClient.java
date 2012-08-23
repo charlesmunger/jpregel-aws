@@ -1,17 +1,6 @@
 package clients;
 
-import api.MasterOutputMaker;
-import api.MasterGraphMaker;
-import api.WorkerGraphMaker;
-import api.WorkerOutputMaker;
-import static java.lang.System.out;
-import system.MasterGraphMakerGrid;
-import system.MasterOutputMakerStandard;
 import system.*;
-import system.AggregatorSumInteger;
-import system.VertexShortestPathEuclidean;
-import system.WorkerGraphMakerGrid;
-import system.WorkerOutputMakerStandard;
 
 /**
  *
@@ -42,9 +31,8 @@ public class Euclidean2DGridShortestPathClient
                 );
         System.out.println( job + "\n      numWorkers: " + numWorkers );
         
-        boolean   isEc2Master = false;
         System.out.println("Euclidean2DGridShortestPathClient.main: about to invoke Client.run");
-        Client.run( job, isEc2Master, numWorkers); 
-        System.exit( 0 );
+        ClientToMaster master = LocalReservationService.newLocalCluster(numWorkers);
+        System.out.println(master.run(job));        System.exit( 0 );
     }
 }

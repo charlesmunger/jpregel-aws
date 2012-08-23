@@ -11,7 +11,6 @@
 // TODO FIX jicosfoundation Processor thread invokes start() in its constructor
 package system;
 
-import JpAws.S3FileSystem;
 import api.Aggregator;
 import java.io.IOException;
 import static java.lang.System.out;
@@ -31,7 +30,7 @@ import system.commands.*;
  *
  * @author Peter Cappello
  */
-public final class Worker extends ServiceImpl
+public class Worker extends ServiceImpl
 {
     // ServiceImpl attributes
     static public String SERVICE_NAME = "Master";
@@ -57,7 +56,7 @@ public final class Worker extends ServiceImpl
     private final static RemoteExceptionHandler REMOTE_EXCEPTION_HANDLER = new DefaultRemoteExceptionHandler(); 
     
     private final Proxy masterProxy;
-    private final int myWorkerNum;
+    private int myWorkerNum;
     private final ComputeThread[] computeThreads;
     
     private Map<Integer, Service> workerNumToWorkerMap;
@@ -82,19 +81,16 @@ public final class Worker extends ServiceImpl
     // constants
     private final Command AddVertexToPartCompleteCommand = new AddVertexToPartComplete();
     private final Command MessageReceived = new MessageReceived();
-    
-    Worker( Service master ) throws RemoteException
+    private final Service master;
+    public Worker( Service master ) throws RemoteException
     {
         // set Jicos Service attributes
         super( command2DepartmentArray );
         super.setService( this ); //TODO leaking partially constructed object
         super.setDepartments( departments );
-        
+        this.master = master;
         masterProxy = new ProxyMaster( master, this, REMOTE_EXCEPTION_HANDLER );
-        CommandSynchronous command = new RegisterWorker( serviceName() ); 
-        myWorkerNum = (Integer) master.executeCommand( this, command ); //TODO leaking partially constructed object
-        super.register ( master );
-        
+                
         int numAvailableProcessors = Runtime.getRuntime().availableProcessors();
         System.out.println("Worker.constructor: Available processors: " + numAvailableProcessors ) ; 
         computeThreads = new ComputeThread[ numAvailableProcessors ];
@@ -102,6 +98,17 @@ public final class Worker extends ServiceImpl
         {
             computeThreads[i] = new ComputeThread( this );
         }
+    }
+    
+    public void start() throws RemoteException {
+        init();
+        startComputeThreads();
+    }
+    
+    void init() throws RemoteException {
+        CommandSynchronous command = new RegisterWorker( serviceName() ); 
+        myWorkerNum = (Integer) master.executeCommand( this, command ); //TODO leaking partially constructed object
+        super.register ( master );
     }
     
     void startComputeThreads()
@@ -124,7 +131,7 @@ public final class Worker extends ServiceImpl
         part.add( vertex );
     }
     
-    synchronized public FileSystem getFileSystem() { return fileSystem; }
+    //synchronized public FileSystem getFileSystem() { return fileSystem; }
     
     synchronized public Collection<Part> getParts() { return partIdToPartMap.values(); }
     
@@ -202,9 +209,9 @@ public final class Worker extends ServiceImpl
         }
     }
     
-    private FileSystem makeFileSystem( boolean isEc2, String jobDirectoryName )
+    public FileSystem makeFileSystem( String jobDirectoryName)
     {
-        return ( isEc2 ) ? new S3FileSystem( jobDirectoryName) : new LocalFileSystem( jobDirectoryName );
+        return new LocalFileSystem( jobDirectoryName );
     }
     
     @Override
@@ -298,12 +305,12 @@ public final class Worker extends ServiceImpl
     }
     
     // Command: SetJob 
-    synchronized public void setJob( Job job, boolean isEc2 )
+    synchronized public void setJob( Job job)
     {
         superStep = -1L;
         this.job = job;
         String jobDirectoryName = job.getJobDirectoryName();
-        fileSystem = makeFileSystem( isEc2, jobDirectoryName );
+        fileSystem = makeFileSystem( jobDirectoryName );
         job.setFileSystem( fileSystem );
         Command command = new JobSet( myWorkerNum );
         masterProxy.execute( command );
@@ -434,7 +441,8 @@ public final class Worker extends ServiceImpl
         }
         String masterDomainName = args[0];
         Service master = getMaster( masterDomainName );          
-        Worker worker = new Worker( master );
+        Worker worker = new Worker(master);
+        worker.init();
         worker.startComputeThreads();
         out.println( "Worker: Ready." );
     }
