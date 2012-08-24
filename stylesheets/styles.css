@@ -2,6 +2,22 @@
 Leap Day for Github Pages
 by Matt Graham
 */
+/*
+ img.signature added by Peter Cappello
+*/
+img.signature
+{	
+	float: right;
+	border: 1px solid #000000;
+	margin: 10px 10px 5px 10px;
+	padding: 5px;
+	background-color: #FFF;
+	
+	position: relative;
+	right: -0px;
+	bottom: -0px;
+} 
+
 @font-face {
   font-family: 'Quattrocento Sans';
   src: url("../fonts/quattrocentosans-bold-webfont.eot");
