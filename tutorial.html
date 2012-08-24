@@ -37,7 +37,7 @@
     <div class="wrapper">
       <nav>
         <ul>
-	        <li><a href="index.html">Home</a></li>
+	        <li><a href="index.html"><img src="images/Home24.gif" /></a></li>
         	<li><a href="javadoc-api/index.html" target="parent">API</a></li>
 			<li><a href="tutorial.html">Tutorial</a></li>
         </ul>
@@ -55,7 +55,8 @@
 	<ol>
 		<li><a href="#Introduction-to-jpregel">Introduction to jPregel</a></li>
 		<li>
-			<a href="#Developing-jpregel-Applications">Developing jPregel Applications</a>
+			<a href="developing-applications.html">Developing Applications</a>
+			<!--
 			<ol>
 				<li>
 					Birds eye tour of a jPregel client
@@ -68,7 +69,7 @@
 						<li>Running a Job</li>
 					</ol>
 				</li>
-				<li><a href="#Defining-a-Vertex-class">Defining a Vertex class: Encapsulating a distributed graph algorithm</a></li>
+				<li>Defining a Vertex class: Encapsulating a distributed graph algorithm</li>
 				<li>
 					The Vertex API
 					<ol>
@@ -80,9 +81,12 @@
 				<li>Making a Master Output Maker</li>
 				<li>Making a Worker Output Maker</li>
 			</ol>
+		-->
 		</li>
+	
 		<li>
-			<a href="#Deploying-jpregel-Applications">Deploying jPregel Applications</a>
+			<a href="deploying-applications.html">Deploying Applications</a>
+			<!--
 			<ol>
 				<li>On 1 machine</li>
 				<li>On a Local Area Network (LAN)</li>
@@ -94,16 +98,17 @@
 					</ol>
 				</li>
 			</ol>
+		-->
 		</li>
 		<li>
-			<a href="#Contributing-to-the-jpregel-project">Contributing to the jPregel project</a>
+			<a href="contributing-to-jpregel.html">Contributing to jPregel</a>
 		</li>
 	</ol>
 	<hr>
 	
 	<a name="Introduction-to-jpregel"><h2>Introduction to jPregel</h2></a>
 	
-	<p>jpregel is based on the paper 
+	<p>jPregel is based on the paper 
 		<a href="http://dl.acm.org/citation.cfm?id=1582723">"Pregel: a system for large-scale graph processing."</a>
 		<!--
 			by Grzegorz Malewicz, Matthew H. Austern, Aart J.C. Bik, James C. Dehnert, Ilan Horn, Naty Leiser, and 	Grzegorz Czajkowski 
@@ -135,7 +140,7 @@
 		The following simple example gives the flavor of these concepts.
 	</p>
 	
-	<h4>Example 1.1: Detecting a digraph's source nodes</h4>
+	<h3>Example 1.1: Identifying a digraph's source nodes</h3>
 	<p>
 		At the time a digraph is constructed, a vertex, <i>v</i>, does not "know" if it has in-edges 
 		(i.e., <i>v</i> does not "know" if there is a vertex <i>u</i> with an out-edge to <i>v</i>).
@@ -144,29 +149,37 @@
 	
 		<center><img src="images/figures/source-graph-input.png" alt="a simple 7 node digraph with 2 source nodes." width="400"></center>
 	</p>
+	
+	<h4>Algorithm</h4>
 	<p>
-		Here is a simple algorithm to do this: 
 		When the graph is constructed, all vertices are put in the active set and all vertices are initialized as a source.
-		During the initial step of the graph algorithm, each vertex <i>u</i> sends a message (whose content is irrelevant) to vertex <i>v</i>, 
-		if (<i>u</i>, <i>v</i>) is an out-edge of <i>u</i>.
-		During the next step, active vertices mark themselves as not being a source.
-		No messages are sent during this second step:
-		The algorithm thus terminates after 2 steps.
-		</p>
-		<p>
-		Regarding the correctness of the algorithm,
-		after the graph algorithm terminates, 
-		<i>vertex <i>v</i> is marked as not being a source</i> 
-		if and only if <i>v</i> had at least one message at step 2
-		if and only if there is a vertex <i>u</i> with out-edge (<i>u</i>, <i>v</i>) in step 1
-		if and only if <i>v</i> has in-edge (<i>u</i>, <i>v</i>)
+		The graph algorithm has 2 steps:
+		<ol>
+			<li>
+				Each vertex <i>u</i> sends a message (which is empty) to vertex <i>v</i>, 
+				if (<i>u</i>, <i>v</i>) is an out-edge of <i>u</i>.
+			</li>
+			<li>Active vertices mark themselves as not being a source.</li>
+		</ol>
+		Since no messages are sent during step 2, the algorithm thus terminates after 2 steps.
+	</p>
+		
+	<h4>Correctness</h4>
+	<p>
+		After the graph algorithm terminates, 
+		<i>vertex <i>v</i> is marked as not being a source</i> <br />
+		if and only if <i>v</i> received at least one message at step 2  <br />
+		if and only if there is a vertex <i>u</i> with out-edge (<i>u</i>, <i>v</i>)  <br />
+		if and only if <i>v</i> has in-edge (<i>u</i>, <i>v</i>)  <br />
 		if and only if <i><i>v</i> is not a source</i>.
-		</p>
-		<p>
-			After the graph computation terminates, there is an <i>output phase</i>.
-			During the output phase of our source identification problem, each vertex outputs true, if it is a source, and false otherwise. 
-		</p>
-		<p>
+	</p>
+	<p>
+		After the graph computation terminates, there is an <i>output phase</i>.
+		During the output phase of our source identification problem, each vertex outputs true, if it is a source, and false otherwise. 
+	</p>
+	
+	<h4>Code</h4>
+	<p>
 		The following code fragment makes these ideas more precise, where the value associated with the vertex is a Boolean, 
 		which, after the graph algorithm terminates, has a value of true if and only if the vertex is a source.
 	</p>
@@ -205,30 +218,21 @@
 	    <span class="keyword-directive">public</span> String <span class="ST1">output</span>() { <span class="keyword-directive">return</span> getVertexId() + <span class="character">&quot;</span> <span class="character">&quot;</span> + getVertexValue(); }
 	</pre>
 	<p>
+		Vertex methods <i>getVertexValue</i>, <i>setVertexValue</i>, <i>getEdgeTargets</i>, <i>sendMessage</i>, and <i>getMessageQ</i> 
+		do what their names suggest.
+		The full Vertex API is presented a bit later in the tutorial.
+	</p>
+	<p>
 		Using the output from this jPregel application, if one were to paint the source vertices red and the non-source vertices blue, our small graph would, of course, look as follows:
 		<center><img src="images/figures/source-graph-output.png" alt="a simple 7 node digraph with 2 source nodes." width="400"></center>
 	</p>
 	
-	<a name="Developing-jpregel-Applications"><h2>Developing jPregel Applications</h2></a>
-	
-	<p>A jPregel <i>job</i> proceeds in 3 phases:
-		<ol>
-			<li>Construct a digraph;</li>
-			<li>Execute its algorithm;</li>
-			<li>Produce its output.</li>
-		</ol>
-	</p>
-	
-	<a name="Defining-a-Vertex-class"><h3>Defining a Vertex class: Encapsulating a distributed graph algorithm</h3></a>
-	
 	<p>
-		A Vertex class directly or indirectly extends <i>VertexImpl</i>, which implements the <i>Vertex</i> interface.
-		To be continued ...
+		In the chapters of this tutorial, you will learn how to develop jPregel applications, 
+		how to deploy them, especially on AWS, which we have endeavored to make as easy as possible (we think you'll agree), 
+		and how to contribute to this project.
 	</p>
-	
-	
-	<ol>
-	</ol>
+<!--
 	
 	<a name="Deploying-Applications"><h2>Deploying jPregel Applications</h2></a>
 	<!--
@@ -263,10 +267,10 @@
 			</ol>
 		</li>
 	</ol>
-	-->
+	
 	
 	<a name="Contributing-to-the-jpregel-project"><h2>Contributing to jPregel</h2></a>
-	
+-->
       </section>
       <footer>
         <p>Project maintained by <a href="https://github.com/charlesmunger">charlesmunger</a></p>

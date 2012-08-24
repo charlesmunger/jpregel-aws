@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>jpregel-aws</title>
+    <title>Deploying Applications</title>
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
@@ -12,12 +12,13 @@
       <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
   </head>
   <body>
 
       <header>
-        <h1>jPregel-aws</h1>
-        <p>Java-based Pregel easily deployed on Amazon Web Services</p>
+        <h1>Deploying Applications</h1>
+        <p>A jPregel tutorial introduction</p>
       </header>
 
       <div id="banner">
@@ -27,7 +28,7 @@
         <div class="downloads">
           <span>Download:</span>
           <ul>
-            <!-- <li><a href="https://github.com/charlesmunger/jpregel-aws/zipball/master" class="button">ZIP</a></li> -->
+            <!--<li><a href="https://github.com/charlesmunger/jpregel-aws/zipball/master" class="button">ZIP</a></li> -->
             <li><a href="https://github.com/charlesmunger/jpregel-aws/tarball/master" class="button">JAR</a></li>
           </ul>
         </div>
@@ -42,21 +43,65 @@
         </ul>
       </nav>
       <section>
-        <h1>Welcome to jPregel-aws!</h1>
+	
+	<h1>Deploying Applications</h1>
+	
+	<p><img src="images/merlin.gif" alt="merlin with student" width="400" /></p>
+	
+	<h2>Table of Contents</h2>
+	<ol>
+		<li>On 1 machine</li>
+		<li>On a Local Area Network (LAN)</li>
+		<li>
+			On Amazon Web Services (AWS)
+			<ol>
+				<li>Initial set up</li>
+				<li>Deploying</li>
+			</ol>
+		</li>
+	</ol>
 
-		<p><center><img src="graph_usairways_bundled.jpeg" alt="US airline route graph" width="500"/></center></p>
-
-        <p>
-			The jPregel-aws project comprises a Java-based implementation of Pregel with a package that enables 
-			deployment on Amazon Web Services with a minimum of fuss.
-		</p>
-		<p>The current version does not tolerate machine failures.</p>
-        <p>
-	      The jPregel part of this project was originally written by Peter Cappello; 
-	      the Java packages to run jPregel on AWS, originally written by Varsha Parthasarathy, have been replaced and significantly extended by Charles Munger.
-	   </p>
-		<p>This project is licensed under the MIT license, which is provided in <a href="license.html">license.txt</a>.</p>
-		
+	<hr>
+	
+<!--
+	
+	<a name="Deploying-Applications"><h2>Deploying jPregel Applications</h2></a>
+	<!--
+	<h3>Deploying on a single machine</h3>
+	
+	<h3>Deploying on a local cluster</h3>
+	
+	<h3>Deploying on Amazon Web Services</h3>
+	
+	<ol>
+		<li>Deploying with AWS
+			<ol>
+				<li>Setting up to deploy
+					<ol>
+						<li>Create an Amazon Web Services account. This requires a credit card.</li>
+						<li>Create two SSH key pairs, named "privatekey" and "masterkey".</li>
+						<li>Save these into privatekey.pem and masterkey.pem, in the jpregel-aws directory.</li>
+						<li>Create a file named key.AWSkey, with your access key on the first line and your secret key on the second.</li>
+					</ol>
+				</li>
+				<li>Deploying
+					<ol>
+						<li>From a Nebeans confirguration
+							<ol>
+								<li>
+									<p>Specify a Main file with ant:</p>
+									<p>ant run -propertyfile nbproject/configs/ShortestPath.properties -Dapplication.args="foobucket 10 10"</p>
+								</li>
+							</ol>
+					</ol>
+				</li>
+			</ol>
+		</li>
+	</ol>
+	
+	
+	<a name="Contributing-to-the-jpregel-project"><h2>Contributing to jPregel</h2></a>
+-->
       </section>
       <footer>
         <p>Project maintained by <a href="https://github.com/charlesmunger">charlesmunger</a></p>
