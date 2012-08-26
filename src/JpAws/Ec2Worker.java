@@ -6,7 +6,7 @@ import system.FileSystem;
 import system.Worker;
 
 /**
- *
+ * This class provides a worker that uses S3 for file system access. 
  * @author charlesmunger
  */
 public class Ec2Worker extends Worker {
@@ -16,7 +16,7 @@ public class Ec2Worker extends Worker {
     
     public static void main(String[] args) throws RemoteException {
         Worker worker = new Ec2Worker(getMaster(args[0]));
-        worker.start();
+        worker.init();
     }
     
     @Override

@@ -17,7 +17,6 @@ import static java.lang.System.out;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
-import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -30,7 +29,7 @@ import system.commands.*;
  *
  * @author Peter Cappello
  */
-public class Worker extends ServiceImpl
+public abstract class Worker extends ServiceImpl
 {
     // ServiceImpl attributes
     static public String SERVICE_NAME = "Master";
@@ -100,15 +99,11 @@ public class Worker extends ServiceImpl
         }
     }
     
-    public void start() throws RemoteException {
-        init();
-        startComputeThreads();
-    }
-    
-    void init() throws RemoteException {
+    public void init() throws RemoteException {
         CommandSynchronous command = new RegisterWorker( serviceName() ); 
-        myWorkerNum = (Integer) master.executeCommand( this, command ); //TODO leaking partially constructed object
+        myWorkerNum = (Integer) master.executeCommand( this, command ); 
         super.register ( master );
+        startComputeThreads();
     }
     
     void startComputeThreads()
@@ -130,9 +125,7 @@ public class Worker extends ServiceImpl
         }
         part.add( vertex );
     }
-    
-    //synchronized public FileSystem getFileSystem() { return fileSystem; }
-    
+        
     synchronized public Collection<Part> getParts() { return partIdToPartMap.values(); }
     
     synchronized public int getWorkerNum() { return myWorkerNum; }
@@ -209,10 +202,7 @@ public class Worker extends ServiceImpl
         }
     }
     
-    public FileSystem makeFileSystem( String jobDirectoryName)
-    {
-        return new LocalFileSystem( jobDirectoryName );
-    }
+    public abstract FileSystem makeFileSystem( String jobDirectoryName);
     
     @Override
     public void exceptionHandler( Exception exception )
@@ -423,28 +413,6 @@ public class Worker extends ServiceImpl
         {
             notify();
         }
-    }
-    
-    /*
-     * Invoke to deploy a Worker on some machine
-     * 
-     * @param args [0]: Domain Name of machine on which Master is running
-     */
-    public static void main( String[] args ) throws RemoteException
-    {
-        System.setSecurityManager( new RMISecurityManager() );
-        
-        // get reference to Master
-        if ( 1 != args.length )
-        {
-            out.println("java " + Worker.class.getName() + " MasterDomainName");
-        }
-        String masterDomainName = args[0];
-        Service master = getMaster( masterDomainName );          
-        Worker worker = new Worker(master);
-        worker.init();
-        worker.startComputeThreads();
-        out.println( "Worker: Ready." );
     }
     
     public static Service getMaster( String masterDomainName )

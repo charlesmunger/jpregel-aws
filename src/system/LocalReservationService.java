@@ -28,9 +28,8 @@ public class LocalReservationService
         });
         for (int workerNum = 0; workerNum < numWorkers; workerNum++)
         {
-            workers[ workerNum] = new Worker(master);
+            workers[ workerNum] = new LocalWorker(master);
             workers[workerNum].init();
-            workers[ workerNum].startComputeThreads();
         }
         submit.get();
         return master;
