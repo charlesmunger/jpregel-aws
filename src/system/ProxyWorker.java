@@ -63,6 +63,7 @@ public final class ProxyWorker extends Proxy
         this.workerService = workerService;
     }
     
+    @Override
     public void evict() 
     {
         if ( ! kill )
@@ -75,10 +76,6 @@ public final class ProxyWorker extends Proxy
         {
             System.out.println("WorkerProxy.evict: Thread already evicted.");
         }
-    }
-    
-    public int getProcessorCount() {
-        return ((Worker) workerService).getProcessorCount();
     }
     
     Service worker() { return workerService; }
