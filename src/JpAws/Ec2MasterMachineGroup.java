@@ -96,9 +96,6 @@ public class Ec2MasterMachineGroup extends Ec2MachineGroup<ClientToMaster>
 
     private void tryAgain(int i)
     {
-        if (i > 120000)
-        {
-        }
         System.out.println("Master not up yet. Trying again in 5 seconds...");
         try
         {

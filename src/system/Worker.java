@@ -52,7 +52,19 @@ public abstract class Worker extends ServiceImpl
         } 
     };
     
-    private final static RemoteExceptionHandler REMOTE_EXCEPTION_HANDLER = new DefaultRemoteExceptionHandler(); 
+    private final static RemoteExceptionHandler REMOTE_EXCEPTION_HANDLER = new DefaultRemoteExceptionHandler();
+
+    private static void tryAgain(int i)
+    {
+        System.out.println("Master not up yet. Trying again in 5 seconds...");
+        try
+        {
+            Thread.sleep(5000);
+        } catch (InterruptedException ex1)
+        {
+            System.out.println("Waiting interrupted, trying again immediately");
+        }
+    }
     
     private final Proxy masterProxy;
     private int myWorkerNum;
@@ -419,6 +431,18 @@ public abstract class Worker extends ServiceImpl
     {
         String url = "//" + masterDomainName + ":" + Master.PORT + "/" + Master.SERVICE_NAME;	
         Service master = null;
+        for (int i = 0;; i += 5000)
+        {
+            try
+            {
+                master = (Service) Naming.lookup(url);
+            } catch (Exception ex)
+            {
+                tryAgain(i);
+                continue;
+            }
+            break;
+        }
         try 
         {
             master = (Service) Naming.lookup( url );
