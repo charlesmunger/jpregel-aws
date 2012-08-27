@@ -1,10 +1,6 @@
 package system;
 
-import api.Aggregator;
-import api.MasterOutputMaker;
-import api.MasterGraphMaker;
-import api.WorkerGraphMaker;
-import api.WorkerOutputMaker;
+import api.*;
 import java.io.IOException;
 import java.io.Serializable;
 
@@ -29,7 +25,7 @@ public final class Job implements Serializable
     private final String   jobName;
     private final String   jobDirectoryName;
     // TODO Job: Should this be set in client, as it is now?
-    private final int      numParts;
+    private int      numParts = 0;
     private       Aggregator stepAggregator    = new AggregatorNull();
     private       Aggregator problemAggregator = new AggregatorNull();
     private final VertexImpl   vertexFactory;
@@ -57,7 +53,6 @@ public final class Job implements Serializable
     public Job( String jobName, 
                 String jobDirectoryName, 
                 VertexImpl vertexFactory, 
-                int numParts,
                 MasterGraphMaker masterGraphMaker,
                 WorkerGraphMaker workerGraphMaker,
                 MasterOutputMaker masterOutputMaker,
@@ -67,7 +62,6 @@ public final class Job implements Serializable
         this.jobName               = jobName;
         this.jobDirectoryName      = jobDirectoryName;
         this.vertexFactory         = vertexFactory;
-        this.numParts              = numParts;
         this.masterGraphMaker      = masterGraphMaker;
         this.workerGraphMaker      = workerGraphMaker;
         this.masterOutputMaker     = masterOutputMaker;
@@ -77,7 +71,6 @@ public final class Job implements Serializable
     public Job( String jobName, 
                 String jobDirectoryName, 
                 VertexImpl vertexFactory, 
-                int numParts,
                 MasterGraphMaker masterGraphMaker,
                 WorkerGraphMaker workerGraphMaker,
                 MasterOutputMaker masterOutputMaker,
@@ -89,7 +82,6 @@ public final class Job implements Serializable
         this.jobName           = jobName;
         this.jobDirectoryName  = jobDirectoryName;
         this.vertexFactory     = vertexFactory;
-        this.numParts          = numParts;
         this.masterGraphMaker  = masterGraphMaker;
         this.workerGraphMaker  = workerGraphMaker;
         this.masterOutputMaker = masterOutputMaker;
@@ -114,6 +106,19 @@ public final class Job implements Serializable
         stepAggregator        = job.getStepAggregator();
         problemAggregator     = job.getProblemAggregator(); 
     }  
+    
+    protected Job(Job job, int numParts) {
+        this.jobName               = job.getJobName();
+        this.jobDirectoryName      = job.getJobDirectoryName();
+        this.vertexFactory         = job.getVertexFactory();
+        this.numParts              = numParts;
+        this.masterGraphMaker      = job.getMasterGraphMaker();
+        this.workerGraphMaker      = job.getWorkerGraphMaker();
+        this.masterOutputMaker     = job.getWriter();
+        this.workerOutputMaker     = job.getWorkerWriter();
+        this.stepAggregator        = job.getStepAggregator();
+        this.problemAggregator     = job.getProblemAggregator(); 
+    }
         
     FileSystem getFileSystem() { return fileSystem; }
     

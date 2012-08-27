@@ -16,15 +16,11 @@ public class EuclideanShortestPathLocalClient
     public static void main(String[] args) throws Exception
     {
         int numWorkers = Integer.parseInt(args[1]);
-        int computeThreadsPerWorker = Runtime.getRuntime().availableProcessors();
-        int partsPerComputeThread = 2;
-        int numParts = numWorkers * computeThreadsPerWorker * partsPerComputeThread;
 
         Job job = new Job(
                 "Euclidean Shortest Path", // Job name
                 args[0], // Job directory name
                 new VertexShortestPathEuclidean(), // Vertex factory
-                numParts,
                 new MasterGraphMakerStandard(),
                 new WorkerGraphMakerStandard(),
                 new MasterOutputMakerStandard(),

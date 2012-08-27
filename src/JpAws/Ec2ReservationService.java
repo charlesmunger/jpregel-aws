@@ -1,5 +1,6 @@
 package JpAws;
 
+import api.Cluster;
 import api.MachineGroup;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.ec2.AmazonEC2;
@@ -10,9 +11,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import system.ClientToMaster;
 import system.ReservationServiceImpl;
@@ -31,16 +29,20 @@ public class Ec2ReservationService extends ReservationServiceImpl
      */
     public static final String AMIID = "ami-e565ba8c";
     /**
+     * This is the AMI-ID for Cluster Compute instances - they need an HVM image.
+     */
+    public static final String HVM_AMIID = "ami-0da96764";
+    /**
      * This is the name of the security group for EC2 instances to use.
      */
     public static final String SECURITY_GROUP = "jpregelgroup";
     private final AmazonEC2 ec2 = new AmazonEC2Client(PregelAuthenticator.get());
     private final Map<String, String> heapSizeMap = new HashMap<String, String>();
-    private final ExecutorService exec = Executors.newCachedThreadPool();
 
     public Ec2ReservationService()
     {
         heapSizeMap.put("m1.small", "-Xmx1600m -Xms1600m  ");
+        heapSizeMap.put("m1.medium", "-Xmx3600m -Xms3600m ");
         heapSizeMap.put("cc2.8xlarge","-Xmx58000m ");
         heapSizeMap.put("m1.large","-Xmx7100m -Xms7100m");
         DescribeSecurityGroupsResult describeSecurityGroups = null;
@@ -65,22 +67,22 @@ public class Ec2ReservationService extends ReservationServiceImpl
         }
     }
 
-    public static ClientToMaster newSmallCluster(int numWorkers) throws Exception
+    public static Cluster  newSmallCluster(int numWorkers) throws Exception
     {
         Ec2ReservationService rs = new Ec2ReservationService();
-        Future<MachineGroup<ClientToMaster>> masterMachine = rs.reserveMaster("m1.large");
-        Future<MachineGroup<Worker>> workers = rs.reserveWorkers("cc2.8xlarge", numWorkers);
-        Future<ClientToMaster> deployMaster = masterMachine.get().deploy(Integer.toString(numWorkers));
-        workers.get().deploy(masterMachine.get().getHostname());
-        return deployMaster.get();
+        return new Cluster(rs,"m1.small","m1,small",numWorkers);
     }
 
+    public static Cluster newMassiveCluster(int numWorkers) throws Exception {
+        Ec2ReservationService rs = new Ec2ReservationService();
+        return new Cluster(rs,"m1.large","cc2.8xlarge",numWorkers);
+    }
+    
     @Override
     public MachineGroup<Worker> callWorker(String instanceType, int numWorkers)
     {
         InstanceGroupImpl instanceGroup = new InstanceGroupImpl(ec2);
-
-        RunInstancesRequest launchConfiguration = new RunInstancesRequest("ami-0da96764", numWorkers, numWorkers)
+        RunInstancesRequest launchConfiguration = new RunInstancesRequest(instanceType.contains("cc") ? HVM_AMIID:AMIID, numWorkers, numWorkers)
                 .withKeyName(PregelAuthenticator.getPrivateKeyName())
                 .withInstanceType(instanceType)
                 .withSecurityGroupIds(SECURITY_GROUP);
@@ -94,7 +96,7 @@ public class Ec2ReservationService extends ReservationServiceImpl
     public MachineGroup<ClientToMaster> callMaster(String instanceType)
     {
         InstanceGroupImpl instanceGroup = new InstanceGroupImpl(ec2);
-        RunInstancesRequest launchConfiguration = new RunInstancesRequest(AMIID, 1, 1)
+        RunInstancesRequest launchConfiguration = new RunInstancesRequest(instanceType.contains("cc") ? HVM_AMIID:AMIID, 1, 1)
                 .withKeyName(PregelAuthenticator.getMasterPrivateKeyName())
                 .withInstanceType(instanceType)
                 .withSecurityGroupIds(SECURITY_GROUP);

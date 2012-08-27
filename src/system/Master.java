@@ -10,21 +10,6 @@ import jicosfoundation.*;
 import system.commands.*;
 
 /**
- * Master.run is decoupled from its file system: It receives a FileSystem 
- * that hides the differences between a local file system & S3.
- * 
- * To quickly start workers, we start them from an EC2 machine.
- * If each worker was started from the client/administrator outside EC2, 
- * the total network latency (e.g., 1,000 Workers) would be unnecessarily high.
- * 
- * For now, Master IS responsible for Worker construction.
- * This eases speedup experiments with a specific number of Workers.
- * In a production (non-research) setting,
- * the Master would not be responsible for Worker construction. 
- * 
- * Ant tasks for Amazon Web Services jar files from
- *  https://github.com/crispywalrus/aws-tasks
- * 
  * Code mobility: jPregel comes with several vertex subclasses.
  * The Master/Worker jar includes all these subclasses. By using a code base, 
  * a client can define a vertex subclass that is not in the Master's class path.
@@ -39,7 +24,9 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     
     // ServiceImpl attributes
     final static public String SERVICE_NAME = "Master";
+    public static final String CLIENT_SERVICE_NAME = "ClientToMaster";
     final static public int PORT = 2048;
+    private static final int PARTS_PER_PROCESSOR = 2;
     static private final Department[] departments = {ServiceImpl.ASAP_DEPARTMENT};
     static private Class[][] command2DepartmentArray = {
         // ASAP Commands
@@ -51,12 +38,11 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
             SuperStepComplete.class
         }
     };
-    public static final String CLIENT_SERVICE_NAME = "ClientToMaster";
-    
+        
     // Master attributes
     private Map<Integer, Service> integerToWorkerMap = new HashMap<Integer, Service>();
     protected AtomicInteger numRegisteredWorkers = new AtomicInteger();
-    
+    private volatile int numWorkerProcessors;
     // computation control
     protected int numUnfinishedWorkers;
     protected boolean commandExeutionIsComplete;
@@ -118,6 +104,8 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         System.out.println("Run entered");
         // all Workers have registered with Master
         assert integerToWorkerMap.size() == numRegisteredWorkers.get();
+        System.out.println("Job being split into "+numWorkerProcessors*PARTS_PER_PROCESSOR*numRegisteredWorkers.get() +"parts");
+        job = new Job(job,numWorkerProcessors*PARTS_PER_PROCESSOR*numRegisteredWorkers.get());
 
         JobRunData jobRunData = new JobRunData(job, integerToWorkerMap.size());
 
@@ -220,7 +208,8 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
 
         Service workerService = serviceName.service();
         super.register(workerService);
-        Proxy workerProxy = new ProxyWorker(workerService, this, REMOTE_EXCEPTION_HANDLER);
+        ProxyWorker workerProxy = new ProxyWorker(workerService, this, REMOTE_EXCEPTION_HANDLER);
+        this.numWorkerProcessors = workerProxy.getProcessorCount();
         addProxy(workerService, workerProxy);
         int workerNum = numRegisteredWorkers.incrementAndGet();
         integerToWorkerMap.put(workerNum, workerService);

@@ -11,14 +11,11 @@ public class TestMutabilityClient
      */
     public static void main( String[] args ) throws Exception
     {
-        int computeThreadsPerWorker = Runtime.getRuntime().availableProcessors();
         int numWorkers = Integer.parseInt( args[1] );
-        int numParts = numWorkers * computeThreadsPerWorker * 2; 
         Job job = new Job( 
                 "Test Graph Mutability Features", 
                 args[0],      // jobDirectoryName, 
                 new VertexTestMutability(), 
-                numParts,
                 new MasterGraphMakerStandard(),
                 new WorkerGraphMakerStandard(),
                 new MasterOutputMakerStandard(),

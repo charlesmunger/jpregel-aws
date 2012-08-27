@@ -1,9 +1,9 @@
 package JpLAN;
 
+import api.Cluster;
 import api.MachineGroup;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import system.ClientToMaster;
 import system.ReservationServiceImpl;
 import system.Worker;
@@ -26,13 +26,8 @@ public class LANReservationService extends ReservationServiceImpl {
         return new LANMasterMachineGroup();
     }
     
-    public static ClientToMaster newLocalCluster(int numWorkers) throws InterruptedException, ExecutionException, IOException {
+    public static Cluster newLocalCluster(int numWorkers) throws InterruptedException, ExecutionException, IOException {
         LANReservationService rs = new LANReservationService();
-        Future<MachineGroup<ClientToMaster>> masterMachine = rs.reserveMaster("m1.small");
-        Future<MachineGroup<Worker>> workers = rs.reserveWorkers("m1.small", numWorkers);
-        Future<ClientToMaster> deployMaster = masterMachine.get().deploy(Integer.toString(numWorkers));
-        workers.get().deploy(masterMachine.get().getHostname());
-        System.out.println("Cluster created with "+ numWorkers +" workers");
-        return deployMaster.get();
+        return new Cluster (rs,"","",numWorkers);
     }
 }

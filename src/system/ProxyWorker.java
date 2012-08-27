@@ -77,5 +77,9 @@ public final class ProxyWorker extends Proxy
         }
     }
     
+    public int getProcessorCount() {
+        return ((Worker) workerService).getProcessorCount();
+    }
+    
     Service worker() { return workerService; }
 }

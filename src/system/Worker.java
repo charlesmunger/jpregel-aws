@@ -468,4 +468,8 @@ public abstract class Worker extends ServiceImpl
         Command command = new CommandComplete( myWorkerNum );
         masterProxy.execute( command );   
     }
+    
+    public int getProcessorCount() {
+        return Runtime.getRuntime().availableProcessors();
+    }
 }
