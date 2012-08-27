@@ -81,7 +81,7 @@ public abstract class Worker extends ServiceImpl
     private final Command AddVertexToPartCompleteCommand = new AddVertexToPartComplete();
     private final Command MessageReceived = new MessageReceived();
     private final Service master;
-    public Worker( Master master ) throws RemoteException
+    public Worker( Service master ) throws RemoteException
     {
         // set Jicos Service attributes
         super( command2DepartmentArray );
@@ -89,7 +89,7 @@ public abstract class Worker extends ServiceImpl
         super.setDepartments( departments );
         this.master = master;
         masterProxy = new ProxyMaster( master, this, REMOTE_EXCEPTION_HANDLER );
-        master.setProcessorsPerWorker(Runtime.getRuntime().availableProcessors());
+                
         int numAvailableProcessors = Runtime.getRuntime().availableProcessors();
         System.out.println("Worker.constructor: Available processors: " + numAvailableProcessors ) ; 
         computeThreads = new ComputeThread[ numAvailableProcessors ];
@@ -415,13 +415,13 @@ public abstract class Worker extends ServiceImpl
         }
     }
     
-    public static Master getMaster( String masterDomainName )
+    public static Service getMaster( String masterDomainName )
     {
         String url = "//" + masterDomainName + ":" + Master.PORT + "/" + Master.SERVICE_NAME;	
-        Master master = null;
+        Service master = null;
         try 
         {
-            master = (Master) Naming.lookup( url );
+            master = (Service) Naming.lookup( url );
         }
         catch ( NotBoundException exception ) 
         {

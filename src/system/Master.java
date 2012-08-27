@@ -209,6 +209,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         Service workerService = serviceName.service();
         super.register(workerService);
         ProxyWorker workerProxy = new ProxyWorker(workerService, this, REMOTE_EXCEPTION_HANDLER);
+        this.numWorkerProcessors = workerProxy.getProcessorCount();
         addProxy(workerService, workerProxy);
         int workerNum = numRegisteredWorkers.incrementAndGet();
         integerToWorkerMap.put(workerNum, workerService);
@@ -225,10 +226,6 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         processAcknowledgement();
     }
 
-    protected void setProcessorsPerWorker(final int numProcessors) {
-        this.numWorkerProcessors = numProcessors;
-    }
-    
     // Command: JobSet
     public void jobSet(int workerNum) { processAcknowledgement(); }
 

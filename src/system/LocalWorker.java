@@ -1,6 +1,7 @@
 package system;
 
 import java.rmi.RemoteException;
+import jicosfoundation.Service;
 
 /**
  *
@@ -8,7 +9,7 @@ import java.rmi.RemoteException;
  */
 public class LocalWorker extends Worker {
 
-    public LocalWorker(Master master) throws RemoteException
+    public LocalWorker(Service master) throws RemoteException
     {
         super(master);
     }
