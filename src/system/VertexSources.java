@@ -23,15 +23,13 @@ public class VertexSources extends VertexImpl<Integer, Boolean, Integer, Integer
         if ( null == getVertexValue() ) {
             setVertexValue( true ); // initially mark all vertices as sources
             
-            // for each out-edge, send a message to the endpoint (aka target vertex)
+            // for each out-edge (u, v), send a message to vertex v
             for ( Integer targetVertexId : getEdgeTargets() ) {
                 sendMessage( targetVertexId, new Message( null, null ) );
             }
         }
-        else {
-            if ( getMessageQ().size() > 0 ) {
+        else if ( getMessageQ().size() > 0 ) {
                 setVertexValue( false ); // I have at least 1 in-edge!
-            }
         }
     }
 

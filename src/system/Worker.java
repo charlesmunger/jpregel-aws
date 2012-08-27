@@ -100,7 +100,7 @@ public abstract class Worker extends ServiceImpl
     }
     
     public void init() throws RemoteException {
-        CommandSynchronous command = new RegisterWorker( serviceName() ); 
+        CommandSynchronous command = new RegisterWorker( serviceName(), Runtime.getRuntime().availableProcessors() ); 
         myWorkerNum = (Integer) master.executeCommand( this, command ); 
         super.register ( master );
         startComputeThreads();

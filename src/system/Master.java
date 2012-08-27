@@ -199,13 +199,15 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     }
 
     // Command: RegisterWorker
-    synchronized public int registerWorker(ServiceName serviceName) {
+    synchronized public int registerWorker(ServiceName serviceName, int numWorkerProcessors ) 
+    {
         assert serviceName != null;
         // !! currently not storing/using ServiceName data apart from Service
 
         // !! Ensure that no service with this ID is registered already.
         // !! If there is, unregister it.
 
+        this.numWorkerProcessors = Math.max( this.numWorkerProcessors, numWorkerProcessors);
         Service workerService = serviceName.service();
         super.register(workerService);
         ProxyWorker workerProxy = new ProxyWorker(workerService, this, REMOTE_EXCEPTION_HANDLER);

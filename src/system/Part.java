@@ -63,7 +63,7 @@ public final class Part
         this.computeThread = computeThread;
         this.superStep = superStep;
         this.computeInput = computeInput;
-        numMessagesSent   = 0;
+        numMessagesSent = 0;
         outputStepAggregator    = job.makeStepAggregator();
         outputProblemAggregator = job.makeProblemAggregator();
         Set<VertexImpl> activeSet = superstepToActiveSetMap.get( superStep );
