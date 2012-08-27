@@ -2,8 +2,8 @@ package JpLAN;
 
 import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
-import jicosfoundation.Service;
 import system.LocalWorker;
+import system.Master;
 import system.Worker;
 
 /**
@@ -12,7 +12,7 @@ import system.Worker;
  */
 public class LANWorker extends LocalWorker {
 
-    private LANWorker(Service master) throws RemoteException
+    private LANWorker(Master master) throws RemoteException
     {
         super(master);
     }
@@ -32,7 +32,7 @@ public class LANWorker extends LocalWorker {
             System.out.println("java " + Worker.class.getName() + " MasterDomainName");
         }
         String masterDomainName = args[0];
-        Service master = getMaster( masterDomainName );          
+        Master master = getMaster( masterDomainName );          
         Worker worker = new LANWorker(master);
         worker.init();
         System.out.println( "Worker: Ready." );
