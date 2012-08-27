@@ -70,7 +70,7 @@ public class Ec2ReservationService extends ReservationServiceImpl
     public static Cluster  newSmallCluster(int numWorkers) throws Exception
     {
         Ec2ReservationService rs = new Ec2ReservationService();
-        return new Cluster(rs,"m1.small","m1,small",numWorkers);
+        return new Cluster(rs,"m1.small","m1.small",numWorkers);
     }
 
     public static Cluster newMassiveCluster(int numWorkers) throws Exception {
