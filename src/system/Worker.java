@@ -14,9 +14,7 @@ package system;
 import api.Aggregator;
 import java.io.IOException;
 import static java.lang.System.out;
-import java.net.MalformedURLException;
 import java.rmi.Naming;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -442,22 +440,6 @@ public abstract class Worker extends ServiceImpl
                 continue;
             }
             break;
-        }
-        try 
-        {
-            master = (Service) Naming.lookup( url );
-        }
-        catch ( NotBoundException exception ) 
-        {
-            out.println( "NotBoundException: " + url + " -- " + exception.getMessage() );
-        } 
-        catch ( MalformedURLException exception ) 
-        {
-            out.println( "MalformedURLException: " + url + " -- " + exception.getMessage() );
-        } 
-        catch ( RemoteException exception ) 
-        {
-            out.println( "RemoteException: " + url + " -- " + exception.getMessage() );
         }
         return master;
     }
