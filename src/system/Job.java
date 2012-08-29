@@ -124,7 +124,7 @@ public final class Job implements Serializable
     
     int        getNumParts()   { return numParts; }
             
-    int        getPartId( Object vertexId ) { return vertexFactory.getPartId( vertexId, getNumParts() ); }
+    int        getPartId( Object vertexId ) { return vertexFactory.getPartId( vertexId, numParts ); }
     
     VertexImpl     getVertexFactory() { return vertexFactory; }
     
