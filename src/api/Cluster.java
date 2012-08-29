@@ -1,10 +1,13 @@
 package api;
 
 import java.io.IOException;
+import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import system.ClientToMaster;
 import system.Job;
 import system.JobRunData;
@@ -58,5 +61,22 @@ public class Cluster implements Serializable
         Future<ClientToMaster> deploy = masterMachine.deploy(args);
         workerMachine.deploy(masterMachine.getHostname());
         this.master = deploy.get();
+    }
+    
+    private Object readResolve() throws ObjectStreamException {
+        try
+        {
+            this.reset();
+        } catch (IOException ex)
+        {
+            
+        } catch (InterruptedException ex)
+        {
+            
+        } catch (ExecutionException ex)
+        {
+            
+        }
+        return this;
     }
 }
