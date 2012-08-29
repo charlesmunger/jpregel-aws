@@ -16,7 +16,10 @@ import java.io.IOException;
 import static java.lang.System.out;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -70,8 +73,8 @@ public abstract class Worker extends ServiceImpl
     
     private Map<Integer, Service> workerNumToWorkerMap;
     private Job job;
-    private Map<Integer, Part> partIdToPartMap = new HashMap<Integer, Part>();
-    private Set<Part> partSet = new LinkedHashSet();
+    private ConcurrentMap<Integer, Part> partIdToPartMap = new ConcurrentHashMap<Integer, Part>();
+    private Collection<Part> partSet = partIdToPartMap.values();
     private FileSystem fileSystem;
     private Map<Integer, Map<Object, MessageQ>> workerNumToVertexIdToMessageQMapMap;
     private long superStep;
@@ -124,23 +127,22 @@ public abstract class Worker extends ServiceImpl
         }
     }
     
-    synchronized public void addVertexToPart( int partId, VertexImpl vertex )
+     public void addVertexToPart( int partId, VertexImpl vertex )
     {
         Part part = partIdToPartMap.get( partId );
         if ( null == part )
         {
             part = new Part( partId, job );
-            partSet.add( part );
-            partIdToPartMap.put( partId, part );
+            partIdToPartMap.putIfAbsent( partId, part );
         }
-        part.add( vertex );
+        partIdToPartMap.get(partId).add( vertex );
     }
         
     synchronized public Collection<Part> getParts() { return partIdToPartMap.values(); }
     
     synchronized public int getWorkerNum() { return myWorkerNum; }
         
-    Set<Part> getPartSet() { return partSet; }
+    Collection<Part> getPartSet() { return partSet; }
     
     synchronized PartIterator getPartIterator() { return partIterator; }
     
