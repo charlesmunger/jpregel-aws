@@ -10,15 +10,13 @@ import java.util.concurrent.Future;
  */
 public class LocalReservationService
 {
-
-    public static ClientToMaster newLocalCluster(final int numWorkers) throws Exception
+    public static ClientToMaster newCluster(final int numWorkers) throws Exception
     {
         final Master master = new LocalMaster();
         Worker[] workers = new Worker[numWorkers];
 
         Future<Master> submit = Executors.newSingleThreadExecutor().submit(new Callable<Master>()
         {
-
             @Override
             public Master call() throws Exception
             {
@@ -26,10 +24,10 @@ public class LocalReservationService
                 return master;
             }
         });
-        for (int workerNum = 0; workerNum < numWorkers; workerNum++)
+        for ( Worker worker : workers )
         {
-            workers[ workerNum] = new LocalWorker(master);
-            workers[workerNum].init();
+            worker = new LocalWorker( master );
+            worker.init();
         }
         submit.get();
         return master;

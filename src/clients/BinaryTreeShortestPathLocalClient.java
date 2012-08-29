@@ -23,7 +23,7 @@ public class BinaryTreeShortestPathLocalClient
                 new WorkerOutputMakerStandard()                 
                 );
         System.out.println( job + "\n    numWorkers: " + numWorkers );
-        ClientToMaster master = LocalReservationService.newLocalCluster(numWorkers);
+        ClientToMaster master = LocalReservationService.newCluster(numWorkers);
         System.out.println(master.run(job));
         System.exit( 0 );
     }

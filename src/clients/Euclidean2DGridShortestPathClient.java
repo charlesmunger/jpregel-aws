@@ -29,7 +29,7 @@ public class Euclidean2DGridShortestPathClient
         System.out.println( job + "\n      numWorkers: " + numWorkers );
         
         System.out.println("Euclidean2DGridShortestPathClient.main: about to invoke Client.run");
-        ClientToMaster master = LocalReservationService.newLocalCluster(numWorkers);
+        ClientToMaster master = LocalReservationService.newCluster(numWorkers);
         System.out.println(master.run(job));        System.exit( 0 );
     }
 }
