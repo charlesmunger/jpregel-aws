@@ -15,7 +15,8 @@ import java.io.Serializable;
  * which jpregel runs.
  * </p>
  * <p>
- * Whether or not a Job is run in local mode is an attribute, not of Job, but of the Client
+ * Where a job is deployed (locally or on an external cloud) is an attribute, 
+ * not of Job, but of the Client.
  * </p>
  * 
  * @author Peter Cappello
@@ -45,10 +46,11 @@ public final class Job implements Serializable
      * The job directory is expected to have the <i>input</i> file; 
      * it will have the <i>output</i> file when the job is complete.
      * It also is used to contain intermediate directories <i>in</i> and <i>out</i>.
-     * @param numParts the number of <i>parts</i> for this Job.
-     * This is a Job attribute so that we can conveniently modify it
-     * per Job, to find a good value that appears to be primarily a function of 
-     * graph structure and size, and possibly problem type (e.g., shortest path)
+     * @param vertexFactory an instance of the vertex class being used
+     * @param masterGraphMaker a master graph maker
+     * @param workerGraphMaker a worker graph maker
+     * @param masterOutputMaker a master output maker
+     * @param workerOutputMaker a worker output maker
      */
     public Job( String jobName, 
                 String jobDirectoryName, 
@@ -68,6 +70,10 @@ public final class Job implements Serializable
         this.workerOutputMaker     = workerOutputMaker;
     }
     
+    /**
+     * @param problemAggregator a <i>problem</i> aggregator 
+     * @param stepAggregator a <i>step</i> aggregator
+     */
     public Job( String jobName, 
                 String jobDirectoryName, 
                 VertexImpl vertexFactory, 
@@ -91,7 +97,8 @@ public final class Job implements Serializable
     }
     
     /*
-     * @param masterJob - has Job attributes
+     * @param numParts this is a linear function of the sum of the available processors
+     * in each worker.
      */
     Job( Job job )
     {
@@ -107,7 +114,16 @@ public final class Job implements Serializable
         problemAggregator     = job.getProblemAggregator(); 
     }  
     
-    protected Job(Job job, int numParts) {
+    /**
+     * 
+     * @param job
+     * @param numParts the number of <i>parts</i> for this Job.
+     * This is a Job attribute so that we can conveniently modify it
+     * per Job, to find a good value that appears to be primarily a function of 
+     * graph structure and size, and possibly problem type (e.g., shortest path)
+     */
+    protected Job(Job job, int numParts) 
+    {
         this.jobName               = job.getJobName();
         this.jobDirectoryName      = job.getJobDirectoryName();
         this.vertexFactory         = job.getVertexFactory();
@@ -126,41 +142,37 @@ public final class Job implements Serializable
             
     int        getPartId( Object vertexId ) { return vertexFactory.getPartId( vertexId, numParts ); }
     
-    VertexImpl     getVertexFactory() { return vertexFactory; }
-    
-//    public void setProblemAggregator( Aggregator problemAggregator ) { this.problemAggregator = problemAggregator; }
-//
-//    public void setStepAggregator(    Aggregator stepAggregator )    { this.stepAggregator = stepAggregator; }
-    
+    VertexImpl getVertexFactory() { return vertexFactory; }
+        
     /*
      * Used in JobRunData
      */
-    String           getJobName()               { return jobName; }
+    String            getJobName()           { return jobName; }
     
-    String           getJobDirectoryName()      { return jobDirectoryName; }
+    String            getJobDirectoryName()  { return jobDirectoryName; }
         
-    Aggregator       getProblemAggregator()     { return problemAggregator; }
+    Aggregator        getProblemAggregator() { return problemAggregator; }
     
-    Aggregator       getStepAggregator()        { return stepAggregator; }    
+    Aggregator        getStepAggregator()    { return stepAggregator; }    
     
-    WorkerGraphMaker getWorkerGraphMaker()      { return workerGraphMaker; }
+    WorkerGraphMaker  getWorkerGraphMaker()  { return workerGraphMaker; }
     
-    MasterGraphMaker getMasterGraphMaker()      { return masterGraphMaker; }
+    MasterGraphMaker  getMasterGraphMaker()  { return masterGraphMaker; }
     
-    WorkerOutputMaker getWorkerWriter()          { return workerOutputMaker; }
+    WorkerOutputMaker getWorkerWriter()      { return workerOutputMaker; }
     
-    MasterOutputMaker       getWriter()                { return masterOutputMaker; }
+    MasterOutputMaker getWriter()            { return masterOutputMaker; }
     
     /**
      * @return the number of vertices that were constructed.
      */
-    int  makeGraph( Worker worker )      { return workerGraphMaker.makeGraph( worker ); }
+    int  makeGraph( Worker worker ) { return workerGraphMaker.makeGraph( worker ); }
     
     void makeOutputFile( Worker worker ) throws IOException { workerOutputMaker.write( fileSystem, worker ); }
 
-    Aggregator  makeStepAggregator()            { return stepAggregator.make(); }
+    Aggregator  makeStepAggregator()    { return stepAggregator.make(); }
     
-    Aggregator  makeProblemAggregator()         { return problemAggregator.make(); }
+    Aggregator  makeProblemAggregator() { return problemAggregator.make(); }
     
     /*
      * Process Result
@@ -202,6 +214,7 @@ public final class Job implements Serializable
         string.append("Worker output Maker: ").append(workerOutputMaker.getClass().getCanonicalName()).append("\n\t");
         string.append("Problem aggregator:  ").append(problemAggregator.getClass().getCanonicalName()).append("\n\t");
         string.append("Step aggregator:     ").append(stepAggregator.getClass().getCanonicalName()).append("\n\t");
+        string.append("_____________________________________________________\n");
         return new String( string );
     }
 }
