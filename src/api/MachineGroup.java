@@ -5,6 +5,7 @@
 package api;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -15,7 +16,7 @@ import java.util.concurrent.Future;
  * classes should specify the return type of the remote object.
  * @author charlesmunger
  */
-public abstract class MachineGroup<T>
+public abstract class MachineGroup<T> implements Serializable
 {
     private ExecutorService exec = Executors.newCachedThreadPool();
     public abstract String getHostname();

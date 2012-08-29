@@ -1,6 +1,7 @@
 package api;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -13,10 +14,10 @@ import system.Worker;
  *
  * @author charlesmunger
  */
-public class Cluster 
+public class Cluster implements Serializable
 {
 
-    private ClientToMaster master;
+    private transient ClientToMaster master;
     private final MachineGroup<ClientToMaster> masterMachine;
     private final MachineGroup<Worker> workerMachine;
     private final String[] args;
