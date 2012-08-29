@@ -52,7 +52,7 @@
 	
 	<ol>
 		<li>
-			Birds eye tour of a jPregel client
+			<a href="#Birds-eye-tour-of-a-jPregel-client">Birds eye tour of a jPregel client</a>
 			<ol>
 				<li>What's in a Job?</li>
 				<li>The Job directory structure</li>
@@ -76,6 +76,65 @@
 	</ol>
 
 	<hr>
+	
+	<a name="Birds-eye-tour-of-a-jPregel-client"><h2>Birds eye tour of a jPregel client</h2></a>
+	
+	<p>
+		A jPregel client is a concise sequence of instructions illustrated below.
+		It first specifies the Job object (lines 11 - 19).
+		Then, it:
+		<ol>
+			<li>launches a jPregel cluster (line 22), specifying the number of workers as an argument</li>
+			<li>runs the job (line 23)</li>
+		</ol>
+		Following the listing, we delve into the Job object.
+	</p>
+	
+	<style type="text/css">
+	<!--
+	body {color: #000000; background-color: #ffffff; font-family: Monospaced}
+	pre {color: #000000; background-color: #ffffff; font-family: Monospaced}
+	table {color: #000000; background-color: #e9e8e2; font-family: Monospaced}
+	.ST2 {font-family: Monospaced; font-weight: bold; font-style: italic}
+	.ST5 {font-family: Monospaced; font-style: italic}
+	.ST1 {font-family: Monospaced; font-weight: bold}
+	.ST0 {color: #969696; font-family: Monospaced; font-weight: bold}
+	.comment {color: #969696}
+	.ST4 {color: #ce7b00; font-family: Monospaced; font-weight: bold}
+	.character {color: #ce7b00}
+	.ST3 {color: #009900; font-family: Monospaced; font-style: italic}
+	.keyword-directive {color: #0000e6}
+	-->
+	</style>
+	
+	<pre>
+	 1 <span class="keyword-directive">package</span> clients;
+	 2 <span class="keyword-directive">import</span> system.*;
+	 3 
+	 4 <span class="keyword-directive">public</span> <span class="keyword-directive">class</span> <span class="ST0">SourcesLocalClient</span>
+	 5 {
+	 6     <span class="comment">/**</span>
+	 7 <span class="comment">     * </span><span class="ST1">@param</span> args<span class="comment"> [0]: </span><span class="comment">Job</span> <span class="comment">directory</span> <span class="comment">name</span>
+	 8      <span class="comment">*/</span>
+	 9     <span class="keyword-directive">public</span> <span class="keyword-directive">static</span> <span class="keyword-directive">void</span> <span class="ST2">main</span>( String[] args ) <span class="keyword-directive">throws</span> Exception
+	10     {
+	11         Job job = <span class="keyword-directive">new</span> Job(
+	12                 <span class="character">&quot;</span><span class="character">Identify source nodes</span><span class="character">&quot;</span>,  <span class="comment">// jobName</span>
+	13                 args[0],                          <span class="comment">// jobDirectoryName</span>
+	14                 <span class="keyword-directive">new</span> VertexSources(),     <span class="comment">// vertexFactory</span>
+	15                 <span class="keyword-directive">new</span> MasterGraphMakerStandard(),  
+	16                 <span class="keyword-directive">new</span> WorkerGraphMakerStandard(),   
+	17                 <span class="keyword-directive">new</span> MasterOutputMakerStandard(),
+	18                 <span class="keyword-directive">new</span> WorkerOutputMakerStandard()                 
+	19                 );
+	20         <span class="keyword-directive">int</span> numWorkers = 1; 
+	21         System.<span class="ST3">out</span>.println( job + <span class="character">&quot;</span><span class="ST4">\n</span><span class="character">    numWorkers: </span><span class="character">&quot;</span> + numWorkers );
+	22         ClientToMaster master = LocalReservationService.<span class="ST5">newLocalCluster</span>( numWorkers );
+	23         System.<span class="ST3">out</span>.println( master.run( job ) );
+	24         System.<span class="ST5">exit</span>( 0 );
+	25     }
+	26 }
+	</pre>
 	
 	<a name="Defining-a-Vertex-class"><h2>Defining a Vertex class</h2></a>
 	
