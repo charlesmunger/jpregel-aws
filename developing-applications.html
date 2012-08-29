@@ -129,7 +129,7 @@
 	19                 );
 	20         <span class="keyword-directive">int</span> numWorkers = 1; 
 	21         System.<span class="ST3">out</span>.println( job + <span class="character">&quot;</span><span class="ST4">\n</span><span class="character">    numWorkers: </span><span class="character">&quot;</span> + numWorkers );
-	22         ClientToMaster master = LocalReservationService.<span class="ST5">newLocalCluster</span>( numWorkers );
+	22         ClientToMaster master = LocalReservationService.<span class="ST5">newCluster</span>( numWorkers );
 	23         System.<span class="ST3">out</span>.println( master.run( job ) );
 	24         System.<span class="ST5">exit</span>( 0 );
 	25     }
