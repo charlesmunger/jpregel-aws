@@ -6,6 +6,7 @@ package clients;
 
 import JpAws.Ec2ReservationService;
 import api.Cluster;
+import java.io.*;
 import system.*;
 
 /**
@@ -17,6 +18,16 @@ public class BinaryTreeEc2Client
     public static void main( String[] args ) throws Exception
     {
         int numWorkers = Integer.parseInt(args[1]);  
+        File clusterFile = new File("cluster.AWS");
+        Cluster master;
+        if(clusterFile.exists()) {
+            master = (Cluster) new ObjectInputStream(new FileInputStream(clusterFile)).readObject();
+            master.reset();
+        } else {
+            master = Ec2ReservationService.newMassiveCluster(numWorkers);
+            new ObjectOutputStream(new FileOutputStream(clusterFile)).writeObject(master);
+        }
+        
         Job job = new Job("Binary Tree Shortest Path",        // jobName
                 args[0],                            // jobDirectoryName
                 new VertexShortestPathBinaryTree(), // vertexFactory
@@ -26,7 +37,6 @@ public class BinaryTreeEc2Client
                 new WorkerOutputMakerStandard()                 
                 );
         System.out.println( job + "\n    numWorkers: " + numWorkers );
-        Cluster master = Ec2ReservationService.newMassiveCluster(numWorkers);
         System.out.println(master.run(job));
         System.exit( 0 );
     }

@@ -3,8 +3,6 @@ package system;
 import api.WorkerGraphMaker;
 import java.io.BufferedReader;
 import java.io.IOException;
-import static java.lang.System.err;
-import static java.lang.System.exit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -75,9 +73,9 @@ public class WorkerGraphMakerBinaryTree implements WorkerGraphMaker
         }
         catch ( Exception exception )
         {
-            err.println( "GridWorkerGraphMaker.makeGraph: Error: " + exception.getMessage());
+            System.err.println( "GridWorkerGraphMaker.makeGraph: Error: " + exception.getMessage());
             exception.printStackTrace();
-            exit( 1 );
+            System.exit( 1 );
         }
         return numVertices;
     }
@@ -86,7 +84,7 @@ public class WorkerGraphMakerBinaryTree implements WorkerGraphMaker
     {
         if ( ! stringTokenizer.hasMoreTokens() )
         {
-            err.println( "GridWorkerGraphMaker.makeGraph: getToken: Empty lines are not allowed." );
+            System.err.println( "GridWorkerGraphMaker.makeGraph: getToken: Empty lines are not allowed." );
             throw new IOException();
         }
         return Integer.parseInt( stringTokenizer.nextToken() );
