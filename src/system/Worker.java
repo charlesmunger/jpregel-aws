@@ -173,7 +173,7 @@ public abstract class Worker extends ServiceImpl
         }
     }
     
-    synchronized public void addRemoteVertex( int workerNum, int partId, String stringVertex )
+    public void addRemoteVertex( int workerNum, int partId, String stringVertex )
     {
         Service workerService = workerNumToWorkerMap.get( workerNum );
         numUnacknowledgedAddVertexCommands.getAndIncrement();
