@@ -104,7 +104,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         System.out.println("Run entered");
         // all Workers have registered with Master
         assert integerToWorkerMap.size() == numRegisteredWorkers.get();
-        System.out.println("Job being split into "+numWorkerProcessors*PARTS_PER_PROCESSOR*numRegisteredWorkers.get() +"parts");
+        System.out.println("Job split into " + ( numWorkerProcessors * PARTS_PER_PROCESSOR * numRegisteredWorkers.get() ) + " parts" );
         job = new Job(job,numWorkerProcessors*PARTS_PER_PROCESSOR*numRegisteredWorkers.get());
 
         JobRunData jobRunData = new JobRunData(job, integerToWorkerMap.size());

@@ -74,6 +74,7 @@ public abstract class Worker extends ServiceImpl
     private Map<Integer, Service> workerNumToWorkerMap;
     private Job job;
     private ConcurrentMap<Integer, Part> partIdToPartMap = new ConcurrentHashMap<Integer, Part>();
+    // TODO: Worker: partSet (should be activePartSet) fix code (?) so that it is. Now, it's all part.
     private Collection<Part> partSet = partIdToPartMap.values();
     private FileSystem fileSystem;
     private Map<Integer, Map<Object, MessageQ>> workerNumToVertexIdToMessageQMapMap;
@@ -127,7 +128,7 @@ public abstract class Worker extends ServiceImpl
         }
     }
     
-     public void addVertexToPart( int partId, VertexImpl vertex )
+    public void addVertexToPart( int partId, VertexImpl vertex )
     {
         Part part = partIdToPartMap.get( partId );
         if ( null == part )

@@ -17,8 +17,6 @@ import java.util.concurrent.Future;
  */
 public class WorkerGraphMakerBinaryTree implements WorkerGraphMaker
 {
-    // TODO WorkerGraphMakers: Perhaps multithreading would speed them up.
-    
     @Override
     public int makeGraph(Worker worker) 
     {
@@ -57,7 +55,7 @@ public class WorkerGraphMakerBinaryTree implements WorkerGraphMaker
              *  1 child (a left child), when n is even and n = N/2;
              *  0 children, otherwise (i.e., (N + 1)/2 <= n <= N).
              */
-            ExecutorService exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()*2);
+            ExecutorService exec = Executors.newFixedThreadPool( Runtime.getRuntime().availableProcessors() * 2 );
             List<Future> makeNodes = makeNodes(exec,startVertexId, (numVertices - 1)/2, 2, vertexMaker, job, worker, workerNum );
             if ( numVertices % 2 == 0)
             {
@@ -123,9 +121,10 @@ public class WorkerGraphMakerBinaryTree implements WorkerGraphMaker
             VertexShortestPathBinaryTree vertexFactory, Job job, Worker worker,
             int workerNum)
     {
+        int numParts = job.getNumParts();
         for ( int vertexId = startVertexId; vertexId <= stopVertexId; vertexId++ )
         {
-            int partId = vertexFactory.getPartId( vertexId, job.getNumParts() );
+            int partId = vertexFactory.getPartId( vertexId, numParts );
             int destinationWorkerNum = worker.getWorkerNum( partId );
             if ( destinationWorkerNum == workerNum )
             {   // vertex belongs to this worker
@@ -140,16 +139,17 @@ public class WorkerGraphMakerBinaryTree implements WorkerGraphMaker
         }
     }
     
-    private List<Future> makeNodes(ExecutorService exec, int startVertexId, int stopVertexId, int numChildren,
+    private List<Future> makeNodes( ExecutorService exec, int startVertexId, int stopVertexId, int numChildren,
             VertexShortestPathBinaryTree vertexFactory, Job job, Worker worker,
             int workerNum)
     {
         ArrayList<Future> futlist = new ArrayList<Future>();
-        final int chunkSize = 500000;//(stopVertexId - startVertexId+1) / (Runtime.getRuntime().availableProcessors() *4);
+        int naturalChunkSize = ( stopVertexId - startVertexId + 1 ) / ( Runtime.getRuntime().availableProcessors() * 2 );
+        final int chunkSize = Math.max( 1024 * 64, naturalChunkSize ); // 500000;
         for (int i = startVertexId; i <= stopVertexId; i += chunkSize)
         {
-            futlist.add(exec.submit(new NodeMaker(i, Math.min(i + chunkSize, stopVertexId),
-                    numChildren, vertexFactory, job, worker, workerNum)));
+            futlist.add( exec.submit( new NodeMaker( i, Math.min( i + chunkSize, stopVertexId ),
+                         numChildren, vertexFactory, job, worker, workerNum ) ) );
         }
         return futlist;
     }
