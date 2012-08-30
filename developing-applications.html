@@ -54,15 +54,19 @@
 		<li>
 			<a href="#Birds-eye-tour-of-a-jPregel-client">Birds eye tour of a jPregel client</a>
 			<ol>
-				<li><a href="#Job">What's in a Job?</a></li>
-				<li>The Job directory structure</li>
-				<li>Selecting Master &amp; Worker graph makers</li>
-				<li>Selecting a Vertex class</li>
-				<li>Selecting Master &amp; Worker output makers</li>
-				<li>Running a Job</li>
+				<li><a href="#Job">What's in a Job?</a>
+					<ol>
+						<li><a href="#Job-directory-structure">The Job directory structure</a></li>
+						<li>Selecting Master &amp; Worker graph makers</li>
+						<li>Selecting a Vertex class</li>
+						<li>Selecting Master &amp; Worker output makers</li>
+					</ol>
+				</li>
+				<li><a href="#Launching-a-cluster">Launching a jPregel cluster</a></li>
+				<li>Running the Job</li>
 			</ol>
 		</li>
-		<li>Defining a Vertex class: Encapsulating a distributed graph algorithm</li>
+		<li><a href="#Defining-a-Vertex-class">Defining a Vertex class: Encapsulating a distributed graph algorithm</a></li>
 		<li>
 			The Vertex API
 			<ol>
@@ -84,8 +88,8 @@
 		It first specifies the Job object (lines 11 - 19).
 		Then, it:
 		<ol>
-			<li>launches a jPregel cluster (line 22), specifying the number of workers as an argument</li>
-			<li>runs the job (line 23)</li>
+			<li>(line 22) launches a jPregel cluster, specifying the number of worker machines as an argument</li>
+			<li>(line 23) runs the job</li>
 		</ol>
 		Following the listing, we delve into the Job object.
 	</p>
@@ -142,10 +146,37 @@
 		Again, the phases on a job are:
 		<ol>
 			<li>Construct the graph</li>
-			<li>Perform the computation on the graph</li>
+			<li>Run the graph computation </li>
 			<li>Collect the computation's output</li>
+		</ol> 
+	</p>
+	
+	<a name="Job-directory-structure"><h4>Job directory structure</h4></a>
+	
+	<p>Before we discuss constructing the graph, we introduce the Job Directory structure, illustrated below.
+		Each job uses this file/directory structure. Directories are represented with blue rectangles; files are red.
+	</p>
+	
+	<p>
+		<center>
+			<img src="images/figures/Slide3.png" alt="Job Directory sructure with n worker machines" width="400">
+			<br />
+			Job Directory structure when there are <i>n</i> worker machines.
+		</center>
+	</p>
+	
+	<h4>Constructing the graph</h4>
+	
+	<p>This construction process is as follows:
+		<ol>
+			<li>The master graph maker reads the file named "input" in the job directory;</li>
+			<li>The master graph maker creates <i>n</i> files in the job directory's <i>in</i> sub-directory, named 1, 2, ..., <i>n</i>, 
+				where there are <i>n</i> workers;
+			</li>
+			<li>The worker whose worker number is <i>w</i> reads the file named <i>w</i> in the <i>in</i> sub-directory and 
+				constructs the vertices indicated by that file.
+			</li>
 		</ol>
-		With these phases in mind, we now delve into some Job constructor parameters. 
 	</p>
 	
 	<ul>
@@ -159,6 +190,12 @@
 	
 	<p>
 		To be continued ...
+	</p>
+	
+	<a name="#Launching-a-cluster"><h3>Launching a jPregel cluster</h3></a>
+	
+	<p>
+		To be continued . . 
 	</p>
 	
 	<a name="Defining-a-Vertex-class"><h2>Defining a Vertex class</h2></a>
