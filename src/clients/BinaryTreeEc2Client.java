@@ -26,7 +26,7 @@ public class BinaryTreeEc2Client
 //            master = (Cluster) new ObjectInputStream(new FileInputStream(clusterFile)).readObject();
 //            master.reset();
 //        } else {
-            master = Ec2ReservationService.newSmallCluster(numWorkers);
+            master = Ec2ReservationService.newMassiveCluster(numWorkers);
 //            new ObjectOutputStream(new FileOutputStream(clusterFile)).writeObject(master);
 //        }
         if(args.length > 2) {
