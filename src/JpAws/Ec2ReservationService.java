@@ -75,7 +75,7 @@ public class Ec2ReservationService extends ReservationServiceImpl
 
     public static Cluster newMassiveCluster(int numWorkers) throws Exception {
         Ec2ReservationService rs = new Ec2ReservationService();
-        return new Cluster(rs,"m1.large","cc2.8xlarge",numWorkers);
+        return new Cluster(rs,"cc2.8xlarge","cc2.8xlarge",numWorkers);
     }
     
     @Override
