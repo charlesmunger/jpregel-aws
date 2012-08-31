@@ -5,8 +5,10 @@
 package clients;
 
 import JpAws.Ec2ReservationService;
+import JpAws.PregelAuthenticator;
 import api.Cluster;
-import java.io.*;
+import com.amazonaws.services.s3.AmazonS3Client;
+import java.io.File;
 import system.*;
 
 /**
@@ -24,10 +26,12 @@ public class BinaryTreeEc2Client
 //            master = (Cluster) new ObjectInputStream(new FileInputStream(clusterFile)).readObject();
 //            master.reset();
 //        } else {
-            master = Ec2ReservationService.newMassiveCluster(numWorkers);
+            master = Ec2ReservationService.newSmallCluster(numWorkers);
 //            new ObjectOutputStream(new FileOutputStream(clusterFile)).writeObject(master);
 //        }
-        
+        if(args.length > 2) {
+            new AmazonS3Client(PregelAuthenticator.get()).putObject(args[0], "input", new File(args[2]));
+        }
         Job job = new Job("Binary Tree Shortest Path",        // jobName
                 args[0],                            // jobDirectoryName
                 new VertexShortestPathBinaryTree(), // vertexFactory
