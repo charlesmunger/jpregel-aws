@@ -20,6 +20,8 @@ public class S3FileSystem extends FileSystem
     public S3FileSystem(String jobDirectoryName)
     {
         super(jobDirectoryName);
+        new File("input/").mkdirs();
+        new File("output/").mkdirs();
     }
 
     @Override
