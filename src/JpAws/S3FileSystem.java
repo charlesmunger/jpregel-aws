@@ -4,8 +4,6 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import java.io.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import system.FileSystem;
 
 /**
@@ -34,7 +32,13 @@ public class S3FileSystem extends FileSystem
     @Override
     public BufferedWriter getFileOutputStream()
     {
-        return inToOut("output");
+        try
+        {
+            return new S3Writer("output");
+        } catch (FileNotFoundException ex)
+        {
+            return null;
+        }
     }
 
     @Override
@@ -48,7 +52,13 @@ public class S3FileSystem extends FileSystem
     @Override
     public BufferedWriter getWorkerInputFileOutputStream(int WorkerNum)
     {
-        return inToOut("in/" + WorkerNum);
+        try
+        {
+            return new S3Writer("in/"+WorkerNum);
+        } catch (FileNotFoundException ex)
+        {
+            return null;
+        }
     }
 
     @Override
@@ -63,55 +73,29 @@ public class S3FileSystem extends FileSystem
     @Override
     public BufferedWriter getWorkerOutputFileOutputStream(int WorkerNum)
     {
-        return inToOut("out/" + WorkerNum);
-    }
-
-    private S3Writer inToOut(final String fileName)
-    {
-        final PipedInputStream in = new PipedInputStream();
-        PipedOutputStream out = null;
         try
         {
-            out = new PipedOutputStream(in);
-        } catch (IOException ex)
+            return new S3Writer("out/" + WorkerNum);
+        } catch (FileNotFoundException ex)
         {
-            Logger.getLogger(S3FileSystem.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
         }
-        Thread thread = new Thread(new Runnable()
-        {
-
-            @Override
-            public void run()
-            {
-                s3.putObject(jobDirectoryName, fileName, in, null);
-            }
-        });
-        thread.start();
-        return new S3Writer(thread, new OutputStreamWriter(out));
     }
 
     private class S3Writer extends BufferedWriter
     {
-
-        private Thread S3threadt;
-
-        S3Writer(Thread t, OutputStreamWriter o)
+        private final String path;
+        S3Writer(String path) throws FileNotFoundException 
         {
-            super(o);
-            this.S3threadt = t;
+            super(new OutputStreamWriter(new FileOutputStream(new File(path))));
+            this.path = path;
         }
 
         @Override
         public void close() throws IOException
         {
             super.close();
-            try
-            {
-                S3threadt.join();
-            } catch (InterruptedException ex)
-            {
-                throw new IOException(ex);
-            }
+            s3.putObject(jobDirectoryName, path, new File(path));
         }
     }
 }
