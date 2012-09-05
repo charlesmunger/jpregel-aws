@@ -21,7 +21,7 @@ ant run -propertyfile nbproject/configs/ShortestPath.properties -Dapplication.ar
 
 This project is licensed under the MIT license, which is provided in license.txt.
 
-export ANT_HOME=/home/ec2-user/jpregel-aws/Client-Resources/apache-ant-1.8.4-bin                  
+export ANT_HOME=/home/ec2-user/jpregel-aws/Client-Resources/apache-ant-1.8.4-bin
 export PATH=$PATH:/home/ec2-user/jpregel-aws/Client-Resources/apache-ant-1.8.4-bin/bin
 echo export ANT_HOME=/home/ec2-user/jpregel-aws/Client-Resources/apache-ant-1.8.4-bin >> ~/.bashrc
 echo export PATH=$PATH:/home/ec2-user/jpregel-aws/Client-Resources/apache-ant-1.8.4-bin/bin >> ~/.bashrc
