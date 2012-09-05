@@ -20,3 +20,8 @@ Specify a Main file with ant:
 ant run -propertyfile nbproject/configs/ShortestPath.properties -Dapplication.args="foobucket 10 10 true true"
 
 This project is licensed under the MIT license, which is provided in license.txt.
+
+export ANT_HOME=/home/ec2-user/jpregel-aws/Client-Resources/apache-ant-1.8.4-bin                  
+export PATH=$PATH:/home/ec2-user/jpregel-aws/Client-Resources/apache-ant-1.8.4-bin
+echo export ANT_HOME=/home/ec2-user/jpregel-aws/Client-Resources/apache-ant-1.8.4-bin >> ~/.bashrc
+echo export PATH=$PATH:/home/ec2-user/jpregel-aws/Client-Resources/apache-ant-1.8.4-bin >> ~/.bashrc
