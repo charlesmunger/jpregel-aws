@@ -19,7 +19,7 @@ public final class VertexShortestPathBinaryTree extends VertexShortestPath
     }
     
     @Override
-    synchronized public VertexImpl make( String line )
+    public VertexImpl make( String line )
     {
         StringTokenizer stringTokenizer = new StringTokenizer( line );
         Integer vertexId = Integer.parseInt( stringTokenizer.nextToken() );
@@ -27,7 +27,7 @@ public final class VertexShortestPathBinaryTree extends VertexShortestPath
         return make( vertexId, numChildren);
     }
     
-    synchronized public VertexImpl make( Integer vertexId, int numChildren )
+    public VertexImpl make( Integer vertexId, int numChildren )
     {
         Integer initialKnownDistance = ( vertexId == 1 ) ? 0 : Integer.MAX_VALUE;
         Message<Integer, Integer> vertexValue = new Message<Integer, Integer>( 1, initialKnownDistance );
