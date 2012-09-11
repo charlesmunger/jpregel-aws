@@ -231,7 +231,7 @@ public abstract class Worker extends ServiceImpl
      */
     
     // Command: AddVertexToWorker
-    synchronized public void addVertexToWorker( int partId, String stringVertex, Service sendingWorker )
+    public void addVertexToWorker( int partId, String stringVertex, Service sendingWorker )
     {
         VertexImpl vertexFactory = job.getVertexFactory();
         VertexImpl vertex = vertexFactory.make( stringVertex );
@@ -240,11 +240,13 @@ public abstract class Worker extends ServiceImpl
     }
     
     // Command: AddVertexToPartComplete
-    synchronized public void addVertexToPartComplete()
+     public void addVertexToPartComplete()
     {
         if ( numUnacknowledgedAddVertexCommands.decrementAndGet() == 0 )
         {
-            notify();
+            synchronized(this) {
+                notify();
+            }
         }
     }
     
