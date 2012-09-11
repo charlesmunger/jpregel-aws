@@ -13,10 +13,14 @@ final public class OntoMap<V> extends ConcurrentHashMap<Long, V>
 
     public OntoMap(Factory factory)
     {
-        super(100, 0.9f, 1);
-        this.factory = factory;
+        this(100,factory);
     }
 
+    public OntoMap(int size, Factory factory) {
+        super(size, 0.9f, 1);
+        this.factory = factory;
+    }
+    
     public V get(Long key)
     {
         putIfAbsent(key, factory.make());

@@ -14,7 +14,7 @@ public final class VertexShortestPathBinaryTree extends VertexShortestPath
     
     public VertexShortestPathBinaryTree( Integer vertexId, Message<Integer, Integer> vertexValue, Map<Integer, Integer> edgeMap )
     { 
-        super( vertexId, edgeMap );
+        super( vertexId, edgeMap ,2);
         setVertexValue( new Message( vertexId, Integer.MAX_VALUE ) );
     }
     

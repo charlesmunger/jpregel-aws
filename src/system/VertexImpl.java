@@ -66,11 +66,16 @@ implements Vertex<VertexIdType, VertexValueType, EdgeValueType, MessageValueType
             
     public VertexImpl() { vertexId = null; }
           
-    public VertexImpl( VertexIdType vertexId, Map<VertexIdType, EdgeValueType> edgeMap )
+    public VertexImpl( VertexIdType vertexId, Map<VertexIdType, EdgeValueType> edgeMap, int numOutgoingEdges)
     {
         this.vertexId   = vertexId;
         this.edgeMap = edgeMap;
-        superstepToMessageQMap = new OntoMap<MessageQ<VertexIdType, MessageValueType>>( new MessageQ( combiner ) );
+        superstepToMessageQMap = new OntoMap<MessageQ<VertexIdType, MessageValueType>>(numOutgoingEdges, new MessageQ( combiner ) );
+    }
+    
+    public VertexImpl( VertexIdType vertexId, Map<VertexIdType, EdgeValueType> edgeMap)
+    {
+        this(vertexId, edgeMap,100);
     }
     
     /* _________________________________________

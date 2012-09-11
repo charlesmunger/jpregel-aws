@@ -17,9 +17,15 @@ import java.util.StringTokenizer;
  */
 public class VertexShortestPath extends VertexImpl<Integer, Message<Integer, Integer>, Integer, Integer>
 {
-    public VertexShortestPath( Integer vertexId, Map<Integer, Integer> edgeMap )
+    public VertexShortestPath( Integer vertexId, Map<Integer, Integer> edgeMap,int numOutgoingEdges )
     {
-        super( vertexId, edgeMap );
+        super( vertexId, edgeMap,numOutgoingEdges );
+        setVertexValue( new Message<Integer, Integer>( vertexId, Integer.MAX_VALUE ) );
+        combiner = new CombinerMinInteger();
+    }
+    
+    public VertexShortestPath( Integer vertexId, Map<Integer, Integer> edgeMap ) {
+        super( vertexId, edgeMap);
         setVertexValue( new Message<Integer, Integer>( vertexId, Integer.MAX_VALUE ) );
         combiner = new CombinerMinInteger();
     }
