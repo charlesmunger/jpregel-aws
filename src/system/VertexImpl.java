@@ -152,7 +152,7 @@ implements Vertex<VertexIdType, VertexValueType, EdgeValueType, MessageValueType
     }
     
     @Override
-    synchronized public long getSuperStep() { return part.getSuperStep(); }
+    public long getSuperStep() { return part.getSuperStep(); }
     
     @Override
     public VertexIdType getVertexId() { return vertexId; }
