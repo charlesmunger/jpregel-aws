@@ -41,7 +41,18 @@ public class BinaryTreeEc2Client
                 new WorkerOutputMakerStandard()                 
                 );
         System.out.println( job + "\n    numWorkers: " + numWorkers );
-        System.out.println(master.run(job));
+        JobRunData run1 = master.run(job);
+        System.out.println(run1);
+        Job job2 = new Job("Binary Tree Shortest Path two",        // jobName
+                args[0] ="2",                            // jobDirectoryName
+                new VertexShortestPathBinaryTree(), // vertexFactory
+                new MasterGraphMakerBinaryTree(),  
+                new WorkerGraphMakerBinaryTree(),   
+                new MasterOutputMakerStandard(),
+                new WorkerOutputMakerStandard()                 
+                );
+        System.out.println(master.run(job2));
+        System.out.println(run1);
         System.exit( 0 );
     }
 }
