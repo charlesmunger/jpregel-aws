@@ -122,12 +122,7 @@ implements Vertex<VertexIdType, VertexValueType, EdgeValueType, MessageValueType
     @Override
     synchronized public Iterator<Message<VertexIdType, MessageValueType>> getMessageIterator()
     {
-        MessageQ<VertexIdType, MessageValueType> messageQ = superstepToMessageQMap.remove( getSuperStep() );
-        if ( messageQ == null )
-        {
-            messageQ = new MessageQ<VertexIdType, MessageValueType>( combiner );
-        }
-        return messageQ.iterator(); 
+        return getMessageQ().iterator();
     }
     
     @Override
