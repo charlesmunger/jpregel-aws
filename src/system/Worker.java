@@ -251,11 +251,13 @@ public abstract class Worker extends ServiceImpl
     }
     
     // Command: MessageReceived
-    synchronized public void messageReceived()
+    public void messageReceived()
     {
         if ( numUnacknowledgedSendVertexIdToMessageQMaps.decrementAndGet() == 0 )
         {
-            notify();
+            synchronized(this) {
+                notify();
+            }
         }
     }    
     
@@ -289,7 +291,7 @@ public abstract class Worker extends ServiceImpl
     }
     
     // Command: SendMessage
-    synchronized public void receiveMessage( Service sendingWorker, int partId, int vertexId, Message message, long superStep )
+    public void receiveMessage( Service sendingWorker, int partId, int vertexId, Message message, long superStep )
     {
         Part receivingPart = partIdToPartMap.get( partId );
         receivingPart.receiveMessage( vertexId, message, superStep );
@@ -449,7 +451,7 @@ public abstract class Worker extends ServiceImpl
         return master;
     }
         
-    synchronized void sendMessage( int partId, int vertexId, Message message, long superStep )
+    void sendMessage( int partId, int vertexId, Message message, long superStep )
     {
         Part receivingPart = partIdToPartMap.get( partId );
         if ( receivingPart != null )
