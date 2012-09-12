@@ -65,6 +65,7 @@ public class BinaryTreeEc2Client
 //        System.out.println(run1);
 //        System.out.println(run2);
         System.out.println(run3);
+        master.terminate();
         System.exit( 0 );
     }
 }
