@@ -25,6 +25,19 @@ public class BinaryTreeShortestPathLocalClient
         System.out.println( job + "\n    numWorkers: " + numWorkers );
         ClientToMaster master = LocalReservationService.newCluster(numWorkers);
         System.out.println(master.run(job));
+        
+//        job = new Job("Shortest Path Problem", // jobName
+//                  "examples/ShortestPath",                         // jobDirectoryName
+//                  new VertexShortestPath(),        // vertexFactory, 
+//                  new MasterGraphMakerG1(),
+//                  new WorkerGraphMakerStandard(),
+//                  new MasterOutputMakerStandard(),
+//                  new WorkerOutputMakerStandard(),
+//                  new AggregatorSumInteger(),   // problem aggregator
+//                  new AggregatorSumInteger()    // step    agregator
+//                );
+        System.out.println( job );
+        System.out.println( master.run( job ) );
         System.exit( 0 );
     }
 }

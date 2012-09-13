@@ -370,7 +370,7 @@ public abstract class Worker extends ServiceImpl
     
     synchronized private void sync( AtomicInteger numUnacknowledgedSendVertexIdToMessageQMaps )
     {
-        if ( numUnacknowledgedSendVertexIdToMessageQMaps.get() > 0 )
+        while ( numUnacknowledgedSendVertexIdToMessageQMaps.get() > 0 )
         {
             try
             {

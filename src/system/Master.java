@@ -26,7 +26,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     final static public String SERVICE_NAME = "Master";
     public static final String CLIENT_SERVICE_NAME = "ClientToMaster";
     final static public int PORT = 2048;
-    private static final int PARTS_PER_PROCESSOR = 2;
+    private static final int NUM_PARTS_PER_PROCESSOR = 2;
     static private final Department[] departments = {ServiceImpl.ASAP_DEPARTMENT};
     static private Class[][] command2DepartmentArray = {
         // ASAP Commands
@@ -42,7 +42,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     // Master attributes
     private Map<Integer, Service> integerToWorkerMap = new HashMap<Integer, Service>();
     protected AtomicInteger numRegisteredWorkers = new AtomicInteger();
-    private volatile int numWorkerProcessors;
+    private volatile int numProcessorsPerWorker;
     // computation control
     protected int numUnfinishedWorkers;
     protected boolean commandExeutionIsComplete;
@@ -53,8 +53,6 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     protected Aggregator problemAggregator;
     protected int numVertices;
 
-    
-
     public Master() throws RemoteException 
     {
         // Establish Master as a Jicos Service
@@ -62,7 +60,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     }
 
     @Override
-    public synchronized void init(int numWorkers) throws RemoteException 
+    public synchronized void init(int numWorkers) throws RemoteException, InterruptedException 
     {
         super.setService(this);
         super.setDepartments(departments);
@@ -81,7 +79,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     }
     
     @Override
-    public synchronized void setWorkerMap() 
+    public synchronized void setWorkerMap() throws InterruptedException 
     {
         // broadcaast to workers: set your integerToWorkerMap
         Command command = new SetWorkerMap(integerToWorkerMap);
@@ -99,41 +97,38 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
      * @param Job   - problem and instance parameters
      */
     @Override
-    public JobRunData run(Job job) 
+    public JobRunData run(Job job) throws InterruptedException
     {
         System.out.println("Run entered");
         // all Workers have registered with Master
         assert integerToWorkerMap.size() == numRegisteredWorkers.get();
-        System.out.println("Job split into " + ( numWorkerProcessors * PARTS_PER_PROCESSOR * numRegisteredWorkers.get() ) + " parts" );
-        job = new Job(job,numWorkerProcessors*PARTS_PER_PROCESSOR*numRegisteredWorkers.get());
+        System.out.println("Job split into " + ( numRegisteredWorkers.get() * numProcessorsPerWorker * NUM_PARTS_PER_PROCESSOR ) + " parts" );
+        job = new Job( job, numRegisteredWorkers.get() * numProcessorsPerWorker * NUM_PARTS_PER_PROCESSOR );
 
         JobRunData jobRunData = new JobRunData(job, integerToWorkerMap.size());
-
-        // broadcaast to workers: set your Job & FileSystem
         String jobDirectoryName = job.getJobDirectoryName();
-        FileSystem fileSystem = makeFileSystem( jobDirectoryName);
+        FileSystem fileSystem = makeFileSystem( jobDirectoryName );
+        
+        // broadcaast to workers: set your Job & FileSystem
         numUnfinishedWorkers = integerToWorkerMap.size();
         commandExeutionIsComplete = false;
         Command command = new SetJob(job);
         broadcast(command, this);
 
-        // while workers SetJob, read Job input file, write Worker input files
+        // while workers SetJob, read Master input file, write Worker input files
         job.readJobInputFile(fileSystem, integerToWorkerMap.size());
-
-        try 
-        {   // wait for all workers to SetJob before proceeding
-            synchronized (this) 
+          
+        // wait for all workers to SetJob before proceeding
+        synchronized (this) 
+        {
+            if (!commandExeutionIsComplete) 
             {
-                if (!commandExeutionIsComplete) 
-                {
-                    wait(); // until numUnfinishedWorkers == 0 for SetJob
-                }
+                wait(); // until numUnfinishedWorkers == 0 for SetJob
             }
-        } 
-        catch (InterruptedException ignore) {}
+        }
         jobRunData.setEndTimeSetWorkerJobAndMakeWorkerFiles();
 
-        // broadcaast to workers: set job & read your input file
+        // broadcaast to workers: read your input file
         barrierComputation(new ReadWorkerInputFile());
         jobRunData.setEndTimeReadWorkerInputFile();
 
@@ -207,7 +202,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         // !! Ensure that no service with this ID is registered already.
         // !! If there is, unregister it.
 
-        this.numWorkerProcessors = Math.max( this.numWorkerProcessors, numWorkerProcessors);
+        this.numProcessorsPerWorker = Math.max( this.numProcessorsPerWorker, numWorkerProcessors);
         Service workerService = serviceName.service();
         super.register(workerService);
         ProxyWorker workerProxy = new ProxyWorker(workerService, this, REMOTE_EXCEPTION_HANDLER);
@@ -233,16 +228,15 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     // Command: WorkerMapSet
     public void workerMapSet() { processAcknowledgement(); }
 
-    synchronized protected void barrierComputation(Command command)
+    synchronized protected void barrierComputation(Command command) throws InterruptedException
     {
         numUnfinishedWorkers = integerToWorkerMap.size();
         commandExeutionIsComplete = false;
         broadcast(command, this);
-        try {
-            if (!commandExeutionIsComplete) {
-                wait(); // until all Workers complete
-            }
-        } catch (InterruptedException ignore) {}
+        if (!commandExeutionIsComplete) 
+        {
+            wait(); // until all Workers complete
+        }
     }
 
     synchronized private void processAcknowledgement() {
