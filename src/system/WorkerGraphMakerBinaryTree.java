@@ -3,13 +3,11 @@ package system;
 import api.WorkerGraphMaker;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.StringTokenizer;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -23,7 +21,6 @@ public class WorkerGraphMakerBinaryTree implements WorkerGraphMaker
         int workerNum         = worker.getWorkerNum();
         Job job               = worker.getJob();
         FileSystem fileSystem = job.getFileSystem();
-        VertexImpl vertexFactory  = job.getVertexFactory();
         int numVertices = 0;
         
         try
@@ -55,19 +52,16 @@ public class WorkerGraphMakerBinaryTree implements WorkerGraphMaker
              *  1 child (a left child), when n is even and n = N/2;
              *  0 children, otherwise (i.e., (N + 1)/2 <= n <= N).
              */
-            ExecutorService exec = Executors.newFixedThreadPool( Runtime.getRuntime().availableProcessors() * 2 );
-            List<Future> makeNodes = makeNodes(exec,startVertexId, (numVertices - 1)/2, 2, vertexMaker, job, worker, workerNum );
+            ExecutorService exec = Executors.newFixedThreadPool( Runtime.getRuntime().availableProcessors() );
+            makeNodes(exec,startVertexId, (numVertices - 1)/2, 2, vertexMaker, job, worker, workerNum );
             if ( numVertices % 2 == 0)
             {
                 //makeNodes(exec,numVertices/2, numVertices/2, 1, vertexMaker, job, worker, workerNum );
-                makeNodes.addAll(makeNodes(exec,numVertices/2, numVertices/2, 1, vertexMaker, job, worker, workerNum ));
+                makeNodes(exec,numVertices/2, numVertices/2, 1, vertexMaker, job, worker, workerNum );
             }
-            makeNodes.addAll(makeNodes(exec,numVertices/2 + 1, stopVertexId, 0, vertexMaker, job, worker, workerNum ));
-            for (Future future : makeNodes)
-            {
-                future.get();
-            }
+            makeNodes(exec,numVertices/2 + 1, stopVertexId, 0, vertexMaker, job, worker, workerNum );
             exec.shutdown();
+            exec.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
         }
         catch ( Exception exception )
         {
@@ -139,18 +133,16 @@ public class WorkerGraphMakerBinaryTree implements WorkerGraphMaker
         }
     }
     
-    private List<Future> makeNodes( ExecutorService exec, int startVertexId, int stopVertexId, int numChildren,
+    private void makeNodes( ExecutorService exec, int startVertexId, int stopVertexId, int numChildren,
             VertexShortestPathBinaryTree vertexFactory, Job job, Worker worker,
             int workerNum)
     {
-        ArrayList<Future> futlist = new ArrayList<Future>();
         int naturalChunkSize = ( stopVertexId - startVertexId + 1 ) / ( Runtime.getRuntime().availableProcessors() * 2 );
         final int chunkSize = Math.max( 1024 * 64, naturalChunkSize ); // 500000;
         for (int i = startVertexId; i <= stopVertexId; i += chunkSize)
         {
-            futlist.add( exec.submit( new NodeMaker( i, Math.min( i + chunkSize, stopVertexId ),
-                         numChildren, vertexFactory, job, worker, workerNum ) ) );
+            exec.submit( new NodeMaker( i, Math.min( i + chunkSize, stopVertexId ),
+                         numChildren, vertexFactory, job, worker, workerNum ) ) ;
         }
-        return futlist;
     }
 }
