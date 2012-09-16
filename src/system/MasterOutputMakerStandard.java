@@ -14,6 +14,7 @@ public class MasterOutputMakerStandard implements MasterOutputMaker
 {
     @Override
     public void write(FileSystem fileSystem, int numWorkers) {
+        char[] cbuf = new char[8*1024*1024*10];
         BufferedReader bufferedReader = null;
         BufferedWriter bufferedWriter = fileSystem.getFileOutputStream();
         try {
@@ -23,12 +24,9 @@ public class MasterOutputMakerStandard implements MasterOutputMaker
                 } catch(Exception e) {
                     System.out.println("Error getting input stream for file " +fileNum + " with message " + e.getLocalizedMessage());
                 }
-
-                for (String line; (line = bufferedReader.readLine()) != null;) {
-                    bufferedWriter.write(line);
-                    bufferedWriter.newLine();
+                for (; (bufferedReader.read(cbuf)) != -1;) {
+                    bufferedWriter.write(cbuf);
                 }
-              
                 bufferedReader.close();
             }
             bufferedWriter.close();
