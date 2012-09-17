@@ -256,4 +256,27 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     }
 
     public abstract FileSystem makeFileSystem(String jobDirectoryName);
+    
+    private class Barrier
+    {
+        private int n;
+        
+        Barrier( int n ) { this.n = n; }
+        
+        synchronized void acknowledge()
+        {
+            if ( --n == 0 )
+            {
+                notify();
+            }
+        }
+        
+        synchronized void guard() throws InterruptedException
+        {
+            if ( n > 0 )
+            {
+                wait();
+            }
+        }
+    }
 }
