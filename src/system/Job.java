@@ -202,11 +202,13 @@ public final class Job implements Serializable
     @Override
     public String toString()
     {
+        String border = "\n_________________________________________________________________\n";
         StringBuilder string = new StringBuilder();
-        string.append("Job:\n\t");
+        string.append(border);
+        string.append("\nJob:\n\t");
         string.append("Name:                ").append(jobName).append("\n\t");
         string.append("Directory name:      ").append(jobDirectoryName).append("\n\t");
-        string.append("Number of parts:     ").append(numParts).append("\n\t");
+        //string.append("Number of parts:     ").append(numParts).append("\n\t");
         string.append("Vertex factory:      ").append(vertexFactory.getClass().getCanonicalName()).append("\n\t");
         string.append("Master graph maker:  ").append(masterGraphMaker.getClass().getCanonicalName()).append("\n\t");
         string.append("Worker graph maker:  ").append(workerGraphMaker.getClass().getCanonicalName()).append("\n\t");
@@ -214,7 +216,7 @@ public final class Job implements Serializable
         string.append("Worker output Maker: ").append(workerOutputMaker.getClass().getCanonicalName()).append("\n\t");
         string.append("Problem aggregator:  ").append(problemAggregator.getClass().getCanonicalName()).append("\n\t");
         string.append("Step aggregator:     ").append(stepAggregator.getClass().getCanonicalName()).append("\n\t");
-        string.append("_____________________________________________________\n");
+        string.append(border);
         return new String( string );
     }
 }

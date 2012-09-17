@@ -21,6 +21,14 @@ public class ComputeThread extends Thread
         
     ComputeThread( Worker worker ) { this.worker = worker; }
         
+    void initJob()
+    {
+        workIsAvailable = false;
+        partIdToPartMap = null;
+        workerNumToVertexIdToMessageQMapMap = null;
+        combiner = null;
+    }
+        
     @Override
     public void run()
     {

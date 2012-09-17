@@ -19,8 +19,6 @@ import java.util.Map;
 // *   How to handle request where no such VertexImpl exists?
 // * - Design and implement VertexImpl AddVertex conflict "handler". Use combiner concept, where feasible.
 
-// * TODO VertexImpl: ? Is it safe & faster to make MessageQ thread-safe & remove synchronization of receive methods?
-
 /*
  * I currently think that vertex does not need the bit of state designating it 
  * active/inactive. Instead I:
@@ -102,7 +100,7 @@ implements Vertex<VertexIdType, VertexValueType, EdgeValueType, MessageValueType
     abstract public void compute();
     
     @Override
-    abstract public boolean isSource();
+    abstract public boolean isInitiallyActive();
 
     @Override
     abstract public String output();
