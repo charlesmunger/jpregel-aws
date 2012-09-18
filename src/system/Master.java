@@ -110,9 +110,8 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         assert integerToWorkerMap.size() == numRegisteredWorkers.get();
         
         // initialize job statistics gathering
-        JobRunData jobRunData = new JobRunData(job, integerToWorkerMap.size());
-        System.out.println("Master.run: Job split into " + ( numRegisteredWorkers.get() * numProcessorsPerWorker * NUM_PARTS_PER_PROCESSOR ) + " parts" );
         job = new Job( job, numRegisteredWorkers.get() * numProcessorsPerWorker * NUM_PARTS_PER_PROCESSOR );
+        JobRunData jobRunData = new JobRunData(job, integerToWorkerMap.size());
         initJob();
         String jobDirectoryName = job.getJobDirectoryName();
         FileSystem fileSystem = makeFileSystem( jobDirectoryName );
