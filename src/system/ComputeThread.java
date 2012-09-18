@@ -21,6 +21,14 @@ public class ComputeThread extends Thread
         
     ComputeThread( Worker worker ) { this.worker = worker; }
         
+    void initJob()
+    {
+        workIsAvailable = false;
+        partIdToPartMap = null;
+        workerNumToVertexIdToMessageQMapMap = null;
+        combiner = null;
+    }
+        
     @Override
     public void run()
     {
@@ -46,7 +54,7 @@ public class ComputeThread extends Thread
             boolean thereIsANextStep =  false;
             workerNumToVertexIdToMessageQMapMap = new HashMap<Integer, Map<Object, MessageQ>>();
             Aggregator outputStepAggregator     = worker.getJob().makeStepAggregator();
-            Aggregator outputProblemAggregator  = worker.getJob().makeProblemAggregator();
+            Aggregator outputProblemAggregator  = worker.getJob().makeProblemAggregator(); //TODO: FIX? Make once/job not step!
             deltaNumVertices = 0;
             PartIterator partIterator = worker.getPartIterator();
             for ( Part part = partIterator.getPart(); part != null; part = partIterator.getPart() )

@@ -18,7 +18,7 @@ public class LANMaster extends Master {
 
     LANMaster() throws RemoteException {}
     
-    public static void main(String[] args) throws RemoteException, AlreadyBoundException {
+    public static void main(String[] args) throws RemoteException, AlreadyBoundException, InterruptedException {
         System.setSecurityManager(new RMISecurityManager());
         Registry registry = LocateRegistry.createRegistry(PORT);
         ClientToMaster master = new LANMaster();

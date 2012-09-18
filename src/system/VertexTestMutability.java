@@ -93,5 +93,7 @@ class VertexTestMutability extends VertexImpl<Integer, Message<Integer, Integer>
     }
     
     @Override
+    public boolean isInitiallyActive() { return isSource(); }
+    
     public boolean isSource() { return getVertexId() == 0; }
 }

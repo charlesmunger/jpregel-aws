@@ -123,6 +123,8 @@ public final class VertexShortestPathEuclidean extends VertexImpl<Point2D.Float,
     }
     
     @Override
+    public boolean isInitiallyActive() { return isSource(); }
+    
     public boolean isSource()
     {
         Point2D.Float vertex = (Point2D.Float) getVertexId();

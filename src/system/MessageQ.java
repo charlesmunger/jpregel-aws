@@ -17,7 +17,7 @@ final public class MessageQ<VertexIdType, MessageValueType>
     @Override
     synchronized public boolean add( Message<VertexIdType, MessageValueType> message )
     {
-        if ( ! isEmpty() && combiner != null ) 
+        if ( combiner != null && ! isEmpty() ) 
         {
             message = combiner.combine( remove(), message );
             assert isEmpty() : size();
@@ -27,7 +27,7 @@ final public class MessageQ<VertexIdType, MessageValueType>
     
     synchronized public boolean addAll( MessageQ<VertexIdType, MessageValueType> messageQ )
     {
-        if ( ! isEmpty() && combiner != null ) 
+        if ( combiner != null && ! isEmpty() ) 
         {
             assert messageQ.size() == 1 : messageQ.size();
             return super.add( combiner.combine( remove(), messageQ.remove() ) );

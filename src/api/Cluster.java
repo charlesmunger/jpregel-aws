@@ -36,7 +36,7 @@ public class Cluster implements Serializable
         this.master = deployMaster.get();
     }
 
-    synchronized public JobRunData run(Job job) throws RemoteException {
+    synchronized public JobRunData run(Job job) throws RemoteException, InterruptedException {
         return master.run(job);
     }
 

@@ -26,34 +26,42 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     final static public String SERVICE_NAME = "Master";
     public static final String CLIENT_SERVICE_NAME = "ClientToMaster";
     final static public int PORT = 2048;
-    private static final int PARTS_PER_PROCESSOR = 2;
-    static private final Department[] departments = {ServiceImpl.ASAP_DEPARTMENT};
+    private static final int NUM_PARTS_PER_PROCESSOR = 2;
+    static private final Department[] departments = { ServiceImpl.ASAP_DEPARTMENT };
     static private Class[][] command2DepartmentArray = {
         // ASAP Commands
         {
             CommandComplete.class,
             InputFileProcessingComplete.class,
             JobSet.class,
+            SuperStepComplete.class,
             WorkerMapSet.class,
-            SuperStepComplete.class
+            WorkerOutputWritten.class
         }
     };
         
     // Master attributes
     private Map<Integer, Service> integerToWorkerMap = new HashMap<Integer, Service>();
     protected AtomicInteger numRegisteredWorkers = new AtomicInteger();
-    private volatile int numWorkerProcessors;
+    private volatile int numProcessorsPerWorker;
     // computation control
     protected int numUnfinishedWorkers;
     protected boolean commandExeutionIsComplete;
     protected boolean thereIsANextStep;
     
+    // TODO: use this in init instead of what is there now. 
+    // Must ensure that registrations are not lost before barrier is set to numWorkers
+    private Barrier barrierWorkerRegistrationDone; 
+    private Barrier barrierWorkerMapSet;
+    private Barrier barrierWorkerJobSet;
+    private Barrier barrierGraphMade; 
+    private Barrier barrierSuperStepDone;
+    private Barrier barrierWorkerOutputWritten;
+    
     // graph state
     protected Aggregator stepAggregator;
     protected Aggregator problemAggregator;
     protected int numVertices;
-
-    
 
     public Master() throws RemoteException 
     {
@@ -62,30 +70,27 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     }
 
     @Override
-    public synchronized void init(int numWorkers) throws RemoteException 
+    public synchronized void init(int numWorkers) throws RemoteException, InterruptedException 
     {
         super.setService(this);
         super.setDepartments(departments);
         numUnfinishedWorkers += numWorkers;
         out.println("Master.makeWorkers: waiting for Worker registration to complete");
-        try 
+        if (numUnfinishedWorkers > 0 && !commandExeutionIsComplete) 
         {
-            if (numUnfinishedWorkers > 0 && !commandExeutionIsComplete) 
-            {
-                System.out.println("Master.makeWorkers: about to wait: numUnfinishedWorkers: " + numUnfinishedWorkers);
-                wait(); // until numUnfinishedWorkers == 0
-            }
-        } 
-        catch (InterruptedException ignore) {}
+            System.out.println("Master.makeWorkers: about to wait: numUnfinishedWorkers: " + numUnfinishedWorkers);
+            wait(); // until numUnfinishedWorkers == 0
+        }
         setWorkerMap();
     }
     
     @Override
-    public synchronized void setWorkerMap() 
+    public synchronized void setWorkerMap() throws InterruptedException 
     {
         // broadcaast to workers: set your integerToWorkerMap
+        barrierWorkerMapSet = new Barrier( integerToWorkerMap.size() );
         Command command = new SetWorkerMap(integerToWorkerMap);
-        barrierComputation(command);
+        barrierComputation( command, barrierWorkerMapSet );
     }
 
     @Override
@@ -99,42 +104,34 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
      * @param Job   - problem and instance parameters
      */
     @Override
-    public JobRunData run(Job job) 
-    {
-        System.out.println("Run entered");
+    public JobRunData run(Job job) throws InterruptedException
+    {  
         // all Workers have registered with Master
         assert integerToWorkerMap.size() == numRegisteredWorkers.get();
-        System.out.println("Job split into " + ( numWorkerProcessors * PARTS_PER_PROCESSOR * numRegisteredWorkers.get() ) + " parts" );
-        job = new Job(job,numWorkerProcessors*PARTS_PER_PROCESSOR*numRegisteredWorkers.get());
-
+        
+        // initialize job statistics gathering
         JobRunData jobRunData = new JobRunData(job, integerToWorkerMap.size());
-
-        // broadcaast to workers: set your Job & FileSystem
+        System.out.println("Master.run: Job split into " + ( numRegisteredWorkers.get() * numProcessorsPerWorker * NUM_PARTS_PER_PROCESSOR ) + " parts" );
+        job = new Job( job, numRegisteredWorkers.get() * numProcessorsPerWorker * NUM_PARTS_PER_PROCESSOR );
+        initJob();
         String jobDirectoryName = job.getJobDirectoryName();
-        FileSystem fileSystem = makeFileSystem( jobDirectoryName);
-        numUnfinishedWorkers = integerToWorkerMap.size();
-        commandExeutionIsComplete = false;
+        FileSystem fileSystem = makeFileSystem( jobDirectoryName );
+        
+        // broadcaast to workers: set your Job & FileSystem
+        barrierWorkerJobSet = new Barrier( integerToWorkerMap.size() );
         Command command = new SetJob(job);
         broadcast(command, this);
 
-        // while workers SetJob, read Job input file, write Worker input files
-        job.readJobInputFile(fileSystem, integerToWorkerMap.size());
-
-        try 
-        {   // wait for all workers to SetJob before proceeding
-            synchronized (this) 
-            {
-                if (!commandExeutionIsComplete) 
-                {
-                    wait(); // until numUnfinishedWorkers == 0 for SetJob
-                }
-            }
-        } 
-        catch (InterruptedException ignore) {}
+        // while workers SetJob, read Master input file, write Worker input files
+        job.readJobInputFile(fileSystem, integerToWorkerMap.size() );
+          
+        // wait for all workers to SetJob before proceeding
+        barrierWorkerJobSet.guard(); 
         jobRunData.setEndTimeSetWorkerJobAndMakeWorkerFiles();
 
-        // broadcaast to workers: set job & read your input file
-        barrierComputation(new ReadWorkerInputFile());
+        // broadcaast to workers: read your input file
+        barrierGraphMade = new Barrier( integerToWorkerMap.size() );
+        barrierComputation( new ReadWorkerInputFile(), barrierGraphMade );
         jobRunData.setEndTimeReadWorkerInputFile();
 
         // begin computation phase
@@ -148,8 +145,9 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
             ComputeInput computeInput = new ComputeInput(stepAggregator, problemAggregator, numVertices);
             Command startSuperStep = new StartSuperStep(computeInput);
             stepAggregator = job.makeStepAggregator(); // initialize stepAggregator
-            barrierComputation(startSuperStep); // broadcaast to workers: start a super step
-            // BEGIN Progress monitoring
+            barrierSuperStepDone = new Barrier( integerToWorkerMap.size() );
+            barrierComputation( startSuperStep, barrierSuperStepDone ); // broadcaast to workers: start a super step
+            // BEGIN Post-step progress monitoring
             if (superStep % 2 == 0) 
             {
                 long endStepTime = System.currentTimeMillis();
@@ -168,15 +166,21 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         jobRunData.setNumSuperSteps(superStep);
 
         // broadcaast to workers: write your output file
-        System.out.println("going to write workeroutputfile  ");
-        barrierComputation(new WriteWorkerOutputFile());
+        System.out.println("Master.run: writing worker output files.");
+        barrierWorkerOutputWritten = new Barrier( integerToWorkerMap.size() );
+        barrierComputation( new WriteWorkerOutputFile(), barrierWorkerOutputWritten );
         jobRunData.setEndTimeWriteWorkerOutputFiles();
 
         job.processWorkerOutputFiles(fileSystem, integerToWorkerMap.size());
         jobRunData.setEndTimeRun();
-
+        
         return jobRunData;
     }
+    
+    /**
+     * initialize master Job data structures
+     */
+    private void initJob() { numVertices = 0; }
 
     @Override
     public void shutdown(){} //Master deployment and shutdown is handled at the machine level. 
@@ -184,19 +188,20 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
 
     /* _____________________________
      *  
-     * Command implementations: Synchronize or know why it is not needed!
+     * Command implementations: Synchronize or explain why it is not needed!
      * _____________________________
      */
     // Command: CommandComplete
-    public void commandComplete(int workerNum) {
-        processAcknowledgement();
-    }
+    public void commandComplete( int workerNum ) { processAcknowledgement(); }
 
     // Command: InputFileProcessingComplete
-    synchronized public void inputFileProcessingComplete(int workerNum, int numVertices) {
+    synchronized public void inputFileProcessingComplete( int workerNum, int numVertices ) 
+    {
         this.numVertices += numVertices;
-        processAcknowledgement();
+        processAcknowledgement( barrierGraphMade );
     }
+    
+    public void workerOutputWritten() { processAcknowledgement( barrierWorkerOutputWritten ); }
 
     // Command: RegisterWorker
     synchronized public int registerWorker(ServiceName serviceName, int numWorkerProcessors ) 
@@ -207,7 +212,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         // !! Ensure that no service with this ID is registered already.
         // !! If there is, unregister it.
 
-        this.numWorkerProcessors = Math.max( this.numWorkerProcessors, numWorkerProcessors);
+        this.numProcessorsPerWorker = Math.max( this.numProcessorsPerWorker, numWorkerProcessors);
         Service workerService = serviceName.service();
         super.register(workerService);
         ProxyWorker workerProxy = new ProxyWorker(workerService, this, REMOTE_EXCEPTION_HANDLER);
@@ -219,32 +224,30 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     }
 
     // Command: SuperStepComplete
-    public void superStepComplete(ComputeOutput computeOutput) {
+    public void superStepComplete(ComputeOutput computeOutput) 
+    {
         thereIsANextStep |= computeOutput.getThereIsANextStep();
         numVertices += computeOutput.deltaNumVertices();
         stepAggregator.aggregate(computeOutput.getStepAggregator());
         problemAggregator.aggregate(computeOutput.getProblemAggregator());
         processAcknowledgement();
+        processAcknowledgement( barrierSuperStepDone );
     }
 
     // Command: JobSet
-    public void jobSet(int workerNum) { processAcknowledgement(); }
+    public void jobSet(int workerNum) { barrierWorkerJobSet.acknowledge(); }
 
     // Command: WorkerMapSet
-    public void workerMapSet() { processAcknowledgement(); }
-
-    synchronized protected void barrierComputation(Command command)
+    public void workerMapSet() { processAcknowledgement( barrierWorkerMapSet ); }
+    
+    protected void barrierComputation(Command command, Barrier guard ) throws InterruptedException
     {
-        numUnfinishedWorkers = integerToWorkerMap.size();
-        commandExeutionIsComplete = false;
-        broadcast(command, this);
-        try {
-            if (!commandExeutionIsComplete) {
-                wait(); // until all Workers complete
-            }
-        } catch (InterruptedException ignore) {}
+        broadcast( command, this );
+        guard.guard();
     }
-
+    
+    private void processAcknowledgement( Barrier guard ) { guard.acknowledge(); }
+    
     synchronized private void processAcknowledgement() {
         if (--numUnfinishedWorkers == 0) {
             commandExeutionIsComplete = true;
@@ -253,4 +256,27 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     }
 
     public abstract FileSystem makeFileSystem(String jobDirectoryName);
+    
+    private class Barrier
+    {
+        private int n;
+        
+        Barrier( int n ) { this.n = n; }
+        
+        synchronized void acknowledge()
+        {
+            if ( --n == 0 )
+            {
+                notify();
+            }
+        }
+        
+        synchronized void guard() throws InterruptedException
+        {
+            if ( n > 0 )
+            {
+                wait();
+            }
+        }
+    }
 }

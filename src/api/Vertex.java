@@ -79,16 +79,12 @@ public interface Vertex<VertexIdType, VertexValueType, EdgeValueType, MessageVal
     void compute();
     
     /**
-     * The design intention is for this method to return true if and only if this vertex is a source: 
-     * It has an in-edge degree of 0.
-     * However, jpregel <i>does not</i> check to see that no other vertex has 
-     * <i>this</i> vertex as the endpoint of an out-edge.
-     * The application programmer has complete control over its implementation:
+     * Intention: Return true if and only if this vertex is in the initial superStep's activeSet.
+     * Is invoked when vertex is added to part.
      * 
-     * @return true:  The in-degree of this vertex == 0 <br />
-     *         false: The in-degree of this vertex > 0.
+     * @return true: if and only if this vertex is in the initial superStep's activeSet.<br />
      */
-    boolean isSource();
+    boolean isInitiallyActive();
 
     /**
      * 

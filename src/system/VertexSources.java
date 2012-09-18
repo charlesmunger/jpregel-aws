@@ -12,7 +12,7 @@ public class VertexSources extends VertexImpl<Integer, Boolean, Integer, Integer
 {
     public VertexSources() {}
     
-    public VertexSources( Integer vertexId, Map<Integer, Integer> edgeMap )
+    public VertexSources( Integer vertexId, Map<Integer, Integer> edgeMap ) 
     {
         super( vertexId, edgeMap );
     }
@@ -20,15 +20,18 @@ public class VertexSources extends VertexImpl<Integer, Boolean, Integer, Integer
     @Override
     public void compute() 
     {
-        if ( null == getVertexValue() ) {
+        if ( null == getVertexValue() ) 
+        {
             setVertexValue( true ); // initially mark all vertices as sources
             
             // for each out-edge (u, v), send a message to vertex v
-            for ( Integer targetVertexId : getEdgeTargets() ) {
+            for ( Integer targetVertexId : getEdgeTargets() ) 
+            {
                 sendMessage( targetVertexId, new Message( null, null ) );
             }
         }
-        else if ( getMessageQ().size() > 0 ) {
+        else if ( getMessageQ().size() > 0 ) 
+        {
                 setVertexValue( false ); // I have at least 1 in-edge!
         }
     }
@@ -37,8 +40,7 @@ public class VertexSources extends VertexImpl<Integer, Boolean, Integer, Integer
     public String output() { return getVertexId() + " " + getVertexValue(); }
     
     @Override
-    public boolean isSource() { return true; } // unused
-
+    public boolean isInitiallyActive() { return true; }
 
     @Override
     public VertexImpl make(String line)
