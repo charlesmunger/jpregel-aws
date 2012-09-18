@@ -50,18 +50,158 @@
 	
 	<h2>Table of Contents</h2>
 	<ol>
-		<li>On 1 machine</li>
-		<li>On a Local Area Network (LAN)</li>
+		<li>Deploying on 1 machine</li>
+		<li>Deploying on a Local Area Network (LAN)</li>
 		<li>
-			On Amazon Web Services (AWS)
+			<a href="#AWS">Deploying on Amazon Web Services (AWS)</a>
 			<ol>
-				<li>Initial set up</li>
-				<li>Deploying</li>
+				<li><a href="#Initial-set-up">Initial set up</a></li>
+				<li><a href="#Start-an-application">Starting a jpregel client on EC2</a></li>
 			</ol>
 		</li>
 	</ol>
 
 	<hr>
+	
+	<h2><a name="AWS">Deploying on Amazon Web Services (AWS)</a></h2>
+	
+	<p>
+		Our deployment strategy entails an <i>Initial set up</i>: launching an AWS micro-instance as a client: 
+		It will send the jpregel Master jobs to perform.
+		Once launched, you will stop the client when you are finished with a jpregel job. 
+		You <i>never terminate the client instance</i>.
+		Instead, when you want to run another job, perhaps many days later, you begin by starting the client instance.
+		The sequence of steps to run a job from your client is much shorter than the sequence to launch the client instance.
+		We do endeavor to keep both of these instruction sequences as short as possible.
+	</p>
+	
+	<h3><a name="Initial-set-up">Initial set up</a></h3>
+	
+	<p>The initial set up of your AWS deployment environment consists of the following steps:</p>
+	
+	<ol>
+		<li>Create a free GitHub account.</li>
+		<li>Create a GitHub repository for jpregel-aws.</li>
+		<li>Create an AWS account.</li>
+		<li>Create a file with your AWS jpregel-aws access key.</li>
+		<li>Launch an instance that serves as a jpregel-aws client.</li>
+	</ol>
+	
+	<p>We now explain how to perform these steps.</p>
+	
+	<ol>
+		<li><h4>Create a free GitHub account</h4>
+			<p>
+				If you do not have a GitHub account, please create one. 
+				Rather than repeat the explanation here, please see <a href="https://github.com/signup/free" target="parent">the GitHub explanation for creating a free account.</a>
+			</p>
+		</li>
+		
+		<li>
+			<h4>Create a GitHub repository for jpregel-aws</h4>
+			<p>
+				Using your web browser, go to <a href="https://github.com/PeterCappello/jpregel-aws" target="parent">https://github.com/PeterCappello/jpregel-aws</a>.
+				Click the <b>Fork</b> button in the upper right part of the page.
+				A screen fragment of the web page is given below.
+			</p>
+			<p>
+				<img src="images/ScreenShotFork-jpregel-awsRepository.png" alt="fork button on GitHub repository" width="600" />
+			</p>
+			<p>You now have your own copy of the jpregel-aws repository.
+		</li>
+		
+		<li>
+			<h4>Create an AWS account</h4>
+			<p>
+				Using your web browser, go to 
+				<a href="http://docs.amazonwebservices.com/AWSEC2/latest/GettingStartedGuide/SignUp.html" target="parent">The latest AWS EC2 Getting Started Guide</a>.
+				You will see that getting started entails 4 steps.
+			</p>
+			<p>
+				<img src="images/ScreenShotEc2GettingStartedSteps.png" alt="EC2 Getting Started steps." width="600" />
+			</p>
+			<p>
+				Here, we are interested in the first 2 steps: 
+				<ol>
+					<li>Sign up for EC2</li>
+					<li>Launch instance</li>
+				</ol>
+			</p>
+			<p>
+				To sign up for EC2, create an AWS account:
+				<ol>
+					<li>Go to <a href="http://aws.amazon.com" target="parent">http://aws.amazon.com</a>, and click <b>Create an AWS Account</b>.</li>
+					<li>Follow the on-screen instructions.</li>
+				</ol>
+				Part of the sign-up procedure involves receiving a phone call and entering a PIN using the phone keypad.
+				When you create an account, AWS automatically signs up the account for all services. 
+				You are charged only for the services that you use.
+			</p>			
+		</li>
+		
+		<li>
+			<h4>Create a file with your jpregel AWS access keys.</h4>
+			<p>
+				Running a jpregel job first entails instantiating a Master machine and a set of Worker machines.
+				To do this, you need a jpregel access key.
+				Here is how to create a file with this key.
+			</p>
+			<ol>
+				<li>Sign in to your AWS account.</li>
+				<li>In the upper right hand corner of the page, you will see your name. Click on it, which generates a drop-down menu.</li>
+				<li>Click on the <b>Security Credentials</b> entry.</li>
+				<li>On that page, click on the Access Credentials link.</li>
+				<li>Under the Access Credentials section, click on <b>Create a new Access Key</b>.</li>
+				<li></li>
+			</ol>
+		</li>
+				
+		<li>
+			<h4>Launch an instance</h4>
+			<p>Now launch an instance that subsequently will serve as a jpregel-aws client.
+				<ol>
+					<li>Go to 
+						<a href="http://docs.amazonwebservices.com/AWSEC2/latest/GettingStartedGuide/LaunchInstance.html" target="parent">
+							Getting Started: Launch Instance instructions.
+						</a>
+					</li>
+					<li>Follow the on-screen instructions.
+						<ol>
+							<li>Name the instance something meaningful, such as "jpregel client."</li>
+							<li>Create a key pair, naming it "jpregel".</li>
+							<li>Download the private part of the key pair and store it somewhere safe.</li>
+							<li>For Launch Configuration, select the Amazon Linux, 64-bit option.</li>
+							<li>Click <b>Continue</b>.</li>
+						</ol>
+					</li>
+					<li>Launch the instance, executing the following Unix commands:
+						<ol>
+							<li>chmod 400 jpregel.pem (make sure your private key is not publicly viewable)</li>
+							<li>ssh -i jpregel.pem ec2-user@publicDNS, where publicDNS is the public domain name of your instance.</li>
+							<li>sudo yum install git</li>
+							<li>git clone (url of your jpregel repository)</li>
+							<li>./deploy.sh</li>
+							<li>export ANT_HOME=/home/ec2-user/jpregel-aws/Client-Resources/apache-ant-1.8.4</li>
+							<li>export PATH=$PATH:/home/ec2-user/jpregel-aws/Client-Resources/apache-ant-1.8.4/bin</li>
+							<li>echo export ANT_HOME=/home/ec2-user/jpregel-aws/Client-Resources/apache-ant-1.8.4 >> ~/.bashrc</li>
+							<li>echo export PATH=$PATH:/home/ec2-user/jpregel-aws/Client-Resources/apache-ant-1.8.4/bin >> ~/.bashrc</li>
+							<li>scp -i jpregel.pem key.AWSkey</li>
+						</ol>
+					</li>
+				</ol>
+			</p>
+			<p>At this point you have a running jpregel client.
+				<b>Stop</b> it, but do not <b>terminate</b> it. 
+			</p>
+			<p>
+				When you want to deploy a jpregel job on EC2, you will start this client instance.
+				Stop it when you are done.
+				If you terminate it, you must create another instance using the steps above.	
+			</p>		
+		</li>
+	</ol>
+	
+	<h3><a name="Start-an-application">Start a jpregel application on AWS</a></h3>
 	
 <!--
 	
