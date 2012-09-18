@@ -106,9 +106,8 @@ public class VertexPageRank extends VertexImpl<Integer, Double, OutEdge, Double>
             return new VertexPageRank( vertexId, outEdgeMap );			
 	}
         
-        /**
-         * Unused method
-         */
         @Override
-        public boolean isSource() { return false; }
+        public boolean isInitiallyActive() { return isSource(); }
+            
+        public boolean isSource() { return true; }
 }

@@ -102,5 +102,7 @@ public class VertexShortestPath extends VertexImpl<Integer, Message<Integer, Int
     }
     
     @Override
+    public boolean isInitiallyActive() { return isSource(); }
+    
     public boolean isSource() { return getVertexId() == 1; }
 }
