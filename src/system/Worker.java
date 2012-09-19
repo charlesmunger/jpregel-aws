@@ -315,10 +315,9 @@ public abstract class Worker extends ServiceImpl
     {
         this.job = job;
         partIdToPartMap = new ConcurrentHashMap<Integer, Part>();
-        // TODO: Worker: partSet ? How can this be correct - setting partSet to values when it is empty? 
-        // (should be activePartSet) fix code (?) so that it is. Now, it's all part.
+        // TODO: Worker: partSet: should be just parts that have > 0 active vertices
         partSet = partIdToPartMap.values();
-        numUnacknowledgedAddVertexCommands = new AtomicInteger();; 
+        numUnacknowledgedAddVertexCommands = new AtomicInteger(); 
         numUnacknowledgedSendVertexIdToMessageQMaps = new AtomicInteger();
         numWorkingComputeThreads = new AtomicInteger();
         superStep = -1L;

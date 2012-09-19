@@ -147,7 +147,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
             barrierSuperStepDone = new Barrier( integerToWorkerMap.size() );
             barrierComputation( startSuperStep, barrierSuperStepDone ); // broadcaast to workers: start a super step
             // BEGIN Post-step progress monitoring
-            if (superStep % 2 == 0) 
+            if (superStep % 10 == 0) 
             {
                 long endStepTime = System.currentTimeMillis();
                 long elapsedTime = endStepTime - startStepTime;
@@ -239,13 +239,13 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     // Command: WorkerMapSet
     public void workerMapSet() { processAcknowledgement( barrierWorkerMapSet ); }
     
-    protected void barrierComputation(Command command, Barrier guard ) throws InterruptedException
+    void barrierComputation(Command command, Barrier barrier ) throws InterruptedException
     {
         broadcast( command, this );
-        guard.guard();
+        barrier.guard();
     }
     
-    private void processAcknowledgement( Barrier guard ) { guard.acknowledge(); }
+    private void processAcknowledgement( Barrier barrier ) { barrier.acknowledge(); }
     
     synchronized private void processAcknowledgement() {
         if (--numUnfinishedWorkers == 0) {
