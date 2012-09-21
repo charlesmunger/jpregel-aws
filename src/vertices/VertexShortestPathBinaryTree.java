@@ -1,8 +1,12 @@
- package system;
+ package vertices;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
+import system.Job;
+import system.Message;
+import system.VertexImpl;
+import system.VertexShortestPath;
 
 /**
  *

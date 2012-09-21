@@ -1,5 +1,6 @@
 package system;
 
+import vertices.VertexShortestPathBinaryTree;
 import api.WorkerGraphMaker;
 import java.io.BufferedReader;
 import java.io.IOException;
