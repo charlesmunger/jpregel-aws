@@ -99,9 +99,12 @@ public class Mailer extends Processor
     
     private Queue copyCommandQ() 
     {
-        Queue<Command> commandQCopy = commandQ;
-        commandQ = new ConcurrentLinkedQueue<Command>();
-        return commandQCopy;
+        synchronized ( commandQLock ) 
+        {
+            Queue<Command> commandQCopy = commandQ;
+            commandQ = new ConcurrentLinkedQueue<Command>();
+            return commandQCopy;
+        }
     }
     
     /**
@@ -110,16 +113,11 @@ public class Mailer extends Processor
     @Override
     void process( Object object ) 
     {
-        Queue<Command> commandQCopy;
-        synchronized ( commandQLock )
+        if ( commandQ.isEmpty() )
         {
-            if ( commandQ.isEmpty() )
-            {
-                return;
-            }
-            commandQCopy = copyCommandQ();
+            return;
         }
-        
+        Queue<Command> commandQCopy = copyCommandQ();
         try
         {
             toAddress.receiveCommands ( fromAddress, commandQCopy );

@@ -32,6 +32,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         // ASAP Commands
         {
             CommandComplete.class,
+            GarbageCollected.class,
             InputFileProcessingComplete.class,
             JobSet.class,
             SuperStepComplete.class,
@@ -54,7 +55,8 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     private Barrier barrierWorkerRegistrationDone; 
     private Barrier barrierWorkerMapSet;
     private Barrier barrierWorkerJobSet;
-    private Barrier barrierGraphMade; 
+    private Barrier barrierGraphMade;
+    private Barrier barrierGarbageCollected;
     private Barrier barrierSuperStepDone;
     private Barrier barrierWorkerOutputWritten;
     
@@ -132,6 +134,11 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         barrierGraphMade = new Barrier( integerToWorkerMap.size() );
         barrierComputation( new ReadWorkerInputFile(), barrierGraphMade );
         jobRunData.setEndTimeReadWorkerInputFile();
+        
+        // broadcaast to workers: Collect your garbage
+        barrierGarbageCollected = new Barrier( integerToWorkerMap.size() );
+        barrierComputation( new CollectGarbage(), barrierGarbageCollected );
+        jobRunData.setEndTimeGarbageCollected();
 
         // begin computation phase
         problemAggregator = job.makeProblemAggregator();
@@ -192,6 +199,8 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
      */
     // Command: CommandComplete
     public void commandComplete( int workerNum ) { processAcknowledgement(); }
+    
+    public void garbageCollected() { processAcknowledgement( barrierGarbageCollected ); }
 
     // Command: InputFileProcessingComplete
     synchronized public void inputFileProcessingComplete( int workerNum, int numVertices ) 

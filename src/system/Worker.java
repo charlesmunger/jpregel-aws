@@ -41,6 +41,7 @@ public abstract class Worker extends ServiceImpl
         {
             AddVertexToWorker.class,
             AddVertexToPartComplete.class,
+            CollectGarbage.class,
             MessageReceived.class,
             ReadWorkerInputFile.class,
             WriteWorkerOutputFile.class,
@@ -254,6 +255,13 @@ public abstract class Worker extends ServiceImpl
             synchronized(this) { notify(); }
         }
     }
+     
+     public void collectGarbage()
+     { 
+         System.gc();
+         Command command = new GarbageCollected();
+         sendCommand( master, command );
+     }
     
     // Command: MessageReceived
     public void messageReceived()
