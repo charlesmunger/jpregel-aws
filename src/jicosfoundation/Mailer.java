@@ -46,6 +46,7 @@ public class Mailer extends Processor
     private BlockingQueue<Mailer> mailQ; // queue of references to this.
     private RemoteExceptionHandler remoteExceptionHandler;
     private Proxy myProxy;
+    private final Object commandQLock = new Object();
     
     public Mailer( Service fromAddress, RemoteExceptionHandler remoteExceptionHandler, 
                    BlockingQueue<Mailer> mailQ, Proxy myProxy) 
@@ -65,12 +66,23 @@ public class Mailer extends Processor
     /** Add a Command to the list.
      * @param command The Command object to be added.
      */    
-    public synchronized void add( Command command )
+//    public synchronized void add( Command command )
+//    { 
+//        assert command != null;
+//        commandQ.add( command );
+//        try
+//        {
+//            mailQ.add( this ); // notify mail processor: send commandQ
+//        }
+//        catch ( Exception e ) { e.printStackTrace(); }
+//    }
+    
+    public void add( Command command )
     { 
         assert command != null;
         
         // synchronization is necessary to ensure add completes before copyCommandQ makes commandQ garbage.
-        commandQ.add( command );
+        synchronized ( commandQLock ) { commandQ.add( command ); }
         try
         {
             mailQ.add( this ); // notify mail processor: send commandQ
@@ -78,7 +90,14 @@ public class Mailer extends Processor
         catch ( Exception e ) { e.printStackTrace(); }
     }
     
-    private synchronized Queue copyCommandQ() 
+//    private synchronized Queue copyCommandQ() 
+//    {
+//        Queue<Command> commandQCopy = commandQ;
+//        commandQ = new ConcurrentLinkedQueue<Command>();
+//        return commandQCopy;
+//    }
+    
+    private Queue copyCommandQ() 
     {
         Queue<Command> commandQCopy = commandQ;
         commandQ = new ConcurrentLinkedQueue<Command>();
@@ -91,12 +110,16 @@ public class Mailer extends Processor
     @Override
     void process( Object object ) 
     {
-        if ( commandQ.isEmpty() )
+        Queue commandQCopy;
+        synchronized ( commandQLock )
         {
-            return;
+            if ( commandQ.isEmpty() )
+            {
+                return;
+            }
+            commandQCopy = copyCommandQ();
         }
         
-        Queue commandQCopy = copyCommandQ();
         try
         {
             toAddress.receiveCommands ( fromAddress, commandQCopy );
