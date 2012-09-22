@@ -172,7 +172,7 @@ abstract public class ServiceImpl extends UnicastRemoteObject
             Command command = i.next();
             if ( command instanceof CommandList )
             {
-                Queue queue = ((CommandList) command).q();
+                Queue<Command> queue = ((CommandList) command).q();
                 processCommands ( queue );
             }
             else
@@ -205,7 +205,7 @@ abstract public class ServiceImpl extends UnicastRemoteObject
      * @param marshalledCommandQ See the Service interface.
      */    
     @Override
-    public final void receiveCommands ( Service sender, Queue commandQ)
+    public final void receiveCommands ( Service sender, Queue<Command> commandQ)
     {
         assert sender != null;
         assert commandQ != null;

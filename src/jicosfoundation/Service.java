@@ -51,7 +51,7 @@ public interface Service extends Remote
      * @param commandQ a marshalled LinkedList of Command objects.
      * @throws RemoteException This is a Remote method.
      */    
-    public void receiveCommands ( Service sender, Queue commandQ) 
+    public void receiveCommands ( Service sender, Queue<Command> commandQ) 
            throws RemoteException;
     
     /** A Remote method for synchronously executing a Command.

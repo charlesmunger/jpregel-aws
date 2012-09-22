@@ -110,7 +110,7 @@ public class Mailer extends Processor
     @Override
     void process( Object object ) 
     {
-        Queue commandQCopy;
+        Queue<Command> commandQCopy;
         synchronized ( commandQLock )
         {
             if ( commandQ.isEmpty() )
