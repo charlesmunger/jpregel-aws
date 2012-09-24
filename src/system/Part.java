@@ -90,7 +90,7 @@ public final class Part
     
     void incrementNumMessagesSent() { numMessagesSent++; }
     
-    synchronized void receiveMessage( Object vertexId, Message message, long superStep )
+    void receiveMessage( Object vertexId, Message message, long superStep )
     {
         VertexImpl vertex = vertexIdToVertexMap.get( vertexId );
         assert vertex != null : vertexId;
@@ -98,7 +98,7 @@ public final class Part
         addToActiveSet( superStep, vertex );
     }
     
-    synchronized void receiveMessageQ( Object vertexId, MessageQ messageQ, long superStep )
+    void receiveMessageQ( Object vertexId, MessageQ messageQ, long superStep )
     {
         VertexImpl vertex = vertexIdToVertexMap.get( vertexId );
         vertex.receiveMessageQ( messageQ, superStep );
