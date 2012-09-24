@@ -22,50 +22,55 @@
  *  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                   *
  *                                                                           *
  * ************************************************************************* */
-
 /**
  * Encapsulates a List of Commands to be sent to a particular Service.
  *
  * @version 1.0
- * @author  Peter Cappello
+ * @author Peter Cappello
  */
-
 package jicosfoundation;
 
 import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class Mailer extends Processor
 {
+
     private Service fromAddress;
     private Service toAddress;   // the destination of this Mail
     private Queue<Command> commandQ = new ConcurrentLinkedQueue<Command>();
     private BlockingQueue<Mailer> mailQ; // queue of references to this.
     private RemoteExceptionHandler remoteExceptionHandler;
     private Proxy myProxy;
-    private final Object commandQLock = new Object();
-    
-    public Mailer( Service fromAddress, RemoteExceptionHandler remoteExceptionHandler, 
-                   BlockingQueue<Mailer> mailQ, Proxy myProxy) 
-    { 
-        super( mailQ );
-             
+    private final ReadWriteLock commandQLock = new ReentrantReadWriteLock();
+    private final Lock r = commandQLock.readLock();
+    private final Lock w = commandQLock.writeLock();
+
+    public Mailer(Service fromAddress, RemoteExceptionHandler remoteExceptionHandler,
+            BlockingQueue<Mailer> mailQ, Proxy myProxy)
+    {
+        super(mailQ, "Mailer");
+
         assert fromAddress != null;
         assert remoteExceptionHandler != null;
-        
+
         this.fromAddress = fromAddress;
         this.remoteExceptionHandler = remoteExceptionHandler;
         this.mailQ = mailQ;
         this.myProxy = myProxy;
         toAddress = myProxy.getService();
     }
-    
-    /** Add a Command to the list.
+
+    /**
+     * Add a Command to the list.
+     *
      * @param command The Command object to be added.
-     */    
+     */
 //    public synchronized void add( Command command )
 //    { 
 //        assert command != null;
@@ -76,77 +81,89 @@ public class Mailer extends Processor
 //        }
 //        catch ( Exception e ) { e.printStackTrace(); }
 //    }
-    
-    public void add( Command command )
-    { 
+    public void add(Command command)
+    {
         assert command != null;
-        
+
         // synchronization is necessary to ensure add completes before copyCommandQ makes commandQ garbage.
-        synchronized ( commandQLock ) { commandQ.add( command ); }
+        r.lock();
         try
         {
-            mailQ.add( this ); // notify mail processor: send commandQ
+            commandQ.add(command);
+        } finally
+        {
+            r.unlock();
         }
-        catch ( Exception e ) { e.printStackTrace(); }
+        try
+        {
+            mailQ.add(this); // notify mail processor: send commandQ
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
-    
+
 //    private synchronized Queue copyCommandQ() 
 //    {
 //        Queue<Command> commandQCopy = commandQ;
 //        commandQ = new ConcurrentLinkedQueue<Command>();
 //        return commandQCopy;
 //    }
-    
-    private Queue copyCommandQ() 
+    private Queue copyCommandQ()
     {
-        synchronized ( commandQLock ) 
+        w.lock();
+        try
         {
             Queue<Command> commandQCopy = commandQ;
             commandQ = new ConcurrentLinkedQueue<Command>();
             return commandQCopy;
+        } finally
+        {
+            w.unlock();
         }
     }
-    
+
     /**
      * Mail command queue to destination distributed component
      */
     @Override
-    void process( Object object ) 
+    void process(Object object)
     {
-        if ( commandQ.isEmpty() )
+        if (commandQ.isEmpty())
         {
             return;
         }
         Queue<Command> commandQCopy = copyCommandQ();
         try
         {
-            toAddress.receiveCommands ( fromAddress, commandQCopy );
-        }
-        catch ( Exception exception ) 
+            toAddress.receiveCommands(fromAddress, commandQCopy);
+        } catch (Exception exception)
         {
             exception.printStackTrace();
-            System.out.println( "Mail: toAddress: " + toAddress + "\n Command Q: \n");
-            for ( Iterator iterator = commandQCopy.iterator(); iterator.hasNext(); )
+            System.out.println("Mail: toAddress: " + toAddress + "\n Command Q: \n");
+            for (Iterator iterator = commandQCopy.iterator(); iterator.hasNext();)
             {
-                System.out.println( ((Command) iterator.next()) );
+                System.out.println(((Command) iterator.next()));
             }
             myProxy.evict();
-            System.exit( 1 ); // !! TODO modify when jPregel becomes fault-tolerant
+            System.exit(1); // !! TODO modify when jPregel becomes fault-tolerant
             //remoteExceptionHandler.handle ( exception, fromAddress, toAddress );         
         }
     }
-    
-    /** Returns a String representation of the object.
+
+    /**
+     * Returns a String representation of the object.
+     *
      * @return A String representation of the object.
-     */    
-    public String toString() 
+     */
+    public String toString()
     {
         StringBuffer stringBuffer = new StringBuffer("Mail: toAddress: " + toAddress);
         stringBuffer.append("\n Command Q: \n");
-        for ( Iterator iterator = commandQ.iterator(); iterator.hasNext(); )
+        for (Iterator iterator = commandQ.iterator(); iterator.hasNext();)
         {
-            stringBuffer.append( ((Command) iterator.next()).toString() );
+            stringBuffer.append(((Command) iterator.next()).toString());
         }
-        return new String( stringBuffer );
+        return new String(stringBuffer);
     }
 }

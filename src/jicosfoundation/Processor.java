@@ -47,9 +47,9 @@ abstract class Processor<T> extends Thread
     private BlockingQueue<T> q;            // queue of objects to be processed
     private boolean paused;             // pause processing during checkpointing        
     
-    public Processor( BlockingQueue<T> q ) 
+    public Processor( BlockingQueue<T> q, String name ) 
     {
-        super( "Jicos Processer " + (++nProcessors) );
+        super( "Jicos Processer " + (++nProcessors) + " " +name);
         assert q != null;
         
         setDaemon( true );
@@ -57,6 +57,9 @@ abstract class Processor<T> extends Thread
         start();
     }
     
+    public Processor(BlockingQueue<T> q) {
+        this(q,"");
+    }
     abstract void process( T object );
     
     public void run()
