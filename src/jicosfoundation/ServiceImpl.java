@@ -86,7 +86,7 @@ abstract public class ServiceImpl extends UnicastRemoteObject
      * @return a reference to the Mailer object just created. 
      * Client may cache this for subsequent use.
      */
-    protected synchronized final Mailer addMail( Proxy myProxy,
+    protected synchronized final Mailer addMail( Proxy myProxy, //TODO evalute whether needs to be synchronized
                                  RemoteExceptionHandler remoteExceptionHandler ) 
     {
         assert remoteExceptionHandler != null;        
