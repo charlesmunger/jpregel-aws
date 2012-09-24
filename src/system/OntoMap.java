@@ -1,34 +1,96 @@
 package system;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
- * For all Long keys, get( Long ) returns a non-null value.
+ * A map that creates objects on demand as they are requested. 
+ * Uses Longs as keys, and does not create value objects unless their keys do 
+ * not already have a corresponding value in the map. 
+ * 
+ * If multiple threads get(Long key) the same key, one thread will create a 
+ * value object and the others will block until the object is created, and then
+ * they will get a reference to it. Because this class is final, this is nothing
+ * to worry about. 
  *
- * @author Pete Cappello
+ * @author Charles Munger
  */
-final public class OntoMap<V> extends ConcurrentHashMap<Long, V>
+final public class OntoMap<V>
 {
-    private Factory<V> factory;
 
-    public OntoMap(Factory factory)
+    private final Factory<V> factory;
+    private final ConcurrentMap<Long, Holder<V>> map;
+
+    public OntoMap(Factory<V> factory)
     {
-        this(100,factory);
+        this(100, factory);
     }
 
-    public OntoMap(int size, Factory factory) {
-        super(size, 0.9f, 1);
+    public OntoMap(int size, Factory<V> factory)
+    {
+        map = new ConcurrentHashMap<Long, Holder<V>>(100, 0.9f, 2);
         this.factory = factory;
     }
-    
-    public V get(Long key)
+
+    public V get(final Long key)
     {
-        putIfAbsent(key, factory.make());
-        return super.get(key);
+        final Holder<V> h = new Holder<V>();
+        final Holder<V> putIfAbsent = map.putIfAbsent(key, h);
+        if (putIfAbsent != null)
+        {
+            return putIfAbsent.blockingGet();
+        } else
+        {
+            final V make = factory.make();
+            h.fill(make);
+            return make;
+        }
     }
 
     public V remove(Long key)
     {
-        return super.remove(key);
+        final Holder<V> remove = map.remove(key);
+        return remove == null ? null : remove.get();
+    }
+
+    private class Holder<T>
+    {
+
+        private volatile T contents = null;
+
+        void fill(T contents)
+        {
+            this.contents = contents;
+            synchronized (this)
+            {
+                notifyAll();
+            }
+        }
+
+        T blockingGet()
+        {
+            if (contents == null)
+            {
+                synchronized (this)
+                {
+                    try
+                    {
+                        while (contents == null)
+                        {
+                            wait();
+                        }
+                    } catch (InterruptedException ex)
+                    {
+                        System.out.println("Wait interrupted in get");
+                    }
+                }
+            }
+            return contents;
+        }
+
+        T get()
+        {
+            return contents;
+        }
     }
 }
