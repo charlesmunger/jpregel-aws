@@ -55,7 +55,8 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     private Barrier barrierWorkerRegistrationDone; 
     private Barrier barrierWorkerMapSet;
     private Barrier barrierWorkerJobSet;
-    private Barrier barrierGraphMade;
+//    private Barrier barrierGraphMade;
+    private BarrierComputation barrierGraphMade;
     private Barrier barrierGarbageCollected;
     private Barrier barrierSuperStepDone;
     private Barrier barrierWorkerOutputWritten;
@@ -131,8 +132,11 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         jobRunData.setEndTimeSetWorkerJobAndMakeWorkerFiles();
 
         // broadcaast to workers: read your input file
-        barrierGraphMade = new Barrier( integerToWorkerMap.size() );
-        barrierComputation( new ReadWorkerInputFile(), barrierGraphMade );
+//        barrierGraphMade = new Barrier( integerToWorkerMap.size() );
+//        barrierComputation( new ReadWorkerInputFile(), barrierGraphMade );
+        command = new ReadWorkerInputFile();
+        barrierGraphMade = new BarrierComputation( command );
+        barrierGraphMade.start();
         jobRunData.setEndTimeReadWorkerInputFile();
         
         // broadcaast to workers: Collect your garbage
@@ -206,7 +210,8 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     synchronized public void inputFileProcessingComplete( int workerNum, int numVertices ) 
     {
         this.numVertices += numVertices;
-        processAcknowledgement( barrierGraphMade );
+//        processAcknowledgement( barrierGraphMade );
+        acceptAcknowledgement( barrierGraphMade );
     }
     
     public void workerOutputWritten() { processAcknowledgement( barrierWorkerOutputWritten ); }
@@ -247,6 +252,11 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
 
     // Command: WorkerMapSet
     public void workerMapSet() { processAcknowledgement( barrierWorkerMapSet ); }
+    
+    void acceptAcknowledgement( BarrierComputation barrierComputation )
+    {
+        barrierComputation.acknowledge();
+    }
     
     void barrierComputation(Command command, Barrier barrier ) throws InterruptedException
     {

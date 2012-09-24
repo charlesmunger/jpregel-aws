@@ -25,18 +25,15 @@
 
 /**
  * Generic distributed service.
- *
- * @version 1.0
- * @author  Peter Cappello
- */
-
-/*
  * Extender of ServiceImpl: Your constructor must invoke setDepartments, passing
  * it an array of Department objects, the 0th of which is assumed to be the asap
  * "Department": A Command type is Associate with this "Department" if and only 
  * if the Command types is to be executed by the RMI thread executing the 
  * receiveCommands method. 
  * Such Command types must invoke neither wait() nor Remote methods.
+ * 
+ * @version 1.0
+ * @author  Peter Cappello
  */
 
 package jicosfoundation;
@@ -46,6 +43,7 @@ import java.rmi.*;
 import java.rmi.server.*;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 abstract public class ServiceImpl extends UnicastRemoteObject 
                                   implements Service
@@ -285,5 +283,34 @@ abstract public class ServiceImpl extends UnicastRemoteObject
         }
         ObjectInputStream objectInputStream = new ObjectInputStream( new ByteArrayInputStream( bytes ) );
         return objectInputStream.readObject();
+    }
+    
+    protected class BarrierComputation
+    {
+        private Command command;
+        private AtomicInteger unfinishedCommands;
+        
+        public BarrierComputation( Command command )
+        {
+            this.command = command;
+            unfinishedCommands = new AtomicInteger( proxyManager.size() );
+        }
+        
+        public void start() throws InterruptedException
+        {
+            ServiceImpl.this.broadcast( command, ServiceImpl.this );
+            while ( unfinishedCommands.get() > 0 )
+            {
+                synchronized ( this ) { wait(); }
+            }
+        }
+        
+        public void acknowledge()
+        {
+            if ( unfinishedCommands.decrementAndGet() == 0 )
+            {
+                synchronized ( this ) { notify(); }
+            }
+        }
     }
 }
