@@ -24,7 +24,8 @@ public class MasterOutputMakerStandard implements MasterOutputMaker
                 } catch(Exception e) {
                     System.out.println("Error getting input stream for file " +fileNum + " with message " + e.getLocalizedMessage());
                 }
-                for (; (bufferedReader.read(cbuf)) != -1;) {
+                
+                while(bufferedReader.read(cbuf) != -1) {
                     bufferedWriter.write(cbuf);
                 }
                 bufferedReader.close();
