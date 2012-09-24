@@ -89,15 +89,20 @@ public class VertexShortestPath extends VertexImpl<Integer, Message<Integer, Int
 //        voteToHalt(); 
     }
 
+      
     @Override
     public String output() 
     {
         StringBuilder string = new StringBuilder();
-        string.append( getVertexId() );
-        string.append( " : ");
-        string.append( getVertexValue().getVertexId() );
-        string.append( " - ");
-        string.append( getVertexValue().getMessageValue() );
+        string.append( "" );
+        if ( getNumVertices() == getVertexId() )
+        {
+            string.append( getVertexId() );
+            string.append( " : ");
+            string.append( getVertexValue().getVertexId() );
+            string.append( " - ");
+            string.append( getVertexValue().getMessageValue() );
+        }
         return new String( string );
     }
     

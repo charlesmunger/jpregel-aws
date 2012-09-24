@@ -4,6 +4,7 @@
  */
 package clients;
 
+import vertices.VertexShortestPathBinaryTree;
 import JpAws.Ec2ReservationService;
 import JpAws.PregelAuthenticator;
 import api.Cluster;
