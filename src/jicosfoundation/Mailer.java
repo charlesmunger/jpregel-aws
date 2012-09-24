@@ -71,16 +71,6 @@ public class Mailer extends Processor
      *
      * @param command The Command object to be added.
      */
-//    public synchronized void add( Command command )
-//    { 
-//        assert command != null;
-//        commandQ.add( command );
-//        try
-//        {
-//            mailQ.add( this ); // notify mail processor: send commandQ
-//        }
-//        catch ( Exception e ) { e.printStackTrace(); }
-//    }
     public void add(Command command)
     {
         assert command != null;
@@ -103,24 +93,20 @@ public class Mailer extends Processor
         }
     }
 
-//    private synchronized Queue copyCommandQ() 
-//    {
-//        Queue<Command> commandQCopy = commandQ;
-//        commandQ = new ConcurrentLinkedQueue<Command>();
-//        return commandQCopy;
-//    }
     private Queue copyCommandQ()
     {
+        Queue<Command> commandQCopy;
+        Queue<Command> temp = new ConcurrentLinkedQueue<Command>();
         w.lock();
         try
         {
-            Queue<Command> commandQCopy = commandQ;
-            commandQ = new ConcurrentLinkedQueue<Command>();
-            return commandQCopy;
+            commandQCopy = commandQ;
+            commandQ = temp;
         } finally
         {
             w.unlock();
         }
+        return commandQCopy;
     }
 
     /**
