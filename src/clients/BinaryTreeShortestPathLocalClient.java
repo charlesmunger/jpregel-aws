@@ -1,6 +1,7 @@
 package clients;
 
 import system.*;
+import vertices.VertexShortestPathBinaryTree;
 
 /**
  *
