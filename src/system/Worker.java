@@ -69,7 +69,7 @@ public abstract class Worker extends ServiceImpl
     }
     
     private final Proxy masterProxy;
-    private int myWorkerNum;
+    private AtomicInteger myWorkerNum = new AtomicInteger();
     private final ComputeThread[] computeThreads;
     
     private Map<Integer, Service> workerNumToWorkerMap;
@@ -118,7 +118,7 @@ public abstract class Worker extends ServiceImpl
     
     public void init() throws RemoteException {
         CommandSynchronous command = new RegisterWorker( serviceName(), Runtime.getRuntime().availableProcessors() ); 
-        myWorkerNum = (Integer) master.executeCommand( this, command ); 
+        myWorkerNum.set((Integer) master.executeCommand( this, command )); 
         super.register ( master );
         startComputeThreads();
     }
@@ -149,7 +149,7 @@ public abstract class Worker extends ServiceImpl
         
     synchronized public Collection<Part> getParts() { return partIdToPartMap.values(); }
     
-    synchronized public int getWorkerNum() { return myWorkerNum; }
+    public int getWorkerNum() { return myWorkerNum.get(); }
         
     Collection<Part> getPartSet() { return partSet; }
     
@@ -168,7 +168,7 @@ public abstract class Worker extends ServiceImpl
     {
         int partId = job.getPartId( vertex.getVertexId() );
         int workerNum = getWorkerNum( partId );
-        if ( myWorkerNum == workerNum )
+        if ( myWorkerNum.get() == workerNum )
         {   // vertex is local to this worker
             addVertexToPart( partId, vertex );
         }
@@ -287,7 +287,7 @@ public abstract class Worker extends ServiceImpl
         {
             computeThread.setPartIdToPartMap( partIdToPartMap );
         }
-        Command command = new InputFileProcessingComplete( myWorkerNum, numVertices );
+        Command command = new InputFileProcessingComplete( myWorkerNum.get(), numVertices );
         sendCommand( master, command );
         
         // output part sizes to see how PartId for vertices are distributed
@@ -336,7 +336,7 @@ public abstract class Worker extends ServiceImpl
             computeThread.initJob();
         }
         
-        Command command = new JobSet( myWorkerNum );
+        Command command = new JobSet( myWorkerNum.get() );
         sendCommand( master, command );
      }
     
@@ -496,7 +496,7 @@ public abstract class Worker extends ServiceImpl
         {
             Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
         }
-        Command command = new CommandComplete( myWorkerNum );
+        Command command = new CommandComplete( myWorkerNum.get() );
         sendCommand( master, command );
     }
 }
