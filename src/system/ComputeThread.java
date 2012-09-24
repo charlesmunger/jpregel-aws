@@ -23,6 +23,7 @@ public class ComputeThread extends Thread
         
     void initJob()
     {
+        super.setName("Worker "+worker.getWorkerNum()+ "'s ComputeThread");
         workIsAvailable = false;
         partIdToPartMap = null;
         workerNumToVertexIdToMessageQMapMap = null;
