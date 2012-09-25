@@ -14,17 +14,20 @@ public class MasterOutputMakerStandard implements MasterOutputMaker
 {
     @Override
     public void write(FileSystem fileSystem, int numWorkers) {
-        BufferedReader bufferedReader;
+        char[] cbuf = new char[8*1024*1024*10];
+        BufferedReader bufferedReader = null;
         BufferedWriter bufferedWriter = fileSystem.getFileOutputStream();
         try {
             for (int fileNum = 1; fileNum <= numWorkers; fileNum++) {
-                bufferedReader = fileSystem.getWorkerOutputFileInputStream(fileNum);
-
-                for (String line; (line = bufferedReader.readLine()) != null;) {
-                    bufferedWriter.write(line);
-                    bufferedWriter.newLine();
+                try {
+                    bufferedReader = fileSystem.getWorkerOutputFileInputStream(fileNum);
+                } catch(Exception e) {
+                    System.out.println("Error getting input stream for file " +fileNum + " with message " + e.getLocalizedMessage());
                 }
-              
+                
+                while(bufferedReader.read(cbuf) != -1) {
+                    bufferedWriter.write(cbuf);
+                }
                 bufferedReader.close();
             }
             bufferedWriter.close();

@@ -38,9 +38,14 @@ import system.Master;
 
 public final class RegisterWorker implements CommandSynchronous
 {
-    private ServiceName workerServiceName;
+    private final ServiceName workerServiceName;
+    private final int numProcessors;
     
-    public RegisterWorker( ServiceName workerServiceName ) { this.workerServiceName = workerServiceName; }
+    public RegisterWorker( ServiceName workerServiceName, int numProcessors )
+    { 
+        this.workerServiceName = workerServiceName;
+        this.numProcessors = numProcessors;
+    }
     
     @Override
     public Integer execute( Proxy proxy, RemoteExceptionHandler remoteExceptionHandler ) 
@@ -53,7 +58,7 @@ public final class RegisterWorker implements CommandSynchronous
     {
         // set Worker information on Master
         Master master = (Master) myService;
-        return master.registerWorker( workerServiceName );
+        return master.registerWorker( workerServiceName, numProcessors );
     }
     
     @Override

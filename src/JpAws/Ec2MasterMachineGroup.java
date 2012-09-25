@@ -4,7 +4,9 @@ import datameer.awstasks.aws.ec2.InstanceGroup;
 import datameer.awstasks.aws.ec2.ssh.SshClient;
 import java.io.File;
 import java.io.IOException;
+import java.rmi.Naming;
 import system.ClientToMaster;
+import system.Master;
 
 /**
  *
@@ -13,29 +15,18 @@ import system.ClientToMaster;
 public class Ec2MasterMachineGroup extends Ec2MachineGroup<ClientToMaster>
 {
 
-    public static final String JARNAME = "jpregel-aws";
+    public static final String JARNAME = "jpregel-aws.jar";
+    private final String hostName;
 
     public Ec2MasterMachineGroup(InstanceGroup i, String heapsize)
     {
         super(i, heapsize);
+        hostName = i.getInstances(true).get(0).getPrivateDnsName();
     }
 
-    @Override
-    void startObject(String[] args)
+    void startObject(final String[] args)
     {
-        File privateKeyFile = PregelAuthenticator.getPrivateKey();
         File jars = new File("jars.tar");
-        if (!jars.exists())
-        {
-            try
-            {
-                Runtime.getRuntime().exec("tar -zcvf jars.tar ./dist/lib policy key.AWSkey");
-            } catch (IOException ex)
-            {
-                System.out.println("Error tarring jars.");
-                System.exit(1);
-            }
-        }
         try
         {
             System.out.println("Waiting");
@@ -64,7 +55,6 @@ public class Ec2MasterMachineGroup extends Ec2MachineGroup<ClientToMaster>
         try
         {
             sshClient.uploadFile(jars, "~/jars.tar");
-            sshClient.uploadFile(privateKeyFile, "~/" + privateKeyFile.getName());
             sshClient.executeCommand("tar -zxvf jars.tar", null);
         } catch (IOException ex)
         {
@@ -80,9 +70,10 @@ public class Ec2MasterMachineGroup extends Ec2MachineGroup<ClientToMaster>
                 try
                 {
                     sshClient.executeCommand("java -server -cp " + JARNAME + ":./dist/lib/*"
-                            + " -Djava.security.policy=policy"
+                            + " -Djava.security.policy=policy "
                             + heapsize
-                            + " JpAws.Ec2Master", System.out);
+                            + " JpAws.Ec2Master "
+                            + args[0], System.out);
                 } catch (IOException ex)
                 {
                     System.out.println("Master disconnected " + ex.getLocalizedMessage());
@@ -100,6 +91,39 @@ public class Ec2MasterMachineGroup extends Ec2MachineGroup<ClientToMaster>
     @Override
     public String getHostname()
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return hostName;
+    }
+
+    private void tryAgain(int i)
+    {
+        System.out.println("Master not up yet. Trying again in 5 seconds...");
+        try
+        {
+            Thread.sleep(5000);
+        } catch (InterruptedException ex1)
+        {
+            System.out.println("Waiting interrupted, trying again immediately");
+        }
+    }
+
+    @Override
+    public ClientToMaster syncDeploy(String... args)
+    {
+        startObject(args);
+        ClientToMaster remoteObject = null;
+        String url = "//" + getHostname() + ":" + Master.PORT + "/" + Master.CLIENT_SERVICE_NAME;
+        for (int i = 0;; i += 5000)
+        {
+            try
+            {
+                remoteObject = (ClientToMaster) Naming.lookup(url);
+            } catch (Exception ex)
+            {
+                tryAgain(i);
+                continue;
+            }
+            break;
+        }
+        return remoteObject;
     }
 }

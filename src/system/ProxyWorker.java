@@ -63,6 +63,7 @@ public final class ProxyWorker extends Proxy
         this.workerService = workerService;
     }
     
+    @Override
     public void evict() 
     {
         if ( ! kill )

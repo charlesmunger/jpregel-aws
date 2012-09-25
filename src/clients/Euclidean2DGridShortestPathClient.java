@@ -1,17 +1,6 @@
 package clients;
 
-import api.MasterOutputMaker;
-import api.MasterGraphMaker;
-import api.WorkerGraphMaker;
-import api.WorkerOutputMaker;
-import static java.lang.System.out;
-import system.MasterGraphMakerGrid;
-import system.MasterOutputMakerStandard;
 import system.*;
-import system.AggregatorSumInteger;
-import system.VertexShortestPathEuclidean;
-import system.WorkerGraphMakerGrid;
-import system.WorkerOutputMakerStandard;
 
 /**
  *
@@ -25,14 +14,11 @@ public class Euclidean2DGridShortestPathClient
     public static void main( String[] args ) throws Exception
     {
         int numWorkers = 1;
-        int computeThreadsPerWorker = Runtime.getRuntime().availableProcessors();
-        int numParts = numWorkers * computeThreadsPerWorker * 2; // numWorkers * ComputeThrads/Worker * Parts/ComputeThread
-        
+
         Job job = new Job( 
                 "Euclidean 2D Grid Shortest Path",
                 args[0],     // job directory name
                 new VertexShortestPathEuclidean(),
-                numParts,
                 new MasterGraphMakerGrid(),
                 new WorkerGraphMakerGrid(),
                 new MasterOutputMakerStandard(),
@@ -42,9 +28,8 @@ public class Euclidean2DGridShortestPathClient
                 );
         System.out.println( job + "\n      numWorkers: " + numWorkers );
         
-        boolean   isEc2Master = false;
         System.out.println("Euclidean2DGridShortestPathClient.main: about to invoke Client.run");
-        Client.run( job, isEc2Master, numWorkers); 
-        System.exit( 0 );
+        ClientToMaster master = LocalReservationService.newCluster(numWorkers);
+        System.out.println(master.run(job));        System.exit( 0 );
     }
 }

@@ -17,9 +17,15 @@ import java.util.StringTokenizer;
  */
 public class VertexShortestPath extends VertexImpl<Integer, Message<Integer, Integer>, Integer, Integer>
 {
-    public VertexShortestPath( Integer vertexId, Map<Integer, Integer> edgeMap )
+    public VertexShortestPath( Integer vertexId, Map<Integer, Integer> edgeMap,int numOutgoingEdges )
     {
-        super( vertexId, edgeMap );
+        super( vertexId, edgeMap,numOutgoingEdges );
+        setVertexValue( new Message<Integer, Integer>( vertexId, Integer.MAX_VALUE ) );
+        combiner = new CombinerMinInteger();
+    }
+    
+    public VertexShortestPath( Integer vertexId, Map<Integer, Integer> edgeMap ) {
+        super( vertexId, edgeMap);
         setVertexValue( new Message<Integer, Integer>( vertexId, Integer.MAX_VALUE ) );
         combiner = new CombinerMinInteger();
     }
@@ -83,18 +89,25 @@ public class VertexShortestPath extends VertexImpl<Integer, Message<Integer, Int
 //        voteToHalt(); 
     }
 
+      
     @Override
     public String output() 
     {
         StringBuilder string = new StringBuilder();
-        string.append( getVertexId() );
-        string.append( " : ");
-        string.append( getVertexValue().getVertexId() );
-        string.append( " - ");
-        string.append( getVertexValue().getMessageValue() );
+        string.append( "" );
+        if ( getNumVertices() == getVertexId() )
+        {
+            string.append( getVertexId() );
+            string.append( " : ");
+            string.append( getVertexValue().getVertexId() );
+            string.append( " - ");
+            string.append( getVertexValue().getMessageValue() );
+        }
         return new String( string );
     }
     
     @Override
+    public boolean isInitiallyActive() { return isSource(); }
+    
     public boolean isSource() { return getVertexId() == 1; }
 }
