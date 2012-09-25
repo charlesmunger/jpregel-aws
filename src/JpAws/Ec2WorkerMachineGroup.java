@@ -4,8 +4,6 @@ import datameer.awstasks.aws.ec2.InstanceGroup;
 import datameer.awstasks.aws.ec2.ssh.SshClient;
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import system.Worker;
 
 /**
@@ -15,44 +13,36 @@ import system.Worker;
 public class Ec2WorkerMachineGroup extends Ec2MachineGroup<Worker>
 {
 
-    public static final String JARNAME = "jpregel-aws";
+    public static final String JARNAME = "jpregel-aws.jar";
+    private final String hostName = null;
 
     public Ec2WorkerMachineGroup(InstanceGroup i, String heapsize)
     {
-        super(i,heapsize);
+        super(i, heapsize);
     }
 
     @Override
-    void startObject(final String[] args)
+    File getKey()
+    {
+        return PregelAuthenticator.getPrivateKey();
+    }
+
+    @Override
+    public String getHostname()
+    {
+        return hostName;
+    }
+
+    @Override
+    public Worker syncDeploy(final String... args)
     {
         File privateKeyFile = PregelAuthenticator.getPrivateKey();
         File jars = new File("jars.tar");
-        if (!jars.exists())
-        {
-            System.out.println("Error fetching jars file - " + jars.getAbsolutePath());
-        }
-        try
-        {
-            System.out.println("Waiting");
-            Thread.sleep(30000);
-            System.out.println("Waking");
-        } catch (InterruptedException ex)
-        {
-            System.out.println("Waiting interrupted");
-        }
+
         final SshClient sshClient = instanceGroup.createSshClient("ec2-user", privateKeyFile, false);
         File thisjar = new File(JARNAME);
         File distjar = new File("dist/" + JARNAME);
-        if (thisjar.exists())
-        {
-            try
-            {
-                sshClient.uploadFile(thisjar, "~/" + JARNAME);
-            } catch (IOException ex)
-            {
-                Logger.getLogger(Ec2WorkerMachineGroup.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } else if (distjar.exists())
+        if (distjar.exists())
         {
             try
             {
@@ -88,24 +78,13 @@ public class Ec2WorkerMachineGroup extends Ec2MachineGroup<Worker>
                     sshClient.executeCommand("java -server -cp " + JARNAME + ":./dist/lib/*"
                             + " -Djava.security.policy=policy "
                             + heapsize
-                            + " system.Worker " + args[0], null);
+                            + " JpAws.Ec2Worker " + args[0], System.out);
                 } catch (IOException ex)
                 {
                     System.out.println("Workers terminated");
                 }
             }
         }).start();
-    }
-
-    @Override
-    File getKey()
-    {
-        return PregelAuthenticator.getPrivateKey();
-    }
-
-    @Override
-    public String getHostname()
-    {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return null;
     }
 }

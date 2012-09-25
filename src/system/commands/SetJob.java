@@ -13,12 +13,10 @@ import system.Worker;
 public class SetJob implements Command
 {
     private Job workerJob;
-    private boolean isEc2;
     
-    public SetJob( Job workerJob, boolean isEc2 )
+    public SetJob( Job workerJob)
     {
         this.workerJob = workerJob;
-        this.isEc2 = isEc2;
     }
 
     @Override
@@ -28,6 +26,6 @@ public class SetJob implements Command
     public void execute( ServiceImpl serviceImpl ) throws Exception 
     {
         Worker worker = (Worker) serviceImpl;
-        worker.setJob( workerJob, isEc2 );
+        worker.setJob( workerJob);
     }
 }

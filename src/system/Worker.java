@@ -11,16 +11,15 @@
 // TODO FIX jicosfoundation Processor thread invokes start() in its constructor
 package system;
 
-import JpAws.S3FileSystem;
 import api.Aggregator;
 import java.io.IOException;
 import static java.lang.System.out;
-import java.net.MalformedURLException;
 import java.rmi.Naming;
-import java.rmi.NotBoundException;
-import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,7 +30,7 @@ import system.commands.*;
  *
  * @author Peter Cappello
  */
-public final class Worker extends ServiceImpl
+public abstract class Worker extends ServiceImpl
 {
     // ServiceImpl attributes
     static public String SERVICE_NAME = "Master";
@@ -42,6 +41,7 @@ public final class Worker extends ServiceImpl
         {
             AddVertexToWorker.class,
             AddVertexToPartComplete.class,
+            CollectGarbage.class,
             MessageReceived.class,
             ReadWorkerInputFile.class,
             WriteWorkerOutputFile.class,
@@ -54,16 +54,28 @@ public final class Worker extends ServiceImpl
         } 
     };
     
-    private final static RemoteExceptionHandler REMOTE_EXCEPTION_HANDLER = new DefaultRemoteExceptionHandler(); 
+    private final static RemoteExceptionHandler REMOTE_EXCEPTION_HANDLER = new DefaultRemoteExceptionHandler();
+
+    private static void tryAgain(int i)
+    {
+        System.out.println("Master not up yet. Trying again in 5 seconds...");
+        try
+        {
+            Thread.sleep(5000);
+        } catch (InterruptedException ex1)
+        {
+            System.out.println("Waiting interrupted, trying again immediately");
+        }
+    }
     
     private final Proxy masterProxy;
-    private final int myWorkerNum;
+    private AtomicInteger myWorkerNum = new AtomicInteger();
     private final ComputeThread[] computeThreads;
     
     private Map<Integer, Service> workerNumToWorkerMap;
     private Job job;
-    private Map<Integer, Part> partIdToPartMap = new HashMap<Integer, Part>();
-    private Set<Part> partSet = new LinkedHashSet();
+    private ConcurrentMap<Integer, Part> partIdToPartMap; 
+    private Collection<Part> partSet; 
     private FileSystem fileSystem;
     private Map<Integer, Map<Object, MessageQ>> workerNumToVertexIdToMessageQMapMap;
     private long superStep;
@@ -73,28 +85,28 @@ public final class Worker extends ServiceImpl
     
     // coordination variables
     private boolean thereIsANextStep;
-    private AtomicInteger numUnacknowledgedAddVertexCommands = new AtomicInteger();
-    private AtomicInteger numUnacknowledgedSendVertexIdToMessageQMaps = new AtomicInteger();
-    private AtomicInteger numWorkingComputeThreads = new AtomicInteger();
+    private AtomicInteger numUnacknowledgedAddVertexCommands; 
+    private AtomicInteger numUnacknowledgedSendVertexIdToMessageQMaps;
+    private AtomicInteger numWorkingComputeThreads;
     
     private PartIterator partIterator;
     
     // constants
     private final Command AddVertexToPartCompleteCommand = new AddVertexToPartComplete();
     private final Command MessageReceived = new MessageReceived();
+    private final Service master;
     
-    Worker( Service master ) throws RemoteException
+    public Worker( Service master ) throws RemoteException
     {
         // set Jicos Service attributes
         super( command2DepartmentArray );
         super.setService( this ); //TODO leaking partially constructed object
         super.setDepartments( departments );
-        
+        super.register(master);
+        this.master = master;
         masterProxy = new ProxyMaster( master, this, REMOTE_EXCEPTION_HANDLER );
-        CommandSynchronous command = new RegisterWorker( serviceName() ); 
-        myWorkerNum = (Integer) master.executeCommand( this, command ); //TODO leaking partially constructed object
-        super.register ( master );
-        
+        addProxy(master, masterProxy);
+                
         int numAvailableProcessors = Runtime.getRuntime().availableProcessors();
         System.out.println("Worker.constructor: Available processors: " + numAvailableProcessors ) ; 
         computeThreads = new ComputeThread[ numAvailableProcessors ];
@@ -102,6 +114,13 @@ public final class Worker extends ServiceImpl
         {
             computeThreads[i] = new ComputeThread( this );
         }
+    }
+    
+    public void init() throws RemoteException {
+        CommandSynchronous command = new RegisterWorker( serviceName(), Runtime.getRuntime().availableProcessors() ); 
+        myWorkerNum.set((Integer) master.executeCommand( this, command )); 
+        super.register ( master );
+        startComputeThreads();
     }
     
     void startComputeThreads()
@@ -112,25 +131,27 @@ public final class Worker extends ServiceImpl
         }
     }
     
-    synchronized public void addVertexToPart( int partId, VertexImpl vertex )
+    void addToActiveSet( Long partId, Long vertexId )
+    {
+        
+    }
+    
+    public void addVertexToPart( int partId, VertexImpl vertex )
     {
         Part part = partIdToPartMap.get( partId );
         if ( null == part )
         {
             part = new Part( partId, job );
-            partSet.add( part );
-            partIdToPartMap.put( partId, part );
+            partIdToPartMap.putIfAbsent( partId, part );
         }
-        part.add( vertex );
+        partIdToPartMap.get(partId).add( vertex );
     }
-    
-    synchronized public FileSystem getFileSystem() { return fileSystem; }
-    
+        
     synchronized public Collection<Part> getParts() { return partIdToPartMap.values(); }
     
-    synchronized public int getWorkerNum() { return myWorkerNum; }
+    public int getWorkerNum() { return myWorkerNum.get(); }
         
-    Set<Part> getPartSet() { return partSet; }
+    Collection<Part> getPartSet() { return partSet; }
     
     synchronized PartIterator getPartIterator() { return partIterator; }
     
@@ -147,7 +168,7 @@ public final class Worker extends ServiceImpl
     {
         int partId = job.getPartId( vertex.getVertexId() );
         int workerNum = getWorkerNum( partId );
-        if ( myWorkerNum == workerNum )
+        if ( myWorkerNum.get() == workerNum )
         {   // vertex is local to this worker
             addVertexToPart( partId, vertex );
         }
@@ -160,7 +181,7 @@ public final class Worker extends ServiceImpl
         }
     }
     
-    synchronized public void addRemoteVertex( int workerNum, int partId, String stringVertex )
+    public void addRemoteVertex( int workerNum, int partId, String stringVertex )
     {
         Service workerService = workerNumToWorkerMap.get( workerNum );
         numUnacknowledgedAddVertexCommands.getAndIncrement();
@@ -202,10 +223,7 @@ public final class Worker extends ServiceImpl
         }
     }
     
-    private FileSystem makeFileSystem( boolean isEc2, String jobDirectoryName )
-    {
-        return ( isEc2 ) ? new S3FileSystem( jobDirectoryName) : new LocalFileSystem( jobDirectoryName );
-    }
+    public abstract FileSystem makeFileSystem( String jobDirectoryName);
     
     @Override
     public void exceptionHandler( Exception exception )
@@ -221,7 +239,7 @@ public final class Worker extends ServiceImpl
      */
     
     // Command: AddVertexToWorker
-    synchronized public void addVertexToWorker( int partId, String stringVertex, Service sendingWorker )
+    public void addVertexToWorker( int partId, String stringVertex, Service sendingWorker )
     {
         VertexImpl vertexFactory = job.getVertexFactory();
         VertexImpl vertex = vertexFactory.make( stringVertex );
@@ -230,44 +248,47 @@ public final class Worker extends ServiceImpl
     }
     
     // Command: AddVertexToPartComplete
-    synchronized public void addVertexToPartComplete()
+     public void addVertexToPartComplete()
     {
         if ( numUnacknowledgedAddVertexCommands.decrementAndGet() == 0 )
         {
-            notify();
+            synchronized(this) { notify(); }
         }
     }
+     
+     public void collectGarbage()
+     { 
+         System.gc();
+         Command command = new GarbageCollected();
+         sendCommand( master, command );
+     }
     
     // Command: MessageReceived
-    synchronized public void messageReceived()
+    public void messageReceived()
     {
         if ( numUnacknowledgedSendVertexIdToMessageQMaps.decrementAndGet() == 0 )
         {
-            notify();
+            synchronized(this) { notify(); }
         }
     }    
     
     // Command: ReadWorkerInputFile 
-    synchronized public void processInputFile()
+    synchronized public void processInputFile() throws InterruptedException
     {
         int numVertices = job.makeGraph( this );
         
-        // ensure that all AddVertexToPath Commands complete
+        // ensure completion of all AddVertexToPath Commands before notifying master
         if ( numUnacknowledgedAddVertexCommands.get() > 0 )
         {
-            try
-            {
-                wait();
-            }
-            catch( InterruptedException ignore ) {}
+            wait();
         }
         
         for ( ComputeThread computeThread : computeThreads )
         {
             computeThread.setPartIdToPartMap( partIdToPartMap );
         }
-        Command command = new InputFileProcessingComplete( myWorkerNum, numVertices );
-        masterProxy.execute( command );
+        Command command = new InputFileProcessingComplete( myWorkerNum.get(), numVertices );
+        sendCommand( master, command );
         
         // output part sizes to see how PartId for vertices are distributed
         for ( Part part : partSet )
@@ -277,7 +298,7 @@ public final class Worker extends ServiceImpl
     }
     
     // Command: SendMessage
-    synchronized public void receiveMessage( Service sendingWorker, int partId, int vertexId, Message message, long superStep )
+    public void receiveMessage( Service sendingWorker, int partId, int vertexId, Message message, long superStep )
     {
         Part receivingPart = partIdToPartMap.get( partId );
         receivingPart.receiveMessage( vertexId, message, superStep );
@@ -297,16 +318,26 @@ public final class Worker extends ServiceImpl
         sendCommand( sendingWorker, MessageReceived );
     }
     
-    // Command: SetJob 
-    synchronized public void setJob( Job job, boolean isEc2 )
+    // Command: SetJob: initialize Job data structures
+    synchronized public void setJob( Job job)
     {
-        superStep = -1L;
         this.job = job;
-        String jobDirectoryName = job.getJobDirectoryName();
-        fileSystem = makeFileSystem( isEc2, jobDirectoryName );
+        partIdToPartMap = new ConcurrentHashMap<Integer, Part>();
+        // TODO: Worker: partSet: should be just parts that have > 0 active vertices
+        partSet = partIdToPartMap.values();
+        numUnacknowledgedAddVertexCommands = new AtomicInteger(); 
+        numUnacknowledgedSendVertexIdToMessageQMaps = new AtomicInteger();
+        numWorkingComputeThreads = new AtomicInteger();
+        superStep = -1L;
+        fileSystem = makeFileSystem( job.getJobDirectoryName() );
         job.setFileSystem( fileSystem );
-        Command command = new JobSet( myWorkerNum );
-        masterProxy.execute( command );
+        for ( ComputeThread computeThread : computeThreads )
+        {
+            computeThread.initJob();
+        }
+        
+        Command command = new JobSet( myWorkerNum.get() );
+        sendCommand( master, command );
      }
     
     // Command: SetJob 
@@ -322,7 +353,7 @@ public final class Worker extends ServiceImpl
         }
         
         Command command = new WorkerMapSet();
-        masterProxy.execute( command );
+        sendCommand( master, command );
      }
     
     // Command: ShutdownWorker
@@ -339,7 +370,7 @@ public final class Worker extends ServiceImpl
         barrierComputation( computeInput );
         ComputeOutput computeOutput = new ComputeOutput( thereIsANextStep, stepAggregator, problemAggregator, deltaNumVertices );
         Command command = new SuperStepComplete( computeOutput );
-        masterProxy.execute( command );
+        sendCommand( master, command );
     }
     
     // Command: WriteWorkerOutputFile
@@ -352,13 +383,14 @@ public final class Worker extends ServiceImpl
         {
             Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
         }
-        Command command = new CommandComplete( myWorkerNum );
-        masterProxy.execute( command );
+//        Command command = new CommandComplete( myWorkerNum );
+        Command command = new WorkerOutputWritten();
+        sendCommand( master, command );
     }
     
     synchronized private void sync( AtomicInteger numUnacknowledgedSendVertexIdToMessageQMaps )
     {
-        if ( numUnacknowledgedSendVertexIdToMessageQMaps.get() > 0 )
+        while ( numUnacknowledgedSendVertexIdToMessageQMaps.get() > 0 )
         {
             try
             {
@@ -418,51 +450,26 @@ public final class Worker extends ServiceImpl
         }
     }
     
-    /*
-     * Invoke to deploy a Worker on some machine
-     * 
-     * @param args [0]: Domain Name of machine on which Master is running
-     */
-    public static void main( String[] args ) throws RemoteException
-    {
-        System.setSecurityManager( new RMISecurityManager() );
-        
-        // get reference to Master
-        if ( 1 != args.length )
-        {
-            out.println("java " + Worker.class.getName() + " MasterDomainName");
-        }
-        String masterDomainName = args[0];
-        Service master = getMaster( masterDomainName );          
-        Worker worker = new Worker( master );
-        worker.startComputeThreads();
-        out.println( "Worker: Ready." );
-    }
-    
     public static Service getMaster( String masterDomainName )
     {
         String url = "//" + masterDomainName + ":" + Master.PORT + "/" + Master.SERVICE_NAME;	
         Service master = null;
-        try 
+        for (int i = 0;; i += 5000)
         {
-            master = (Service) Naming.lookup( url );
-        }
-        catch ( NotBoundException exception ) 
-        {
-            out.println( "NotBoundException: " + url + " -- " + exception.getMessage() );
-        } 
-        catch ( MalformedURLException exception ) 
-        {
-            out.println( "MalformedURLException: " + url + " -- " + exception.getMessage() );
-        } 
-        catch ( RemoteException exception ) 
-        {
-            out.println( "RemoteException: " + url + " -- " + exception.getMessage() );
+            try
+            {
+                master = (Service) Naming.lookup(url);
+            } catch (Exception ex)
+            {
+                tryAgain(i);
+                continue;
+            }
+            break;
         }
         return master;
     }
         
-    synchronized void sendMessage( int partId, int vertexId, Message message, long superStep )
+    void sendMessage( int partId, int vertexId, Message message, long superStep )
     {
         Part receivingPart = partIdToPartMap.get( partId );
         if ( receivingPart != null )
@@ -489,7 +496,7 @@ public final class Worker extends ServiceImpl
         {
             Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
         }
-        Command command = new CommandComplete( myWorkerNum );
-        masterProxy.execute( command );   
+        Command command = new CommandComplete( myWorkerNum.get() );
+        sendCommand( master, command );
     }
 }

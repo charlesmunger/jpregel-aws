@@ -20,6 +20,7 @@ public class JobRunData implements java.io.Serializable
     
     private long endTimeSetWorkerJobAndMakeWorkerFiles;
     private long endTimeReadWorkerInputFile;
+    private long endTimeGarbageCollected;
     private long endTimeComputation;
     private long endTimeWriteWorkerOutputFiles;
     private long endTimeRun;
@@ -35,6 +36,8 @@ public class JobRunData implements java.io.Serializable
     }
         
     void setEndTimeComputation() { endTimeComputation = currentTimeMillis(); }
+    
+    void setEndTimeGarbageCollected() { endTimeGarbageCollected = currentTimeMillis(); }
 
     void setEndTimeReadWorkerInputFile() { endTimeReadWorkerInputFile = currentTimeMillis(); }
         
@@ -65,9 +68,11 @@ public class JobRunData implements java.io.Serializable
         string.append( " : Set WorkerJob & make Worker files\n   " );
         string.append( endTimeReadWorkerInputFile - endTimeSetWorkerJobAndMakeWorkerFiles );
         string.append( " : Read Worker input files\n   " );
-        string.append( endTimeComputation - endTimeReadWorkerInputFile );
+        string.append( endTimeGarbageCollected - endTimeReadWorkerInputFile );
+        string.append( " : Worker Garbage Collection\n   ");
+        string.append( endTimeComputation - endTimeGarbageCollected );
         string.append( " : Computation\n   " );
-        string.append( (endTimeComputation - endTimeReadWorkerInputFile) / ( numSuperSteps + 1 ) );
+        string.append( (endTimeComputation - endTimeGarbageCollected) / ( numSuperSteps + 1 ) );
         string.append( " : average per super step \n   " );
         string.append(  endTimeWriteWorkerOutputFiles - endTimeComputation );
         string.append( " : Write Worker output files\n   " );

@@ -36,21 +36,23 @@ public final class Part
     }
     
     /*
-     * FIX: For graph mutation (add vertex), also need void addVertexToActiveSet( Long superStep, VertexImpl vertex )
+     * FIXME: For graph mutation (add vertex), also need void addVertexToActiveSet( Long superStep, VertexImpl vertex )
      */
     void add( VertexImpl vertex )
     {
         vertex.setPart( this );
         vertexIdToVertexMap.put( vertex.getVertexId(), vertex );
-        if ( vertex.isSource() )
+        if ( vertex.isInitiallyActive() )
         {
-            Set<VertexImpl> activeSet = superstepToActiveSetMap.get( new Long(0) );
-            activeSet.add( vertex );
+            addToActiveSet( 0L, vertex );
         }
     }
     
-    void addToActiveSet( long superStep, VertexImpl vertex ) { superstepToActiveSetMap.get( superStep ).add( vertex ); }
-    
+    void addToActiveSet( long superStep, VertexImpl vertex ) 
+    { 
+        superstepToActiveSetMap.get( superStep ).add( vertex ); 
+    }
+     
     void aggregateOutputProblemAggregator( Aggregator aggregator ) { outputProblemAggregator.aggregate(aggregator); }
     
     void aggregateOutputStepAggregator( Aggregator aggregator ) { outputStepAggregator.aggregate(aggregator); }
@@ -60,7 +62,7 @@ public final class Part
         this.computeThread = computeThread;
         this.superStep = superStep;
         this.computeInput = computeInput;
-        numMessagesSent   = 0;
+        numMessagesSent = 0;
         outputStepAggregator    = job.makeStepAggregator();
         outputProblemAggregator = job.makeProblemAggregator();
         Set<VertexImpl> activeSet = superstepToActiveSetMap.get( superStep );
@@ -88,20 +90,15 @@ public final class Part
     
     void incrementNumMessagesSent() { numMessagesSent++; }
     
-    synchronized void receiveMessage( Object vertexId, Message message, long superStep )
+    void receiveMessage( Object vertexId, Message message, long superStep )
     {
         VertexImpl vertex = vertexIdToVertexMap.get( vertexId );
-        // BEGIN DEBUG
-        if ( vertex == null )
-        {
-            System.out.println("Part.receiveMessage: vertexId: " + vertexId );
-        }
-        // END DEBUG
+        assert vertex != null : vertexId;
         vertex.receiveMessage( message, superStep );
         addToActiveSet( superStep, vertex );
     }
     
-    synchronized void receiveMessageQ( Object vertexId, MessageQ messageQ, long superStep )
+    void receiveMessageQ( Object vertexId, MessageQ messageQ, long superStep )
     {
         VertexImpl vertex = vertexIdToVertexMap.get( vertexId );
         vertex.receiveMessageQ( messageQ, superStep );

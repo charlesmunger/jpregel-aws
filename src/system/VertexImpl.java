@@ -19,8 +19,6 @@ import java.util.Map;
 // *   How to handle request where no such VertexImpl exists?
 // * - Design and implement VertexImpl AddVertex conflict "handler". Use combiner concept, where feasible.
 
-// * TODO VertexImpl: ? Is it safe & faster to make MessageQ thread-safe & remove synchronization of receive methods?
-
 /*
  * I currently think that vertex does not need the bit of state designating it 
  * active/inactive. Instead I:
@@ -66,11 +64,16 @@ implements Vertex<VertexIdType, VertexValueType, EdgeValueType, MessageValueType
             
     public VertexImpl() { vertexId = null; }
           
-    public VertexImpl( VertexIdType vertexId, Map<VertexIdType, EdgeValueType> edgeMap )
+    public VertexImpl( VertexIdType vertexId, Map<VertexIdType, EdgeValueType> edgeMap, int numOutgoingEdges)
     {
-        this.vertexId   = vertexId;
+        this.vertexId = vertexId;
         this.edgeMap = edgeMap;
-        superstepToMessageQMap = new OntoMap<MessageQ<VertexIdType, MessageValueType>>( new MessageQ( combiner ) );
+        superstepToMessageQMap = new OntoMap<MessageQ<VertexIdType, MessageValueType>>(numOutgoingEdges, new MessageQ( combiner ) );
+    }
+    
+    public VertexImpl( VertexIdType vertexId, Map<VertexIdType, EdgeValueType> edgeMap)
+    {
+        this(vertexId, edgeMap,100);
     }
     
     /* _________________________________________
@@ -97,7 +100,7 @@ implements Vertex<VertexIdType, VertexValueType, EdgeValueType, MessageValueType
     abstract public void compute();
     
     @Override
-    abstract public boolean isSource();
+    abstract public boolean isInitiallyActive();
 
     @Override
     abstract public String output();
@@ -117,12 +120,7 @@ implements Vertex<VertexIdType, VertexValueType, EdgeValueType, MessageValueType
     @Override
     synchronized public Iterator<Message<VertexIdType, MessageValueType>> getMessageIterator()
     {
-        MessageQ<VertexIdType, MessageValueType> messageQ = superstepToMessageQMap.remove( getSuperStep() );
-        if ( messageQ == null )
-        {
-            messageQ = new MessageQ<VertexIdType, MessageValueType>( combiner );
-        }
-        return messageQ.iterator(); 
+        return getMessageQ().iterator();
     }
     
     @Override
@@ -152,7 +150,7 @@ implements Vertex<VertexIdType, VertexValueType, EdgeValueType, MessageValueType
     }
     
     @Override
-    synchronized public long getSuperStep() { return part.getSuperStep(); }
+    public long getSuperStep() { return part.getSuperStep(); }
     
     @Override
     public VertexIdType getVertexId() { return vertexId; }

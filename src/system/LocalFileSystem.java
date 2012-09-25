@@ -9,7 +9,7 @@ import java.io.*;
 public class LocalFileSystem extends FileSystem
 {
 
-    LocalFileSystem(String jobDirectoryName)
+    public LocalFileSystem(String jobDirectoryName)
     {
         super(jobDirectoryName);
         new File(jobDirectoryName + "/in/").mkdirs();
