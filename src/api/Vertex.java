@@ -8,7 +8,7 @@ import system.MessageQ;
 import system.VertexImpl;
 
 /**
- * Graphs are comprised of Vertex objects. A Vertex has type parameters:
+ * Graphs are comprised of Vertex objects, which have several type parameters.
  * <ol>
  *   <li><b>VertexIdType</b> - the type of the vertex identifier. For example, in a 
  *       graph embedded in the 2D plane, each vertex may be identified by its 

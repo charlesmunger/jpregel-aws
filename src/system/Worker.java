@@ -100,7 +100,6 @@ public abstract class Worker extends ServiceImpl
     {
         // set Jicos Service attributes
         super( command2DepartmentArray );
-        super.setService( this ); //TODO leaking partially constructed object
         super.setDepartments( departments );
         super.register(master);
         this.master = master;
@@ -116,7 +115,9 @@ public abstract class Worker extends ServiceImpl
         }
     }
     
-    public void init() throws RemoteException {
+    public void init() throws RemoteException 
+    {
+        super.setService( this );
         CommandSynchronous command = new RegisterWorker( serviceName(), Runtime.getRuntime().availableProcessors() ); 
         myWorkerNum.set((Integer) master.executeCommand( this, command )); 
         super.register ( master );
@@ -130,12 +131,7 @@ public abstract class Worker extends ServiceImpl
             computeThread.start();
         }
     }
-    
-    void addToActiveSet( Long partId, Long vertexId )
-    {
-        
-    }
-    
+ 
     public void addVertexToPart( int partId, VertexImpl vertex )
     {
         Part part = partIdToPartMap.get( partId );
