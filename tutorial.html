@@ -117,26 +117,27 @@
 		-->
 		</p>
 		<p>
-		jPregel's computational model consists of a set of directed graph (digraph) and may be described as vertex-centric.
-		Every vertex in the graph is associated with the same <i>vertex algorithm</i>, encapsulated in its <i>compute</i> method.
-		Attributes associated with each vertex include:
+		jPregel's computational model consists of a directed graph (digraph) and may be described as vertex-centric:
+		The graph's vertices are the active elements of a distributed graph algorithm.
+		Every vertex is associated with the same <i>vertex algorithm</i>, encapsulated in its <i>compute</i> method.
+		Attributes associated with each vertex include, but are not limited to:
 		<ol>
-			<li>a unique vertex identifier</li>
+			<li>a unique identifier</li>
 			<li>a value</li>
 			<li>a collection of out-edges, each of which has an associated value.</li>
 		</ol>
-		A <i>digraph algorithm</i> consists of a sequence of steps.
-		Associated with each step is a set of <i>active vertices</i>.
-		The initial set of active vertices is determined by the graph construction process.
-		In subsequent steps, a vertex is active if and only if the set of messages sent to it in the previous step is non-empty.
-		At each step, each active vertex invokes its compute method, which may:
+		A <i>digraph algorithm</i> consists of a sequence of steps called <i>super steps</i>.
+		Associated with each super step is a set of <i>active vertices</i>, each of which performs that super step.
+		The set of active vertices that is associated with the initial super step is algorithmically defined by the process that constructs the initial graph.
+		In subsequent super steps, a vertex is active if and only if the set of messages sent to it in the previous super step is non-empty.
+		At each super step, each active vertex invokes its compute method, which may:
 		<ul>
 			<li>read messages sent to the vertex from vertices during the previous step;</li>
 			<li>modify its state</li>
-			<li>send messages to vertices, (including itself) to be received by them during the next step.</li>
+			<li>send messages to vertices (including itself), each of which is read by the receiving vertex during the next super step.</li>
 		</ul> 
-		If a step has an empty set of active vertices, the digraph algorithm halts.
-		(This method for detecting termination of the digraph algorithm is different, but equivalent, to that of Pregel.)
+		If a super step has an empty set of active vertices, the digraph algorithm halts.
+		(This termination condition of the distributed digraph algorithm is different from, but equivalent to, that of Pregel.)
 		The following simple example gives the flavor of these concepts.
 	</p>
 	
@@ -153,7 +154,7 @@
 	<h4>Algorithm</h4>
 	<p>
 		When the graph is constructed, all vertices are put in the active set and all vertices are initialized as a source.
-		The graph algorithm has 2 steps:
+		The graph algorithm has 2 super steps:
 		<ol>
 			<li>
 				Each vertex <i>u</i> sends a message (which is empty) to vertex <i>v</i>, 
@@ -161,14 +162,14 @@
 			</li>
 			<li>Active vertices mark themselves as not being a source.</li>
 		</ol>
-		Since no messages are sent during step 2, the algorithm thus terminates after 2 steps.
+		Since no messages are sent during super step 2, the algorithm thus terminates after 2 super steps.
 	</p>
 		
 	<h4>Correctness</h4>
 	<p>
 		After the graph algorithm terminates, 
 		<i>vertex <i>v</i> is marked as not being a source</i> <br />
-		if and only if <i>v</i> received at least one message at step 2  <br />
+		if and only if <i>v</i> received at least one message at super step 2  <br />
 		if and only if there is a vertex <i>u</i> with out-edge (<i>u</i>, <i>v</i>)  <br />
 		if and only if <i>v</i> has in-edge (<i>u</i>, <i>v</i>)  <br />
 		if and only if <i><i>v</i> is not a source</i>.
