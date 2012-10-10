@@ -97,7 +97,13 @@
                 <filename name="**/Aggregator*.java"/>
             </fileset>
             <fileset dir="src">
+                <filename name="**/Cluster.java"/>
+            </fileset>
+            <fileset dir="src">
                 <filename name="**/Combiner*.java"/>
+            </fileset>
+            <fileset dir="src">
+                <filename name="**/MachineGroup.java"/>
             </fileset>
             <fileset dir="src">
                 <filename name="**/MasterGraph*.java"/>
@@ -106,13 +112,16 @@
                 <filename name="**/MasterOutput*.java"/>
             </fileset>
             <fileset dir="src">
+                <filename name="**/ReservationService.java"/>
+            </fileset>
+            <fileset dir="src">
                 <filename name="**/Vertex*.java"/>
             </fileset>
             <fileset dir="src">
                 <filename name="**/WorkerGraphMaker*.java"/>
             </fileset>
             <fileset dir="src">
-                <filename name="**/WorkerOutput*.java"/>
+                <filename name="**/WorkerOutputMaker*.java"/>
             </fileset>
             <fileset file="src/system/Client.java"></fileset>
             <fileset file="src/system/Job.java"></fileset>
