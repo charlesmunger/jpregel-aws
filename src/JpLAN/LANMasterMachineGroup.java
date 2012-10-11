@@ -46,6 +46,7 @@ class LANMasterMachineGroup extends MachineGroup<ClientToMaster>
             {
                 try
                 {
+                    System.out.println("Deploying Master");
                     Runtime.getRuntime().exec("java -server -cp ./dist/jpregel-aws.jar:./dist/lib/*  -Djava.security.policy=policy JpLAN.LANMaster");
                 } catch (IOException ex)
                 {

@@ -24,16 +24,7 @@ public class LANWorker extends LocalWorker {
      */
     public static void main( String[] args ) throws RemoteException
     {
-        System.setSecurityManager( new RMISecurityManager() );
-        
-        // get reference to Master
-        if ( 1 != args.length )
-        {
-            System.out.println("java " + Worker.class.getName() + " MasterDomainName");
-        }
-        String masterDomainName = args[0];
-        Service master = getMaster( masterDomainName );          
-        Worker worker = new LANWorker(master);
+        Worker worker = new LANWorker(getMaster( args[0]));
         worker.init();
         System.out.println( "Worker: Ready." );
     }

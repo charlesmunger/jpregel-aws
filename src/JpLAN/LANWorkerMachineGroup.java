@@ -49,7 +49,8 @@ public class LANWorkerMachineGroup extends MachineGroup<Worker>
                 {
                     try
                     {
-                        Runtime.getRuntime().exec("java -server -cp ./dist/jpregel-aws.jar:./dist/lib/*  -Djava.security.policy=policy system.Worker " + args[0]);
+                        System.out.println("Deploying Worker");
+                        Runtime.getRuntime().exec("java -server -cp ./dist/jpregel-aws.jar:./dist/lib/*  -Djava.security.policy=policy JpLAN.LANWorker localhost" + args[0]);
 
                     } catch (IOException ex)
                     {
