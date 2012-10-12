@@ -3,7 +3,6 @@
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
-import system.Job;
 import system.Message;
 import system.VertexImpl;
 import system.VertexShortestPath;
@@ -45,5 +44,4 @@ public final class VertexShortestPathBinaryTree extends VertexShortestPath
         return new VertexShortestPathBinaryTree( vertexId, vertexValue, edgeMap );
     }
     
-    public int getPartId( Integer vertexId, Job job ) { return vertexId / 1000; }
 }
