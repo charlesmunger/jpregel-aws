@@ -38,22 +38,22 @@ class LANMasterMachineGroup extends MachineGroup<ClientToMaster>
     @Override
     public ClientToMaster syncDeploy(String... args)
     {
-        new Thread(new Runnable()
-        {
-
-            @Override
-            public void run()
-            {
-                try
-                {
-                    System.out.println("Deploying Master");
-                    Runtime.getRuntime().exec("java -server -cp ./dist/jpregel-aws.jar:./dist/lib/*  -Djava.security.policy=policy JpLAN.LANMaster");
-                } catch (IOException ex)
-                {
-                    System.out.println("Failed to start java process." + ex.getLocalizedMessage());
-                }
-            }
-        }).start();
+//        new Thread(new Runnable()
+//        {
+//
+//            @Override
+//            public void run()
+//            {
+//                try
+//                {
+//                    System.out.println("Deploying Master");
+//                    Runtime.getRuntime().exec("java -server -cp ./dist/jpregel-aws.jar:./dist/lib/*  -Djava.security.policy=policy JpLAN.LANMaster");
+//                } catch (IOException ex)
+//                {
+//                    System.out.println("Failed to start java process." + ex.getLocalizedMessage());
+//                }
+//            }
+//        }).start();
         String url = "//" + getHostname() + ":" + Master.PORT + "/" + Master.CLIENT_SERVICE_NAME;
         ClientToMaster remoteObject = null;
         for (int i = 0;; i += 300)

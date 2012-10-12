@@ -172,7 +172,7 @@ public abstract class Worker extends ServiceImpl
         {   // vertex belongs to another worker
             Service workerService = workerNumToWorkerMap.get( workerNum );
             numUnacknowledgedAddVertexCommands.getAndIncrement();
-            Command command = new AddVertexToWorker( partId, stringVertex, this );
+            Command command = new AddVertexToWorker( partId, stringVertex, getWorkerNum() );
             sendCommand( workerService, command ); 
         }
     }
@@ -181,7 +181,7 @@ public abstract class Worker extends ServiceImpl
     {
         Service workerService = workerNumToWorkerMap.get( workerNum );
         numUnacknowledgedAddVertexCommands.getAndIncrement();
-        Command command = new AddVertexToWorker( partId, stringVertex, this );
+        Command command = new AddVertexToWorker( partId, stringVertex, getWorkerNum());
         sendCommand( workerService, command ); 
     }
            
@@ -235,12 +235,12 @@ public abstract class Worker extends ServiceImpl
      */
     
     // Command: AddVertexToWorker
-    public void addVertexToWorker( int partId, String stringVertex, Service sendingWorker )
+    public void addVertexToWorker( int partId, String stringVertex, int sendingWorkerNum)
     {
         VertexImpl vertexFactory = job.getVertexFactory();
         VertexImpl vertex = vertexFactory.make( stringVertex );
         addVertexToPart( partId, vertex );
-        sendCommand( sendingWorker, AddVertexToPartCompleteCommand );
+        sendCommand( workerNumToWorkerMap.get(sendingWorkerNum), AddVertexToPartCompleteCommand );
     }
     
     // Command: AddVertexToPartComplete
@@ -254,7 +254,9 @@ public abstract class Worker extends ServiceImpl
      
      public void collectGarbage()
      { 
-         System.gc();
+         if(this.collectingGarbage()) {
+                      System.gc();
+         }
          Command command = new GarbageCollected();
          sendCommand( master, command );
      }
@@ -294,11 +296,11 @@ public abstract class Worker extends ServiceImpl
     }
     
     // Command: SendMessage
-    public void receiveMessage( Service sendingWorker, int partId, int vertexId, Message message, long superStep )
+    public void receiveMessage( int sendingWorkerNum, int partId, int vertexId, Message message, long superStep )
     {
         Part receivingPart = partIdToPartMap.get( partId );
         receivingPart.receiveMessage( vertexId, message, superStep );
-        sendCommand( sendingWorker, MessageReceived );
+        sendCommand( workerNumToWorkerMap.get(sendingWorkerNum), MessageReceived );
     }
     
     // Command: SendVertexIdToMessageQMap
@@ -478,7 +480,7 @@ public abstract class Worker extends ServiceImpl
             Service workerService = workerNumToWorkerMap.get( workerNum );
             assert workerService != null;
             numUnacknowledgedSendVertexIdToMessageQMaps.getAndIncrement();
-            Command command = new SendMessage( this, partId, vertexId, message, superStep );
+            Command command = new SendMessage( getWorkerNum(), partId, vertexId, message, superStep );
             sendCommand( workerService, command );
         }
     }
@@ -494,5 +496,10 @@ public abstract class Worker extends ServiceImpl
         }
         Command command = new CommandComplete( myWorkerNum.get() );
         sendCommand( master, command );
+    }
+
+    protected boolean collectingGarbage()
+    {
+        return true;
     }
 }

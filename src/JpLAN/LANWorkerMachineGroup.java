@@ -39,26 +39,25 @@ public class LANWorkerMachineGroup extends MachineGroup<Worker>
     @Override
     public Worker syncDeploy(final String... args)
     {
-        for (int i = 0; i < numWorkers; i++)
-        {
-            new Thread(new Runnable()
-            {
-
-                @Override
-                public void run()
-                {
-                    try
-                    {
-                        System.out.println("Deploying Worker");
-                        Runtime.getRuntime().exec("java -server -cp ./dist/jpregel-aws.jar:./dist/lib/*  -Djava.security.policy=policy JpLAN.LANWorker localhost" + args[0]);
-
-                    } catch (IOException ex)
-                    {
-                        System.out.println("Failed to start java process." + ex.getLocalizedMessage());
-                    }
-                }
-            }).start();
-        }
+//        for (int i = 0; i < numWorkers; i++)
+//        {
+//            new Thread(new Runnable()
+//            {
+//                @Override
+//                public void run()
+//                {
+//                    try
+//                    {
+//                        System.out.println("Deploying Worker");
+//                        Runtime.getRuntime().exec("java -server -cp ./dist/jpregel-aws.jar:./dist/lib/*  -Djava.security.policy=policy JpLAN.LANWorker localhost" + args[0]);
+//
+//                    } catch (IOException ex)
+//                    {
+//                        System.out.println("Failed to start java process." + ex.getLocalizedMessage());
+//                    }
+//                }
+//            }).start();
+//        }
         return null;
     }
 }

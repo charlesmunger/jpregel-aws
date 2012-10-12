@@ -21,4 +21,9 @@ public class LocalMaster extends Master
     {
         return new LocalFileSystem(jobDirectoryName);
     }
+    
+    @Override
+    public void collectWorkerGarbage() {
+        System.gc();
+    }
 }

@@ -19,5 +19,9 @@ public class LocalWorker extends Worker {
     {
        return new LocalFileSystem(jobDirectoryName);
     }
-
+    
+    @Override
+    public boolean collectingGarbage(){
+        return false;
+    }
 }

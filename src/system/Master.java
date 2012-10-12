@@ -140,8 +140,10 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         jobRunData.setEndTimeReadWorkerInputFile();
         
         // broadcaast to workers: Collect your garbage
-        barrierGarbageCollected = new Barrier( integerToWorkerMap.size() );
-        barrierComputation( new CollectGarbage(), barrierGarbageCollected );
+        barrierGarbageCollected = new Barrier(integerToWorkerMap.size());
+
+        collectWorkerGarbage();
+
         jobRunData.setEndTimeGarbageCollected();
 
         // begin computation phase
@@ -274,6 +276,11 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     }
 
     public abstract FileSystem makeFileSystem(String jobDirectoryName);
+
+    protected void collectWorkerGarbage() throws InterruptedException
+    {
+        barrierComputation( new CollectGarbage(), barrierGarbageCollected );
+    }
     
     private class Barrier
     {
