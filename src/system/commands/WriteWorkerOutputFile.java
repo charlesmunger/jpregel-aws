@@ -1,15 +1,15 @@
 package system.commands;
 
-import jicosfoundation.Command;
 import jicosfoundation.Proxy;
 import jicosfoundation.ServiceImpl;
+import system.NoFieldCommand;
 import system.Worker;
 
 /**
  *
  * @author cappello
  */
-public class WriteWorkerOutputFile implements Command
+public class WriteWorkerOutputFile extends NoFieldCommand
 {
 
     @Override

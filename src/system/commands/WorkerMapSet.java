@@ -1,15 +1,15 @@
 package system.commands;
 
-import jicosfoundation.Command;
 import jicosfoundation.Proxy;
 import jicosfoundation.ServiceImpl;
 import system.Master;
+import system.NoFieldCommand;
 
 /**
  *
  * @author cappello
  */
-public class WorkerMapSet implements Command
+public class WorkerMapSet extends NoFieldCommand
 {    
     public WorkerMapSet() {}
 

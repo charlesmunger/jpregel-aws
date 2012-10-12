@@ -1,9 +1,11 @@
 package system.commands;
 
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import jicosfoundation.Command;
 import jicosfoundation.Proxy;
-import jicosfoundation.Service;
 import jicosfoundation.ServiceImpl;
 import system.Worker;
 
@@ -15,13 +17,14 @@ public class AddVertexToWorker implements Command
 {
     private int    partId;
     private String vertexString;
-    private Service sendingWorker;
+    private int sendingWorkerNum;
     
-    public AddVertexToWorker( int partId, String vertexString, Service sendingWorker )
+    public AddVertexToWorker(){}
+    public AddVertexToWorker( int partId, String vertexString, int sendingWorkerNum )
     {
         this.partId = partId;
         this.vertexString = vertexString;
-        this.sendingWorker = sendingWorker;
+        this.sendingWorkerNum = sendingWorkerNum;
     }
 
     @Override
@@ -31,6 +34,22 @@ public class AddVertexToWorker implements Command
     public void execute( ServiceImpl serviceImpl ) throws Exception 
     {
         Worker worker = (Worker) serviceImpl;
-        worker.addVertexToWorker( partId, vertexString, sendingWorker );
+        worker.addVertexToWorker( partId, vertexString, sendingWorkerNum );
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput oo) throws IOException
+    {
+        oo.writeInt(partId);
+        oo.writeUTF(vertexString);
+        oo.writeInt(sendingWorkerNum);
+    }
+
+    @Override
+    public void readExternal(ObjectInput oi) throws IOException, ClassNotFoundException
+    {
+        partId = oi.readInt();
+        vertexString = oi.readUTF();
+        sendingWorkerNum = oi.readInt();
     }
 }

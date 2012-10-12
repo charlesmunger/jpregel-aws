@@ -1,15 +1,15 @@
 package system.commands;
 
-import jicosfoundation.Command;
 import jicosfoundation.Proxy;
 import jicosfoundation.ServiceImpl;
+import system.NoFieldCommand;
 import system.Worker;
 
 /**
  *
  * @author Pete Cappello
  */
-public class ShutdownWorker implements Command
+public class ShutdownWorker extends NoFieldCommand
 {    
     @Override
     public void execute( Proxy proxy ) { proxy.sendCommand( this ); }

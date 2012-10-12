@@ -40,6 +40,9 @@
 
 package jicosfoundation;
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.*;
 
 
@@ -59,6 +62,7 @@ public final class CommandList implements Command
     
     final Queue<Command> q() { return q; }
     
+    @Override
     public void execute( Proxy proxy ) //throws Exception 
     { proxy.sendCommand( this ); }
     
@@ -67,5 +71,18 @@ public final class CommandList implements Command
      *
      * !! Check to see if this makes sense when using proxies.
      */    
+    @Override
     public void execute(ServiceImpl myService) {}
+
+    @Override
+    public void writeExternal(ObjectOutput oo) throws IOException
+    {
+        oo.writeObject(q);
+    }
+
+    @Override
+    public void readExternal(ObjectInput oi) throws IOException, ClassNotFoundException
+    {
+        q=(Queue<Command>) oi.readObject();
+    }
 }

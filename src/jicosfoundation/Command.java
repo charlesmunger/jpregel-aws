@@ -34,8 +34,7 @@
 
 package jicosfoundation;
 
-
-public interface Command<S extends ServiceImpl> extends java.io.Serializable
+public interface Command<S extends ServiceImpl> extends java.io.Externalizable
 {    
     /** Proxy invokes this method.
      * 1. update local state, if necessary.

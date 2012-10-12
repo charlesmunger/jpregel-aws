@@ -1,5 +1,8 @@
 package system.commands;
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.Map;
 import jicosfoundation.Command;
 import jicosfoundation.Proxy;
@@ -18,6 +21,7 @@ public class SendVertexIdToMessageQMap implements Command
     private Map<Object, MessageQ> vertexIdToMessageQMap;
     private Long superStep;
     
+    public SendVertexIdToMessageQMap(){}
     public SendVertexIdToMessageQMap( Service sendingWorker, Map<Object, MessageQ> vertexIdToMessageQMap, Long superStep )
     {
         this.sendingWorker = sendingWorker;
@@ -33,5 +37,21 @@ public class SendVertexIdToMessageQMap implements Command
     {
         Worker worker = (Worker) serviceImpl;
         worker.receiveVertexIdToMessageQMap( sendingWorker, vertexIdToMessageQMap, superStep );
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput oo) throws IOException
+    {
+        oo.writeObject(sendingWorker);
+        oo.writeObject(vertexIdToMessageQMap);
+        oo.writeObject(superStep);
+    }
+
+    @Override
+    public void readExternal(ObjectInput oi) throws IOException, ClassNotFoundException
+    {
+        sendingWorker = (Service) oi.readObject();
+        vertexIdToMessageQMap = (Map<Object, MessageQ>) oi.readObject();
+        superStep = (Long) oi.readObject();
     }
 }

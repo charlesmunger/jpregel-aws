@@ -1,15 +1,15 @@
 package system.commands;
 
-import jicosfoundation.Command;
 import jicosfoundation.Proxy;
 import jicosfoundation.ServiceImpl;
+import system.NoFieldCommand;
 import system.Worker;
 
 /**
  *
  * @author cappello
  */
-public class ReadWorkerInputFile implements Command
+public class ReadWorkerInputFile extends NoFieldCommand
 {
     @Override
     public void execute( Proxy proxy ) { proxy.sendCommand( this ); }

@@ -1,5 +1,8 @@
 package system.commands;
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import jicosfoundation.Command;
 import jicosfoundation.Proxy;
 import jicosfoundation.ServiceImpl;
@@ -12,26 +15,32 @@ import system.Master;
  */
 public class SuperStepComplete implements Command
 {
-//    private boolean thereIsANextStep;
     ComputeOutput computeOutput;
-    
-//    public SuperStepComplete( boolean thereIsANextStep ) { this.thereIsANextStep = thereIsANextStep; }
+    public SuperStepComplete(){}
     public SuperStepComplete( ComputeOutput computeOutput ) { this.computeOutput = computeOutput; }
 
     @Override
     public void execute(Proxy proxy) 
     { 
-//        System.out.println("SuperStepComplete.execute: about to send.");
         proxy.sendCommand( this ); 
-//        System.out.println("SuperStepComplete.execute:  sent.");
     }
 
     @Override
     public void execute(ServiceImpl serviceImpl) throws Exception 
     {
-//        System.out.println("SuperStepComplete.execute: entered.");
         Master master = (Master) serviceImpl;
         master.superStepComplete( computeOutput );
-//        System.out.println("SuperStepComplete.execute: complete.");
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput oo) throws IOException
+    {
+        oo.writeObject(computeOutput);
+    }
+
+    @Override
+    public void readExternal(ObjectInput oi) throws IOException, ClassNotFoundException
+    {
+        computeOutput = (ComputeOutput) oi.readObject();
     }
 }

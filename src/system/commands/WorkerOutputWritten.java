@@ -1,15 +1,15 @@
 package system.commands;
 
-import jicosfoundation.Command;
 import jicosfoundation.Proxy;
 import jicosfoundation.ServiceImpl;
 import system.Master;
+import system.NoFieldCommand;
 
 /**
  *
  * @author Pete Cappello
  */
-public class WorkerOutputWritten implements Command
+public class WorkerOutputWritten extends NoFieldCommand
 {
     public WorkerOutputWritten() {}
     

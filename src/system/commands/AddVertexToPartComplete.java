@@ -1,12 +1,12 @@
 package system.commands;
 
-import static java.lang.System.out;
-
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import jicosfoundation.Command;
 import jicosfoundation.Proxy;
 import jicosfoundation.ServiceImpl;
 import system.Worker;
-
 /**
  *
  * @author Pete Cappello
@@ -23,4 +23,10 @@ public class AddVertexToPartComplete implements Command
         Worker worker = (Worker) serviceImpl;
         worker.addVertexToPartComplete();
     }
+
+    @Override
+    public void writeExternal(ObjectOutput oo) throws IOException{}
+
+    @Override
+    public void readExternal(ObjectInput oi) throws IOException, ClassNotFoundException{}
 }

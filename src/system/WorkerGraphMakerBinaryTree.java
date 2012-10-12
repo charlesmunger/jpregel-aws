@@ -112,9 +112,10 @@ public class WorkerGraphMakerBinaryTree implements WorkerGraphMaker
         }
     }
     
-    private void makeNodes(Integer startVertexId, Integer stopVertexId, Integer numChildren, VertexShortestPathBinaryTree vertexFactory, Job job, Worker worker, Integer workerNum)
+    private void makeNodes(int startVertexId, int stopVertexId, int numChildren, VertexShortestPathBinaryTree vertexFactory, Job job, Worker worker, Integer workerNum)
     {
         int numParts = job.getNumParts();
+        StringBuilder stringVertex = new StringBuilder();
         for ( int vertexId = startVertexId; vertexId <= stopVertexId; vertexId++ )
         {
             int partId = vertexFactory.getPartId( vertexId, numParts );
@@ -125,9 +126,9 @@ public class WorkerGraphMakerBinaryTree implements WorkerGraphMaker
                 worker.addVertexToPart(partId, vertex);
             } else
             {   // vertex belongs to another worker
-                StringBuilder stringVertex = new StringBuilder();
+                stringVertex.delete(0, stringVertex.length());
                 stringVertex.append(vertexId).append(" ").append(numChildren);
-                worker.addRemoteVertex(destinationWorkerNum, partId, new String(stringVertex) );
+                worker.addRemoteVertex(destinationWorkerNum, partId, stringVertex.toString() );
             }
         }
     }

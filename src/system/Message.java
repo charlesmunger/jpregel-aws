@@ -1,11 +1,15 @@
 package system;
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+
 /**
  * Immutable
  *
  * @author Pete Cappello
  */
-public class Message<VertexIdType, ValueType> implements java.io.Serializable
+public class Message<VertexIdType, ValueType> implements java.io.Externalizable
 {
     private VertexIdType vertexId;
     private ValueType messageValue;
@@ -32,5 +36,19 @@ public class Message<VertexIdType, ValueType> implements java.io.Serializable
         StringBuilder string = new StringBuilder();
         string.append(vertexId).append(' ').append(messageValue);
         return new String( string );
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput oo) throws IOException
+    {
+        oo.writeObject(vertexId);
+        oo.writeObject(messageValue);
+    }
+
+    @Override
+    public void readExternal(ObjectInput oi) throws IOException, ClassNotFoundException
+    {
+        vertexId = (VertexIdType) oi.readObject();
+        vertexId = (VertexIdType) oi.readObject();
     }
 }
