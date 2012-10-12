@@ -25,13 +25,15 @@
         <span id="logo"></span>
 
         <a href="https://github.com/charlesmunger/jpregel-aws" class="button fork"><strong>View On GitHub</strong></a>
+<!--
         <div class="downloads">
           <span>Download:</span>
           <ul>
-            <!--<li><a href="https://github.com/charlesmunger/jpregel-aws/zipball/master" class="button">ZIP</a></li> -->
+            <li><a href="https://github.com/charlesmunger/jpregel-aws/zipball/master" class="button">ZIP</a></li>
             <li><a href="https://github.com/charlesmunger/jpregel-aws/tarball/master" class="button">JAR</a></li>
           </ul>
         </div>
+-->
       </div><!-- end banner -->
 
     <div class="wrapper">
@@ -204,6 +206,49 @@
 	</ol>
 	
 	<h3><a name="Start-an-application">Start a jpregel application on AWS</a></h3>
+	
+	<ol>
+		<li>Start your EC2 instance.</li>
+		<li>Using ssh, get access to a shell on the instance:
+			<ol>
+				<li>git pull your jpregel-aws repository.</li>
+				<li>Using ant, run your chosen jpregel client.</li>
+			</ol>
+		</li>
+	</ol>
+	
+	<p>We now explain how to perform these steps.</p>
+	
+	<ol>
+		<li><h4>Start your EC2 instance</h4>
+			<p>
+			</p>
+		</li>
+		
+		<li><h4>Using ssh, access a shell on the instance</h4>
+			<p>
+				In the example below, "ec2-54-242-89-232.compute-1.amazonaws.com"
+				is the public domain name of the machine being used as the client.
+			</p>
+			<pre>ssh -i jpregel.pem \
+ec2-user@ec2-54-242-89-232.compute-1.amazonaws.com
+			</pre>
+			<p>Using the shell:</p>
+			<ol>
+				<li><h4>git pull your jpregel-aws repository</h4>
+					<pre>git pull</pre>
+				</li>
+				
+				<li><h4>Using ant, run your chosen jpregel client</h4>
+					<p>We give an example ant command below</p>
+		<pre>ant run -propertyfile \ 
+nbproject/configs/ShortestPath.properties \
+-Dapplication.args="foobucket 10 10 true true
+		</pre>
+				</li>
+			</ol>
+		</li>
+	</ol>
 	
 <!--
 	
