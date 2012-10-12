@@ -13,7 +13,7 @@ public class Message<VertexIdType, ValueType> implements java.io.Externalizable
 {
     private VertexIdType vertexId;
     private ValueType messageValue;
-    
+    public Message(){}
     public Message( VertexIdType vertexId, ValueType messageValue )
     {
         this.vertexId     = vertexId;
@@ -49,6 +49,6 @@ public class Message<VertexIdType, ValueType> implements java.io.Externalizable
     public void readExternal(ObjectInput oi) throws IOException, ClassNotFoundException
     {
         vertexId = (VertexIdType) oi.readObject();
-        vertexId = (VertexIdType) oi.readObject();
+        messageValue = (ValueType) oi.readObject();
     }
 }
