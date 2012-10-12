@@ -112,7 +112,7 @@ public class WorkerGraphMakerBinaryTree implements WorkerGraphMaker
         }
     }
     
-    private void makeNodes(int startVertexId, int stopVertexId, int numChildren, VertexShortestPathBinaryTree vertexFactory, Job job, Worker worker, Integer workerNum)
+    private void makeNodes(int startVertexId, int stopVertexId, int numChildren, VertexShortestPathBinaryTree vertexFactory, Job job, Worker worker, int workerNum)
     {
         int numParts = job.getNumParts();
         StringBuilder stringVertex = new StringBuilder();

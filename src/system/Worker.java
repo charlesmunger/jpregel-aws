@@ -69,7 +69,7 @@ public abstract class Worker extends ServiceImpl
     }
     
     private final Proxy masterProxy;
-    private AtomicInteger myWorkerNum = new AtomicInteger();
+    private int myWorkerNum = 0;
     private final ComputeThread[] computeThreads;
     
     private Map<Integer, Service> workerNumToWorkerMap;
@@ -119,7 +119,7 @@ public abstract class Worker extends ServiceImpl
     {
         super.setService( this );
         CommandSynchronous command = new RegisterWorker( serviceName(), Runtime.getRuntime().availableProcessors() ); 
-        myWorkerNum.set((Integer) master.executeCommand( this, command )); 
+        myWorkerNum =((Integer) master.executeCommand( this, command )); 
         super.register ( master );
         startComputeThreads();
     }
@@ -145,7 +145,7 @@ public abstract class Worker extends ServiceImpl
         
     synchronized public Collection<Part> getParts() { return partIdToPartMap.values(); }
     
-    public int getWorkerNum() { return myWorkerNum.get(); }
+    public int getWorkerNum() { return myWorkerNum; }
         
     Collection<Part> getPartSet() { return partSet; }
     
@@ -164,7 +164,7 @@ public abstract class Worker extends ServiceImpl
     {
         int partId = job.getPartId( vertex.getVertexId() );
         int workerNum = getWorkerNum( partId );
-        if ( myWorkerNum.get() == workerNum )
+        if ( myWorkerNum == workerNum )
         {   // vertex is local to this worker
             addVertexToPart( partId, vertex );
         }
@@ -253,12 +253,13 @@ public abstract class Worker extends ServiceImpl
     }
      
      public void collectGarbage()
-     { 
-         if(this.collectingGarbage()) {
-                      System.gc();
-         }
-         Command command = new GarbageCollected();
-         sendCommand( master, command );
+    {
+        if (this.collectingGarbage())
+        {
+            System.gc();
+        }
+        Command command = new GarbageCollected();
+        sendCommand(master, command);
      }
     
     // Command: MessageReceived
@@ -285,7 +286,7 @@ public abstract class Worker extends ServiceImpl
         {
             computeThread.setPartIdToPartMap( partIdToPartMap );
         }
-        Command command = new InputFileProcessingComplete( myWorkerNum.get(), numVertices );
+        Command command = new InputFileProcessingComplete( myWorkerNum, numVertices );
         sendCommand( master, command );
         
         // output part sizes to see how PartId for vertices are distributed
@@ -334,7 +335,7 @@ public abstract class Worker extends ServiceImpl
             computeThread.initJob();
         }
         
-        Command command = new JobSet( myWorkerNum.get() );
+        Command command = new JobSet( myWorkerNum );
         sendCommand( master, command );
      }
     
@@ -494,7 +495,7 @@ public abstract class Worker extends ServiceImpl
         {
             Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
         }
-        Command command = new CommandComplete( myWorkerNum.get() );
+        Command command = new CommandComplete( myWorkerNum );
         sendCommand( master, command );
     }
 
