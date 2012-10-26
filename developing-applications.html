@@ -55,16 +55,8 @@
 		<li>
 			<a href="#Birds-eye-tour-of-a-jPregel-client">Birds eye tour of a jPregel client</a>
 			<ol>
-				<li><a href="#Job">What's in a Job?</a>
-					<ol>
-						<li><a href="#Job-directory-structure">The Job directory structure</a></li>
-						<li>Selecting Master &amp; Worker graph makers</li>
-						<li>Selecting a Vertex class</li>
-						<li>Selecting Master &amp; Worker output makers</li>
-					</ol>
-				</li>
-				<li><a href="#Launching-a-cluster">Launching a jPregel cluster</a></li>
-				<li>Running the Job</li>
+				<li><a href="#Job">What's in a Job?</a></li>
+				<li><a href="#Job-directory-structure">The Job directory structure</a></li>
 			</ol>
 		</li>
 		<li><a href="#Defining-a-Vertex-class">Defining a Vertex class: Encapsulating a distributed graph algorithm</a></li>
@@ -85,11 +77,14 @@
 	<h2><a name="Birds-eye-tour-of-a-jPregel-client">Birds eye tour of a jPregel client</a></h2>
 	
 	<p>
-		A jPregel client is a concise sequence of instructions illustrated below.
+		A jPregel <b>client</b> is a concise sequence of instructions illustrated below.
 		It first specifies the Job object (lines 11 - 19).
 		Then, it:
 		<ol>
-			<li>(line 22) launches a jPregel cluster, specifying the number of worker machines as an argument</li>
+			<li>
+				(line 22) reserves and launches a jPregel cluster, specifying the number of worker machines as an argument, 
+				and obtaining a remote reference to the jpregel master.
+			</li>
 			<li>(line 23) runs the job</li>
 		</ol>
 		Following the listing, we delve into the Job object.
@@ -143,8 +138,58 @@
 	
 	<h3><a name="Job">What's in a Job?</a></h3>
 	
+	<p>We briefly enumerate the parameters in the Job constructor:</p>
+	<ol>
+		<li>
+			<b>Job Name</b> - A String describing the job/computation. 
+			In our example, we simply use the String "Identify source nodes" since that describes the example computation.
+		</li>
+		<li>
+			<b>Job Directory Name</b> - A String indicating the job directory or job bucket, which is used for job input/output.
+			In our example, this was passed in as the 1st command-line argument, args[0].
+			The example client specifies a local execution (as opposed to an AWS execution).
+			For local executions, the job directory is specified as a path relative to our Netbeans project, which for us was "examples/Sources":
+			In our Netbeans project jpregel-aws, we have a directory called examples in which there is a directory called Sources.
+			For an AWS execution, we would specify an S3 bucket name.
+			These will be explained later.
+		</li>
+		<li>
+			<b>Vertex Factory</b> - A Vertex object whose compute method encapsulates the graph problem we would like to solve.
+			In our example, we pass in a VertexSources object, since its compute method encapsulates the <i>identify sources</i> computation.
+			Please see the API documentation for information about the vertex classes graph are included in the jpregel installation.
+			Later in the tutorial, we discuss making your own vertex class.
+		</li>
+		<li>
+			<b>Master Graph Maker</b> - A master graph maker, which reads an input file and creates 1 input file per worker. 
+			The workers then read their respective input file and construct a part of the graph on which the computation will be run.
+			In our example, we instantiated a standard master graph maker, which reads an input file for a graph in a standard form.
+			Please see the API documentation for information about the master graph makers that are included in the jpregel installation.
+			Later in the tutorial, we discuss making your own master graph maker.
+		</li>
+		<li>
+			<b>Worker Graph Maker</b> - A worker graph maker, which reads an input file, created by the master graph maker, 
+			and constructs vertices using the Vertex Factory specified above.
+			In our example, we instantiated a standard worker graph maker, which reads a standard worker input file and constructs the indicated vertices of a basic graph.
+			Please see the API documentation for information about the worker graph makers that are included in the jpregel installation.
+			Later in the tutorial, we discuss making your own worker graph maker.
+		</li>
+		<li>
+			<b>Master Output Maker</b> - A master output maker, which reads the output files produced by each of the workers, and produces an output file for the overall graph computation.
+			In our example, we instantiated a standard master output maker, which reads a standard worker output file and constructs a standard graph output.
+			Please see the API documentation for information about the master output makers that are included in the jpregel installation.
+			Later in the tutorial, we discuss making your own master output maker.
+		</li>
+		<li>
+			<b>Worker Output Maker</b> - A worker output maker, invokes the output method on each of its vertices and produces an output file that will be read by the master output maker.
+			In our example, we instantiated a standard worker output maker, which produces a file with 1 line per vertex output 1 vertex output per line.
+			Please see the API documentation for information about the worker output makers that are included in the jpregel installation.
+			Later in the tutorial, we discuss making your own worker output maker.
+		</li>
+	</ol>
+		
+	
 	<p>
-		Again, the phases of a job are:
+		The phases of a job are:
 		<ol>
 			<li>Construct the graph</li>
 			<li>Run the graph computation </li>
@@ -152,7 +197,7 @@
 		</ol> 
 	</p>
 	
-	<h4><a name="Job-directory-structure">Job directory structure</a></h4>
+	<h3><a name="Job-directory-structure">Job directory structure</a></h3>
 	
 	<p>Before we discuss constructing the graph, we introduce the Job Directory structure, illustrated below.
 		Each job uses this file/directory structure. Directories are represented with blue rectangles; files are red.
@@ -180,30 +225,10 @@
 		</ol>
 	</p>
 	
-	<ul>
-		<li>job name:</li>
-		<li></li>
-		<li></li>
-		<li></li>
-		<li></li>
-		<li></li>
-	</ul>
 	
-	<p>
-		To be continued ...
-	</p>
-	
-	<a name="#Launching-a-cluster"><h3>Launching a jPregel cluster</h3></a>
-	
-	<p>
-		To be continued . . 
-	</p>
-	
-	<a name="Defining-a-Vertex-class"><h2>Defining a Vertex class</h2></a>
-	
-	<p>Encapsulating a distributed graph algorithm</p>
-	
-	
+	<h2><a name="Defining-a-Vertex-class">Defining a Vertex class</a></h2>
+	<h3>Encapsulating a distributed graph algorithm</h3>
+		
 	<p>
 		A Vertex class directly or indirectly extends <i>VertexImpl</i>, which implements the <i>Vertex</i> interface.
 		To be continued ...
