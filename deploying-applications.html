@@ -154,7 +154,6 @@
 				<li>Click on the <b>Security Credentials</b> entry.</li>
 				<li>On that page, click on the <b>Access Credentials</b> link.</li>
 				<li>Under the Access Credentials section, click on <b>Create a new Access Key</b>.</li>
-				<li></li>
 			</ol>
 		</li>
 				
@@ -244,12 +243,17 @@
 			<p>
 				In the example below, "ec2-54-242-89-232.compute-1.amazonaws.com"
 				is the public domain name of the machine being used as the client.
+				The ssh command given below is issued from within the directory that has the jpregel.pem file.
 			</p>
 			<pre>ssh -i jpregel.pem \
 ec2-user@ec2-54-242-89-232.compute-1.amazonaws.com
 			</pre>
 			<p>Using the shell:</p>
 			<ol>
+				<li><h4>change directory to your jpregel-aws directory</h4>
+					<pre>cd jpregel</pre>
+				</li>
+				
 				<li><h4>git pull your jpregel-aws repository</h4>
 					<pre>git pull</pre>
 				</li>
