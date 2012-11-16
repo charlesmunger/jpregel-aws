@@ -52,6 +52,11 @@
 			The jPregel-aws project comprises a Java-based implementation of Pregel with a package that enables 
 			deployment on Amazon Web Services with a minimum of fuss.
 		</p>
+		<p>
+			A standard performance test for Pregel is the Single Source Shortest Path (SSSP) problem on a binary tree.
+			Using 4 <a href="http://aws.amazon.com/ec2/instance-types/">AWS cc2.8xlarge instances</a> as workers, 
+			jpregel currently can complete an SSSP problem on a binary tree of 70M nodes in 25 seconds.
+		</p>
 		
         <p>
 	      The jPregel part of this project was originally written by Peter Cappello.
