@@ -1,11 +1,10 @@
 package JpLAN;
 
 import api.MachineGroup;
+import edu.ucsb.jpregel.system.ClientToMaster;
+import edu.ucsb.jpregel.system.Master;
 import java.io.IOException;
 import java.rmi.Naming;
-import system.ClientToMaster;
-import system.Master;
-
 /**
  *
  * @author charlesmunger

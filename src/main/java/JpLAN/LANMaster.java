@@ -1,14 +1,14 @@
 package JpLAN;
 
+import edu.ucsb.jpregel.system.ClientToMaster;
+import edu.ucsb.jpregel.system.FileSystem;
+import edu.ucsb.jpregel.system.LocalFileSystem;
+import edu.ucsb.jpregel.system.Master;
 import java.rmi.AlreadyBoundException;
 import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import system.ClientToMaster;
-import system.FileSystem;
-import system.LocalFileSystem;
-import system.Master;
 
 /**
  *

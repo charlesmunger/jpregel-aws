@@ -1,10 +1,10 @@
 package JpLAN;
 
+import edu.ucsb.jpregel.system.FileSystem;
+import edu.ucsb.jpregel.system.LocalFileSystem;
+import edu.ucsb.jpregel.system.Worker;
 import java.rmi.RemoteException;
 import jicosfoundation.Service;
-import system.FileSystem;
-import system.LocalFileSystem;
-import system.Worker;
 
 /**
  *

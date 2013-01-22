@@ -1,8 +1,8 @@
 package JpLAN;
 
 import api.MachineGroup;
+import edu.ucsb.jpregel.system.Worker;
 import java.io.IOException;
-import system.Worker;
 
 /**
  *
