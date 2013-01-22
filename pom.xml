@@ -36,5 +36,10 @@
       <artifactId>jclouds-allblobstore</artifactId>
       <version>1.5.4</version>
     </dependency>
+    <dependency>
+      <groupId>com.google.inject</groupId>
+      <artifactId>guice</artifactId>
+      <version>3.0</version>
+    </dependency>
   </dependencies>
 </project>
