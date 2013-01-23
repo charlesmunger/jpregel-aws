@@ -1,55 +1,12 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Tutorial</title>
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="javascripts/main.js"></script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-
-  </head>
-  <body>
-
-      <header>
-        <h1>Deploying jPregel Applications</h1>
-        <p>A tutorial introduction</p>
-      </header>
-
-      <div id="banner">
-        <span id="logo"></span>
-
-        <a href="https://github.com/charlesmunger/jpregel-aws" class="button fork"><strong>View On GitHub</strong></a>
-<!--
-        <div class="downloads">
-          <span>Download:</span>
-          <ul>
-            <li><a href="https://github.com/charlesmunger/jpregel-aws/zipball/master" class="button">ZIP</a></li>
-            <li><a href="https://github.com/charlesmunger/jpregel-aws/tarball/master" class="button">JAR</a></li>
-          </ul>
-        </div> 
--->
-      </div><!-- end banner -->
-
-    <div class="wrapper">
-      <nav>
-        <ul>
-	        <li><a href="index.html"><img src="images/Home24.gif" /></a></li>
-        	<li><a href="javadoc-api/index.html" target="parent">API</a></li>
-			<li><a href="tutorial.html">Tutorial</a></li>
-        </ul>
-      </nav>
-      <section>
-	
+---
+title: Deploying jPregel Applications
+subtitle: A tutorial introduction
+layout: default
+---
 	<h1>Deploying Applications</h1>
-	
-	<p><img src="images/merlin.gif" alt="merlin with student" width="400" /></p>
-	
+
+	<p><img src="img/merlin.gif" alt="merlin with student" width="400" /></p>
+
 	<h2>Table of Contents</h2>
 	<ol>
 		<li>Deploying on 1 machine</li>
@@ -64,23 +21,23 @@
 	</ol>
 
 	<hr>
-	
+
 	<h2><a name="AWS">Deploying on Amazon Web Services (AWS)</a></h2>
-	
+
 	<p>
-		Our deployment strategy entails an <i>Initial set up</i>: launching an AWS micro-instance as a client: 
+		Our deployment strategy entails an <i>Initial set up</i>: launching an AWS micro-instance as a client:
 		It will send the jpregel Master jobs to perform.
-		Once launched, you will stop the client when you are finished with a jpregel job. 
+		Once launched, you will stop the client when you are finished with a jpregel job.
 		You <i>never terminate the client instance</i>.
 		Instead, when you want to run another job, perhaps many days later, you begin by starting the client instance.
 		The sequence of steps to run a job from your client is much shorter than the sequence to launch the client instance.
 		We do endeavor to keep both of these instruction sequences as short as possible.
 	</p>
-	
+
 	<h3><a name="Initial-set-up">Initial set up</a></h3>
-	
+
 	<p>The initial set up of your AWS deployment environment consists of the following steps:</p>
-	
+
 	<ol>
 		<li>Create a free GitHub account.</li>
 		<li>Create a GitHub repository for jpregel-aws.</li>
@@ -88,17 +45,17 @@
 		<li>Create a file with your AWS jpregel-aws access key.</li>
 		<li>Launch an instance that serves as a jpregel-aws client.</li>
 	</ol>
-	
+
 	<p>We now explain how to perform these steps.</p>
-	
+
 	<ol>
 		<li><h4>Create a free GitHub account</h4>
 			<p>
-				If you do not have a GitHub account, please create one. 
+				If you do not have a GitHub account, please create one.
 				Rather than repeat the explanation here, please see <a href="https://github.com/signup/free" target="parent">the GitHub explanation for creating a free account.</a>
 			</p>
 		</li>
-		
+
 		<li>
 			<h4>Create a GitHub repository for jpregel-aws</h4>
 			<p>
@@ -107,23 +64,23 @@
 				A screen fragment of the web page is given below.
 			</p>
 			<p>
-				<img src="images/ScreenShotFork-jpregel-awsRepository.png" alt="fork button on GitHub repository" width="600" />
+				<img src="img/ScreenShotFork-jpregel-awsRepository.png" alt="fork button on GitHub repository" width="600" />
 			</p>
 			<p>You now have your own jpregel-aws repository.
 		</li>
-		
+
 		<li>
 			<h4>Create an AWS account</h4>
 			<p>
-				Using your web browser, go to 
+				Using your web browser, go to
 				<a href="http://docs.amazonwebservices.com/AWSEC2/latest/GettingStartedGuide/SignUp.html" target="parent">The latest AWS EC2 Getting Started Guide</a>.
 				You will see that getting started entails 4 steps.
 			</p>
 			<p>
-				<img src="images/ScreenShotEc2GettingStartedSteps.png" alt="EC2 Getting Started steps." width="600" />
+				<img src="img/ScreenShotEc2GettingStartedSteps.png" alt="EC2 Getting Started steps." width="600" />
 			</p>
 			<p>
-				Here, we are interested in the first 2 steps: 
+				Here, we are interested in the first 2 steps:
 				<ol>
 					<li>Sign up for EC2</li>
 					<li>Launch instance</li>
@@ -136,11 +93,11 @@
 					<li>Follow the on-screen instructions.</li>
 				</ol>
 				Part of the sign-up procedure involves receiving a phone call and entering a PIN using the phone keypad.
-				When you create an account, AWS automatically signs up the account for all services. 
+				When you create an account, AWS automatically signs up the account for all services.
 				You are charged only for the services that you use.
-			</p>			
+			</p>
 		</li>
-		
+
 		<li>
 			<h4>Create a file with your jpregel AWS access keys.</h4>
 			<p>
@@ -156,12 +113,12 @@
 				<li>Under the Access Credentials section, click on <b>Create a new Access Key</b>.</li>
 			</ol>
 		</li>
-				
+
 		<li>
 			<h4>Launch an instance</h4>
 			<p>Now launch an instance that subsequently will serve as a jpregel-aws client.
 				<ol>
-					<li>Go to 
+					<li>Go to
 						<a href="http://docs.amazonwebservices.com/AWSEC2/latest/GettingStartedGuide/LaunchInstance.html" target="parent">
 							Getting Started: Launch Instance instructions.
 						</a>
@@ -194,18 +151,18 @@
 				</ol>
 			</p>
 			<p>At this point you have a running jpregel client.
-				<b>Stop</b> it, but do not <b>terminate</b> it. 
+				<b>Stop</b> it, but do not <b>terminate</b> it.
 			</p>
 			<p>
 				When you want to deploy a jpregel job on EC2, you will start this client instance.
 				Stop it when you are done.
-				If you terminate it, you must create another instance using the steps above.	
-			</p>		
+				If you terminate it, you must create another instance using the steps above.
+			</p>
 		</li>
 	</ol>
-	
+
 	<h3><a name="Start-an-application">Start a jpregel application on AWS</a></h3>
-	
+
 	<ol>
 		<li>Start your EC2 instance.</li>
 		<li>Using ssh, access a shell on the instance:
@@ -215,20 +172,20 @@
 			</ol>
 		</li>
 	</ol>
-	
+
 	<p>We now explain how to perform these steps.</p>
-	
+
 	<ol>
 		<li><h4>Start your EC2 instance</h4>
 			<ol>
 				<li>
 					In EC2 console page, there is a Navigation column on the left.
 					In that column, there is a heading called <b>Instances</b>.
-					Under that heading, 
+					Under that heading,
 					click <b>Instances</b> which takes you to a page that lists your instances.
 				</li>
 				<li>
-					In the <b>My Instances</b> block of that page, 
+					In the <b>My Instances</b> block of that page,
 					check the instance that you want to start.
 					Doing so, activates the <b>Instance Actions</b> drop down.
 				</li>
@@ -238,7 +195,7 @@
 				</li>
 			</ol>
 		</li>
-		
+
 		<li><h4>Using ssh, access a shell on the instance</h4>
 			<p>
 				In the example below, "ec2-54-242-89-232.compute-1.amazonaws.com"
@@ -253,14 +210,14 @@ ec2-user@ec2-54-242-89-232.compute-1.amazonaws.com
 				<li><h4>change directory to your jpregel-aws directory</h4>
 					<pre>cd jpregel</pre>
 				</li>
-				
+
 				<li><h4>git pull your jpregel-aws repository</h4>
 					<pre>git pull</pre>
 				</li>
-				
+
 				<li><h4>Using ant, run your chosen jpregel client</h4>
 					<p>We give an example ant command below</p>
-		<pre>ant run -propertyfile \ 
+		<pre>ant run -propertyfile \
 nbproject/configs/ShortestPath.properties \
 -Dapplication.args="foobucket 10 10 true true"
 		</pre>
@@ -268,17 +225,17 @@ nbproject/configs/ShortestPath.properties \
 			</ol>
 		</li>
 	</ol>
-	
+
 <!--
-	
+
 	<a name="Deploying-Applications"><h2>Deploying jPregel Applications</h2></a>
 	<!--
 	<h3>Deploying on a single machine</h3>
-	
+
 	<h3>Deploying on a local cluster</h3>
-	
+
 	<h3>Deploying on Amazon Web Services</h3>
-	
+
 	<ol>
 		<li>Deploying with AWS
 			<ol>
@@ -304,17 +261,7 @@ nbproject/configs/ShortestPath.properties \
 			</ol>
 		</li>
 	</ol>
-	
-	
+
+
 	<a name="Contributing-to-the-jpregel-project"><h2>Contributing to jPregel</h2></a>
 -->
-      </section>
-      <footer>
-        <p>Project maintained by <a href="https://github.com/charlesmunger">charlesmunger</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></small></p>
-      </footer>
-    </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-    
-  </body>
-</html>

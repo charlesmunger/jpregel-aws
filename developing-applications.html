@@ -1,56 +1,14 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Tutorial</title>
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="javascripts/main.js"></script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-  </head>
-  <body>
-
-      <header>
-        <h1>Developing jPregel Applications</h1>
-        <p>A tutorial introduction</p>
-      </header>
-
-      <div id="banner">
-        <span id="logo"></span>
-
-        <a href="https://github.com/charlesmunger/jpregel-aws" class="button fork"><strong>View On GitHub</strong></a>
-<!--
-        <div class="downloads">
-          <span>Download:</span>
-          <ul>
-            <!--<li><a href="https://github.com/charlesmunger/jpregel-aws/zipball/master" class="button">ZIP</a></li>
-            <li><a href="https://github.com/charlesmunger/jpregel-aws/tarball/master" class="button">JAR</a></li>
-          </ul>
-        </div>
--->
-      </div><!-- end banner -->
-
-    <div class="wrapper">
-      <nav>
-        <ul>
-	        <li><a href="index.html"><img src="images/Home24.gif" /></a></li>
-        	<li><a href="javadoc-api/index.html" target="parent">API</a></li>
-			<li><a href="tutorial.html">Tutorial</a></li>
-        </ul>
-      </nav>
-      <section>
-	
+---
+title: Developing jPregel Applications
+subtitle: A tutorial introduction
+layout: default
+---
 	<h1>Developing Applications</h1>
-	
-	<p><img src="images/merlin.gif" alt="merlin with student" width="400" /></p>
-	
+
+	<p><img src="img/merlin.gif" alt="merlin with student" width="400" /></p>
+
 	<h2>Table of Contents</h2>
-	
+
 	<ol>
 		<li>
 			<a href="#Birds-eye-tour-of-a-jPregel-client">Birds eye tour of a jPregel client</a>
@@ -73,23 +31,23 @@
 	</ol>
 
 	<hr>
-	
+
 	<h2><a name="Birds-eye-tour-of-a-jPregel-client">Birds eye tour of a jPregel client</a></h2>
-	
+
 	<p>
 		A jPregel <b>client</b> is a concise sequence of instructions illustrated below.
 		It first specifies the Job object (lines 11 - 19).
 		Then, it:
 		<ol>
 			<li>
-				(line 22) reserves and launches a jPregel cluster, specifying the number of worker machines as an argument, 
+				(line 22) reserves and launches a jPregel cluster, specifying the number of worker machines as an argument,
 				and obtaining a remote reference to the jpregel master.
 			</li>
 			<li>(line 23) runs the job</li>
 		</ol>
 		Following the listing, we delve into the Job object.
 	</p>
-	
+
 	<style type="text/css">
 	<!--
 	body {color: #000000; background-color: #ffffff; font-family: Monospaced}
@@ -106,11 +64,11 @@
 	.keyword-directive {color: #0000e6}
 	-->
 	</style>
-	
+
 	<pre>
 	 1 <span class="keyword-directive">package</span> clients;
 	 2 <span class="keyword-directive">import</span> system.*;
-	 3 
+	 3
 	 4 <span class="keyword-directive">public</span> <span class="keyword-directive">class</span> <span class="ST0">SourcesLocalClient</span>
 	 5 {
 	 6     <span class="comment">/**</span>
@@ -122,12 +80,12 @@
 	12                 <span class="character">&quot;</span><span class="character">Identify source nodes</span><span class="character">&quot;</span>,  <span class="comment">// jobName</span>
 	13                 args[0],                          <span class="comment">// jobDirectoryName</span>
 	14                 <span class="keyword-directive">new</span> VertexSources(),     <span class="comment">// vertexFactory</span>
-	15                 <span class="keyword-directive">new</span> MasterGraphMakerStandard(),  
-	16                 <span class="keyword-directive">new</span> WorkerGraphMakerStandard(),   
+	15                 <span class="keyword-directive">new</span> MasterGraphMakerStandard(),
+	16                 <span class="keyword-directive">new</span> WorkerGraphMakerStandard(),
 	17                 <span class="keyword-directive">new</span> MasterOutputMakerStandard(),
-	18                 <span class="keyword-directive">new</span> WorkerOutputMakerStandard()                 
+	18                 <span class="keyword-directive">new</span> WorkerOutputMakerStandard()
 	19                 );
-	20         <span class="keyword-directive">int</span> numWorkers = 1; 
+	20         <span class="keyword-directive">int</span> numWorkers = 1;
 	21         System.<span class="ST3">out</span>.println( job + <span class="character">&quot;</span><span class="ST4">\n</span><span class="character">    numWorkers: </span><span class="character">&quot;</span> + numWorkers );
 	22         ClientToMaster master = LocalReservationService.<span class="ST5">newCluster</span>( numWorkers );
 	23         System.<span class="ST3">out</span>.println( master.run( job ) );
@@ -135,13 +93,13 @@
 	25     }
 	26 }
 	</pre>
-	
+
 	<h3><a name="Job">What's in a Job?</a></h3>
-	
+
 	<p>We briefly enumerate the parameters in the Job constructor:</p>
 	<ol>
 		<li>
-			<b>Job Name</b> - A String describing the job/computation. 
+			<b>Job Name</b> - A String describing the job/computation.
 			In our example, we simply use the String "Identify source nodes" since that describes the example computation.
 		</li>
 		<li>
@@ -160,14 +118,14 @@
 			Later in the tutorial, we discuss making your own vertex class.
 		</li>
 		<li>
-			<b>Master Graph Maker</b> - A master graph maker, which reads an input file and creates 1 input file per worker. 
+			<b>Master Graph Maker</b> - A master graph maker, which reads an input file and creates 1 input file per worker.
 			The workers then read their respective input file and construct a part of the graph on which the computation will be run.
 			In our example, we instantiated a standard master graph maker, which reads an input file for a graph in a standard form.
 			Please see the API documentation for information about the master graph makers that are included in the jpregel installation.
 			Later in the tutorial, we discuss making your own master graph maker.
 		</li>
 		<li>
-			<b>Worker Graph Maker</b> - A worker graph maker, which reads an input file, created by the master graph maker, 
+			<b>Worker Graph Maker</b> - A worker graph maker, which reads an input file, created by the master graph maker,
 			and constructs vertices using the Vertex Factory specified above.
 			In our example, we instantiated a standard worker graph maker, which reads a standard worker input file and constructs the indicated vertices of a basic graph.
 			Please see the API documentation for information about the worker graph makers that are included in the jpregel installation.
@@ -186,61 +144,50 @@
 			Later in the tutorial, we discuss making your own worker output maker.
 		</li>
 	</ol>
-		
-	
+
+
 	<p>
 		The phases of a job are:
 		<ol>
 			<li>Construct the graph</li>
 			<li>Run the graph computation </li>
 			<li>Collect the computation's output</li>
-		</ol> 
+		</ol>
 	</p>
-	
+
 	<h3><a name="Job-directory-structure">Job directory structure</a></h3>
-	
+
 	<p>Before we discuss constructing the graph, we introduce the Job Directory structure, illustrated below.
 		Each job uses this file/directory structure. Directories are represented with blue rectangles; files are red.
 	</p>
-	
+
 	<p>
 		<center>
-			<img src="images/figures/Slide3.png" alt="Job Directory sructure with n worker machines" width="400">
+			<img src="img/figures/Slide3.png" alt="Job Directory sructure with n worker machines" width="400">
 			<br />
 			Job Directory structure when there are <i>n</i> worker machines.
 		</center>
 	</p>
-	
+
 	<h4>Constructing the graph</h4>
-	
+
 	<p>This construction process is as follows:
 		<ol>
 			<li>The master graph maker reads the file named "input" in the job directory;</li>
-			<li>The master graph maker creates <i>n</i> files in the job directory's <i>in</i> sub-directory, named 1, 2, ..., <i>n</i>, 
+			<li>The master graph maker creates <i>n</i> files in the job directory's <i>in</i> sub-directory, named 1, 2, ..., <i>n</i>,
 				where there are <i>n</i> workers;
 			</li>
-			<li>The worker whose worker number is <i>w</i> reads the file named <i>w</i> in the <i>in</i> sub-directory and 
+			<li>The worker whose worker number is <i>w</i> reads the file named <i>w</i> in the <i>in</i> sub-directory and
 				constructs the vertices indicated by that file.
 			</li>
 		</ol>
 	</p>
-	
-	
+
+
 	<h2><a name="Defining-a-Vertex-class">Defining a Vertex class</a></h2>
 	<h3>Encapsulating a distributed graph algorithm</h3>
-		
+
 	<p>
 		A Vertex class directly or indirectly extends <i>VertexImpl</i>, which implements the <i>Vertex</i> interface.
 		To be continued ...
 	</p>
-	
-      </section>
-      <footer>
-        <p>Project maintained by <a href="https://github.com/charlesmunger">charlesmunger</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></small></p>
-      </footer>
-    </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-    
-  </body>
-</html>

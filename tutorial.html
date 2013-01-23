@@ -1,60 +1,16 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Tutorial</title>
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="javascripts/main.js"></script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-
-  </head>
-  <body>
-
-      <header>
-        <h1>Tutorial</h1>
-        <p>An introduction to jPregel-aws</p>
-      </header>
-
-      <div id="banner">
-        <span id="logo"></span>
-
-        <a href="https://github.com/charlesmunger/jpregel-aws" class="button fork"><strong>View On GitHub</strong></a>
-<!--
-        <div class="downloads">
-          <span>Download:</span>
-          <ul>
-            <li><a href="https://github.com/charlesmunger/jpregel-aws/zipball/master" class="button">ZIP</a></li> 
-
-            <li><a href="https://github.com/charlesmunger/jpregel-aws/tarball/master" class="button">JAR</a></li>
-          </ul>
-        </div>
--->
-      </div><!-- end banner -->
-
-    <div class="wrapper">
-      <nav>
-        <ul>
-	        <li><a href="index.html"><img src="images/Home24.gif" /></a></li>
-        	<li><a href="javadoc-api/index.html" target="parent">API</a></li>
-			<li><a href="tutorial.html">Tutorial</a></li>
-        </ul>
-      </nav>
-      <section>
-	
+---
+title: Tutorial
+subtitle: An introduction to jPregel-aws
+layout: default
+---
 	<h1>Tutorial</h1>
-	
+
 	<h3>Make magic with jPregel-aws!</h3>
-	
-	<p><img src="images/merlin.gif" alt="merlin with student" width="400" /></p>
-	
+
+	<p><img src="img/merlin.gif" alt="merlin with student" width="400" /></p>
+
 	<h2>Table of Contents</h2>
-	
+
 	<ol>
 		<li><a href="#Introduction-to-jpregel">Introduction to jPregel</a></li>
 		<li>
@@ -86,7 +42,7 @@
 			</ol>
 		-->
 		</li>
-	
+
 		<li>
 			<a href="deploying-applications.html">Deploying Applications</a>
 			<!--
@@ -108,13 +64,13 @@
 		</li>
 	</ol>
 	<hr>
-	
+
 	<a name="Introduction-to-jpregel"><h2>Introduction to jPregel</h2></a>
-	
-	<p>jPregel is based on the paper 
+
+	<p>jPregel is based on the paper
 		<a href="http://dl.acm.org/citation.cfm?id=1582723">"Pregel: a system for large-scale graph processing."</a>
 		<!--
-			by Grzegorz Malewicz, Matthew H. Austern, Aart J.C. Bik, James C. Dehnert, Ilan Horn, Naty Leiser, and 	Grzegorz Czajkowski 
+			by Grzegorz Malewicz, Matthew H. Austern, Aart J.C. Bik, James C. Dehnert, Ilan Horn, Naty Leiser, and 	Grzegorz Czajkowski
 			(all affiliated with Google, Inc.),
 		Proceedings, PODC Proceedings of the 28th ACM symposium on Principles of Distributed Computing, 2009.
 		-->
@@ -138,39 +94,39 @@
 			<li>read messages sent to the vertex from vertices during the previous step;</li>
 			<li>modify its state</li>
 			<li>send messages to vertices (including itself), each of which is read by the receiving vertex during the next super step.</li>
-		</ul> 
+		</ul>
 		If a super step has an empty set of active vertices, the digraph algorithm halts.
 		(This termination condition of the distributed digraph algorithm is different from, but equivalent to, that of Pregel.)
 		The following simple example gives the flavor of these concepts.
 	</p>
-	
+
 	<h3>Example 1.1: Identifying a digraph's source nodes</h3>
 	<p>
-		At the time a digraph is constructed, a vertex, <i>v</i>, does not "know" if it has in-edges 
+		At the time a digraph is constructed, a vertex, <i>v</i>, does not "know" if it has in-edges
 		(i.e., <i>v</i> does not "know" if there is a vertex <i>u</i> with an out-edge to <i>v</i>).
 		Let us define a jpregel algorithm to determine if a vertex is a source (i.e., has no in-edges).
 		We will illustrate our algorithm on the small digraph below:
-	
-		<center><img src="images/figures/Slide1.png" alt="a simple 7 node digraph with 2 source nodes." width="400"></center>
+
+		<center><img src="img/figures/Slide1.png" alt="a simple 7 node digraph with 2 source nodes." width="400"></center>
 	</p>
-	
+
 	<h4>Algorithm</h4>
 	<p>
 		When the graph is constructed, all vertices are put in the active set and all vertices are initialized as a source.
 		The graph algorithm has 2 super steps:
 		<ol>
 			<li>
-				Each vertex <i>u</i> sends a message (which is empty) to vertex <i>v</i>, 
+				Each vertex <i>u</i> sends a message (which is empty) to vertex <i>v</i>,
 				if (<i>u</i>, <i>v</i>) is an out-edge of <i>u</i>.
 			</li>
 			<li>Active vertices mark themselves as not being a source.</li>
 		</ol>
 		Since no messages are sent during super step 2, the algorithm terminates after 2 super steps.
 	</p>
-		
+
 	<h4>Correctness</h4>
 	<p>
-		After the graph algorithm terminates, 
+		After the graph algorithm terminates,
 		<i>vertex <i>v</i> is marked as not being a source</i> <br />
 		if and only if <i>v</i> received at least one message at super step 2  <br />
 		if and only if there is a vertex <i>u</i> with out-edge (<i>u</i>, <i>v</i>)  <br />
@@ -179,12 +135,12 @@
 	</p>
 	<p>
 		After the graph computation terminates, there is an <i>output phase</i>.
-		During the output phase of our source identification problem, each vertex outputs true, if it is a source, and false otherwise. 
+		During the output phase of our source identification problem, each vertex outputs true, if it is a source, and false otherwise.
 	</p>
-	
+
 	<h4>Code</h4>
 	<p>
-		The following code fragment makes these ideas more precise, where the value associated with the vertex is a Boolean, 
+		The following code fragment makes these ideas more precise, where the value associated with the vertex is a Boolean,
 		which, after the graph algorithm terminates, has a value of true if and only if the vertex is a source.
 	</p>
 	<style>
@@ -200,10 +156,10 @@
 	.keyword-directive {color: #0000e6}
 	-->
 	</style>
-	
+
 	<pre>
 	    @Override
-	    <span class="keyword-directive">public</span> <span class="keyword-directive">void</span> <span class="ST1">compute</span>() 
+	    <span class="keyword-directive">public</span> <span class="keyword-directive">void</span> <span class="ST1">compute</span>()
 	    {
 	        <span class="keyword-directive">if</span> ( <span class="keyword-directive">null</span> == getVertexValue() ) {
 	            setVertexValue( <span class="keyword-directive">true</span> ); <span class="comment">// initially mark all vertices as sources</span>
@@ -222,30 +178,30 @@
 	    <span class="keyword-directive">public</span> String <span class="ST1">output</span>() { <span class="keyword-directive">return</span> getVertexId() + <span class="character">&quot;</span> <span class="character">&quot;</span> + getVertexValue(); }
 	</pre>
 	<p>
-		Vertex methods <i>getVertexValue</i>, <i>setVertexValue</i>, <i>getEdgeTargets</i>, <i>sendMessage</i>, and <i>getMessageQ</i> 
+		Vertex methods <i>getVertexValue</i>, <i>setVertexValue</i>, <i>getEdgeTargets</i>, <i>sendMessage</i>, and <i>getMessageQ</i>
 		do what their names suggest.
 		The full Vertex API is presented a bit later in the tutorial.
 	</p>
 	<p>
 		Using the output from this jPregel application, if one were to paint the source vertices red and the non-source vertices blue, our small graph would, of course, look as follows:
-		<center><img src="images/figures/Slide2.png" alt="a simple 7 node digraph with 2 source nodes." width="400"></center>
+		<center><img src="img/figures/Slide2.png" alt="a simple 7 node digraph with 2 source nodes." width="400"></center>
 	</p>
-	
+
 	<p>
-		In the chapters of this tutorial, you will learn how to develop jPregel applications, 
-		how to deploy them, especially on AWS, which we have endeavored to make as easy as possible (we think you'll agree), 
+		In the chapters of this tutorial, you will learn how to develop jPregel applications,
+		how to deploy them, especially on AWS, which we have endeavored to make as easy as possible (we think you'll agree),
 		and how to contribute to this project.
 	</p>
 <!--
-	
+
 	<a name="Deploying-Applications"><h2>Deploying jPregel Applications</h2></a>
 	<!--
 	<h3>Deploying on a single machine</h3>
-	
+
 	<h3>Deploying on a local cluster</h3>
-	
+
 	<h3>Deploying on Amazon Web Services</h3>
-	
+
 	<ol>
 		<li>Deploying with AWS
 			<ol>
@@ -271,17 +227,7 @@
 			</ol>
 		</li>
 	</ol>
-	
-	
+
+
 	<a name="Contributing-to-the-jpregel-project"><h2>Contributing to jPregel</h2></a>
 -->
-      </section>
-      <footer>
-        <p>Project maintained by <a href="https://github.com/charlesmunger">charlesmunger</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></small></p>
-      </footer>
-    </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-    
-  </body>
-</html>
