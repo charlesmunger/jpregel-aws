@@ -1,78 +1,26 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>jpregel-aws</title>
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="javascripts/main.js"></script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-  </head>
-  <body>
+---
+title: jPregel
+subtitle: Java-based Pregel easily deployed on Amazon Web Services
+layout: default
+---
+    <h1>Welcome to jPregel-aws!</h1>
 
-      <header>
-        <h1>jPregel-aws</h1>
-        <p>Java-based Pregel easily deployed on Amazon Web Services</p>
-      </header>
-
-      <div id="banner">
-        <span id="logo"></span>
-
-        <a href="https://github.com/charlesmunger/jpregel-aws" class="button fork"><strong>View On GitHub</strong></a>
-<!--
-        <div class="downloads">
-          <span>Download:</span>
-          <ul>
-             <li><a href="https://github.com/charlesmunger/jpregel-aws/zipball/master" class="button">ZIP</a></li> 
-            <li><a href="https://github.com/charlesmunger/jpregel-aws/tarball/master" class="button">JAR</a></li>
-          </ul>
-        </div>
--->
-      </div><!-- end banner -->
-
-    <div class="wrapper">
-      <nav>
-        <ul>
-	        <li><a href="index.html"><img src="images/Home24.gif" /></a></li>
-        	<li><a href="javadoc-api/index.html" target="parent">API</a></li>
-			<li><a href="tutorial.html">Tutorial</a></li>
-        </ul>
-      </nav>
-      <section>
-        <h1>Welcome to jPregel-aws!</h1>
-
-		<p><center><img src="images/graph_usairways_bundled.jpeg" alt="US airline route graph" width="500"/></center></p>
+		<p><center><img src="img/graph_usairways_bundled.jpeg" alt="US airline route graph" width="500"/></center></p>
 
         <p>
-			The jPregel-aws project comprises a Java-based implementation of Pregel with a package that enables 
+			The jPregel-aws project comprises a Java-based implementation of Pregel with a package that enables
 			deployment on Amazon Web Services with a minimum of fuss.
 		</p>
 		<p>
 			A standard performance test for Pregel is the Single Source Shortest Path (SSSP) problem on a binary tree.
-			Using 4 <a href="http://aws.amazon.com/ec2/instance-types/">AWS cc2.8xlarge instances</a> as workers, 
+			Using 4 <a href="http://aws.amazon.com/ec2/instance-types/">AWS cc2.8xlarge instances</a> as workers,
 			jpregel currently can complete an SSSP problem on a binary tree of 70M nodes in 25 seconds.
 		</p>
-		
+
         <p>
 	      The jPregel part of this project was originally written by Peter Cappello.
 		  The current version does not tolerate machine failures.
 	      The Java package to run jPregel on AWS, originally written by Varsha Parthasarathy, has been replaced and significantly extended by Charles Munger.
 	   </p>
-	
+
 		<p>This project is licensed under the MIT license, which is provided in <a href="license.html">license.txt</a>.</p>
-		
-      </section>
-      <footer>
-        <p>Project maintained by <a href="https://github.com/charlesmunger">charlesmunger</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></small></p>
-      </footer>
-    </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-    
-  </body>
-</html>
