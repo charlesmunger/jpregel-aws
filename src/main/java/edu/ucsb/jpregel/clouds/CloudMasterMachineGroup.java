@@ -4,6 +4,8 @@
  */
 package edu.ucsb.jpregel.clouds;
 
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import edu.ucsb.jpregel.system.ClientToMaster;
 import edu.ucsb.jpregel.system.FileSystem;
 import edu.ucsb.jpregel.system.Master;
@@ -26,7 +28,7 @@ import org.jclouds.compute.domain.NodeMetadata;
  */
 class CloudMasterMachineGroup extends CloudMachineGroup<ClientToMaster> {
 
-	public CloudMasterMachineGroup(Set<? extends NodeMetadata> nodes, ApiMetadata apiMetadata) {
+	public CloudMasterMachineGroup(Set<? extends NodeMetadata> nodes, @Named("compute") ApiMetadata apiMetadata) {
 		super(nodes, apiMetadata);
 	}
 
@@ -65,8 +67,8 @@ class CloudMasterMachineGroup extends CloudMachineGroup<ClientToMaster> {
 			registry.bind(Master.CLIENT_SERVICE_NAME, master);
 			System.out.println("Master ready");
 		}
-
-		public CloudMaster(ApiMetadata storage) throws RemoteException {
+		@Inject
+		public CloudMaster(@Named("storage") ApiMetadata storage) throws RemoteException {
 			this.storage = storage;
 		}
 

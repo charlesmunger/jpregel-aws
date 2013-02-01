@@ -5,6 +5,8 @@
 package edu.ucsb.jpregel.clouds;
 
 import api.MachineGroup;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import edu.ucsb.jpregel.system.ClientToMaster;
 import edu.ucsb.jpregel.system.ReservationServiceImpl;
 import edu.ucsb.jpregel.system.Worker;
@@ -33,7 +35,8 @@ public class CloudReservationService extends ReservationServiceImpl {
     private final ApiMetadata compute;
     private final ApiMetadata storage;
 
-    public CloudReservationService(ApiMetadata apiMetadata,ApiMetadata storage) {
+    @Inject
+    public CloudReservationService(@Named("compute") ApiMetadata apiMetadata,@Named("storage") ApiMetadata storage) {
         this.compute = apiMetadata;
 	this.storage = storage;
         context = new ContextBuilder(apiMetadata).credentials(null, null).build(ComputeServiceContext.class).getComputeService();

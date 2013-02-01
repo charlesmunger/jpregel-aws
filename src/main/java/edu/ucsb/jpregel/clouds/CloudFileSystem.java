@@ -1,5 +1,7 @@
 package edu.ucsb.jpregel.clouds;
 
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import edu.ucsb.jpregel.system.FileSystem;
 import java.io.*;
 import org.jclouds.ContextBuilder;
@@ -12,9 +14,14 @@ public class CloudFileSystem extends FileSystem {
     private final BlobStoreContext context;
     private final InputStreamMap storage;
 
-    public CloudFileSystem(String jobDirectoryName, ApiMetadata apiMetadata) {
+    @Inject
+    public CloudFileSystem(
+    @Named("jobDirectoryName") String jobDirectoryName, 
+    @Named("storage") ApiMetadata apiMetadata, 
+    @Named("sAccess") String access, 
+    @Named("sModify") String modify) {
         super(jobDirectoryName);
-        this.context = new ContextBuilder(apiMetadata).credentials("access", "modify").build(BlobStoreContext.class);
+        this.context = new ContextBuilder(apiMetadata).credentials(access, modify).build(BlobStoreContext.class);
         this.storage = context.createInputStreamMap(jobDirectoryName);
         new File("in/").mkdirs();
         new File("out/").mkdirs();

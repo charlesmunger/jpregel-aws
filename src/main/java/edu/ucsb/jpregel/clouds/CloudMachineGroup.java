@@ -8,6 +8,7 @@ import api.MachineGroup;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import java.io.File;
 import java.io.IOException;
 import java.util.Set;
@@ -39,7 +40,7 @@ public abstract class CloudMachineGroup<T> extends MachineGroup<T> {
 
 
 	@Inject
-	CloudMachineGroup(Set<? extends NodeMetadata> nodes, ApiMetadata compute) {
+	CloudMachineGroup(Set<? extends NodeMetadata> nodes, @Named("compute") ApiMetadata compute) {
 		this.nodes = nodes;
 		this.context = new ContextBuilder(compute).credentials(null, null).build(ComputeServiceContext.class);
 		this.comp = context.getComputeService();

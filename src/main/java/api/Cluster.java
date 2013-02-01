@@ -1,11 +1,11 @@
 package api;
 
+import edu.ucsb.jpregel.system.Job;
+import edu.ucsb.jpregel.system.JobRunData;
 import java.io.IOException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.concurrent.ExecutionException;
-import edu.ucsb.jpregel.system.Job;
-import edu.ucsb.jpregel.system.JobRunData;
 
 /**
  *
