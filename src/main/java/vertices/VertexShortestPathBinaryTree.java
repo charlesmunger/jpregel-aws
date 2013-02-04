@@ -15,7 +15,7 @@ public final class VertexShortestPathBinaryTree extends VertexShortestPath
 {
     public VertexShortestPathBinaryTree() {}
     
-    public VertexShortestPathBinaryTree( Integer vertexId, Message<Integer, Integer> vertexValue, Map<Integer, Integer> edgeMap )
+    public VertexShortestPathBinaryTree( Integer vertexId, Map<Integer, Integer> edgeMap )
     { 
         super( vertexId, edgeMap ,2);
         setVertexValue( new Message( vertexId, Integer.MAX_VALUE ) );
@@ -32,8 +32,6 @@ public final class VertexShortestPathBinaryTree extends VertexShortestPath
     
     public VertexImpl make( Integer vertexId, int numChildren )
     {
-        Integer initialKnownDistance = ( vertexId == 1 ) ? 0 : Integer.MAX_VALUE;
-        Message<Integer, Integer> vertexValue = new Message<Integer, Integer>( 1, initialKnownDistance );
         Map<Integer, Integer> edgeMap = new HashMap<Integer, Integer>( numChildren );
         switch ( numChildren )
         {
@@ -41,7 +39,7 @@ public final class VertexShortestPathBinaryTree extends VertexShortestPath
             case 1: edgeMap.put( 2 * vertexId,     1 );
             default: break; // no children
         }
-        return new VertexShortestPathBinaryTree( vertexId, vertexValue, edgeMap );
+        return new VertexShortestPathBinaryTree( vertexId, edgeMap );
     }
     
     @Override
@@ -54,5 +52,10 @@ public final class VertexShortestPathBinaryTree extends VertexShortestPath
             id >>=1;
         }
         return id-numparts+1;
+    }
+    
+    @Override
+    public void initialValue(Integer vertexId) {
+          setVertexValue( new Message( vertexId, Integer.MAX_VALUE ) );
     }
 }

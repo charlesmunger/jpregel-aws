@@ -17,18 +17,27 @@ import java.util.StringTokenizer;
  */
 public class VertexShortestPath extends VertexImpl<Integer, Message<Integer, Integer>, Integer, Integer>
 {
+    private static final Combiner sCombiner = new CombinerMinInteger();
+    private static final ThreadLocal< StringBuilder> uniqueNum = new ThreadLocal<StringBuilder>() {
+
+		@Override
+		protected StringBuilder initialValue() {
+			return new StringBuilder();
+		}
+	};
+    
     public VertexShortestPath( Integer vertexId, Map<Integer, Integer> edgeMap, int numOutgoingEdges )
     {
         super( vertexId, edgeMap, numOutgoingEdges );
-        setVertexValue( new Message<Integer, Integer>( vertexId, Integer.MAX_VALUE ) );
-        combiner = new CombinerMinInteger();
+        initialValue( vertexId);
+        combiner = sCombiner;
     }
     
     public VertexShortestPath( Integer vertexId, Map<Integer, Integer> edgeMap ) 
     {
         super( vertexId, edgeMap );
-        setVertexValue( new Message<Integer, Integer>( vertexId, Integer.MAX_VALUE ) );
-        combiner = new CombinerMinInteger();
+        initialValue( vertexId);
+        combiner = sCombiner;
     }
     
     public VertexShortestPath() {}
@@ -94,7 +103,7 @@ public class VertexShortestPath extends VertexImpl<Integer, Message<Integer, Int
     @Override
     public String output() 
     {
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder stringBuilder = uniqueNum.get();
         stringBuilder.append( "" );
         if ( getNumVertices() == getVertexId() )
         {
@@ -105,11 +114,17 @@ public class VertexShortestPath extends VertexImpl<Integer, Message<Integer, Int
             stringBuilder.append( " - ");
             stringBuilder.append( getVertexValue().getMessageValue() );
         }
-        return stringBuilder.toString();
+        String toString = stringBuilder.toString();
+        stringBuilder.setLength(0);
+        return toString;
     }
-    
+        
     @Override
     public boolean isInitiallyActive() { return isSource(); }
     
     public boolean isSource() { return getVertexId() == 1; }
+
+    public void initialValue(Integer vertexId) {
+        setVertexValue( new Message<Integer, Integer>( vertexId, Integer.MAX_VALUE ) );
+    }
 }
