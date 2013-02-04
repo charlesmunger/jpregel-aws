@@ -40,7 +40,7 @@ public class VertexSsspBinaryTree extends VertexShortestPath
             case 1: edgeMap.put( 2 * vertexId,     1 );
             default: break; // no children
         }
-        return new VertexShortestPathBinaryTree( vertexId, vertexValue, edgeMap );
+        return new VertexSsspBinaryTree( vertexId, vertexValue, edgeMap );
     }
     
     /*
