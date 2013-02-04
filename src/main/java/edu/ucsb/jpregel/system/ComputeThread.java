@@ -82,16 +82,15 @@ public class ComputeThread extends Thread
         }
         else
         {  
-            int receivingWorkerNum = worker.getWorkerNum( receivingPartId );
-            if ( Worker.BATCH_MESSAGES )
-            {
-//              TODO ComputeThread: Monitor map.size(): when too large, Worker combines, sends, & reinitializes
+            // TODO ComputeThread: Later: monitor size of map: when too large, give to Worker to combine/send & reinitialize
+            
                 // get vertexIdToMessageQMap for destination Worker
-                Map<Object, MessageQ> vertexIdToMessageQMap = workerNumToVertexIdToMessageQMapMap.get( receivingWorkerNum );
+            int workerNum = worker.getWorkerNum( receivingPartId );
+            Map<Object, MessageQ> vertexIdToMessageQMap = workerNumToVertexIdToMessageQMapMap.get( workerNum );
                 if ( vertexIdToMessageQMap == null )
                 {
                     vertexIdToMessageQMap = new HashMap<Object, MessageQ>();
-                    workerNumToVertexIdToMessageQMapMap.put( receivingWorkerNum, vertexIdToMessageQMap );
+                    workerNumToVertexIdToMessageQMapMap.put( workerNum, vertexIdToMessageQMap );
                 }
 
                 // get receivingVertex's MessageQ
@@ -101,14 +100,9 @@ public class ComputeThread extends Thread
                     receivingVertexMessageQ = new MessageQ( combiner );
                     vertexIdToMessageQMap.put( receivingVertexId, receivingVertexMessageQ );
                 }
-                receivingVertexMessageQ.add( message ); 
+            receivingVertexMessageQ.add( message );           
             }
-            else
-            {
-                worker.sendMessage( receivingPartId, receivingVertexId, message, superStep );
-            }
-        }
-    }
+      }
     
     void setPartIdToPartMap( Map<Integer, Part> partIdToPartMap ) { this.partIdToPartMap = partIdToPartMap; }
     

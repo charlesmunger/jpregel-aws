@@ -16,6 +16,14 @@ import vertices.VertexShortestPathBinaryTree;
  */
 public class WorkerGraphMakerBinaryTree implements WorkerGraphMaker
 {
+    
+    private static final ThreadLocal< StringBuilder> uniqueNum = new ThreadLocal<StringBuilder>() {
+
+		@Override
+		protected StringBuilder initialValue() {
+			return new StringBuilder();
+		}
+	};
     @Override
     public int makeGraph(Worker worker) 
     {
@@ -115,7 +123,7 @@ public class WorkerGraphMakerBinaryTree implements WorkerGraphMaker
     private void makeNodes(int startVertexId, int stopVertexId, int numChildren, VertexShortestPathBinaryTree vertexFactory, Job job, Worker worker, int workerNum)
     {
         int numParts = job.getNumParts();
-        StringBuilder stringVertex = new StringBuilder();
+        StringBuilder stringVertex = uniqueNum.get();
         for ( int vertexId = startVertexId; vertexId <= stopVertexId; vertexId++ )
         {
             int partId = vertexFactory.getPartId( vertexId, numParts );
@@ -129,6 +137,7 @@ public class WorkerGraphMakerBinaryTree implements WorkerGraphMaker
                 stringVertex.delete(0, stringVertex.length());
                 stringVertex.append(vertexId).append(" ").append(numChildren);
                 worker.addRemoteVertex(destinationWorkerNum, partId, stringVertex.toString() );
+                stringVertex.setLength(0);
             }
         }
     }

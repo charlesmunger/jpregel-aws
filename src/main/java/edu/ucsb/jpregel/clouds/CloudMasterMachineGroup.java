@@ -74,7 +74,7 @@ class CloudMasterMachineGroup extends CloudMachineGroup<ClientToMaster> {
 
 		@Override
 		public FileSystem makeFileSystem(String jobDirectoryName) {
-			return new CloudFileSystem(jobDirectoryName, storage);
+			return null;//new CloudFileSystem(jobDirectoryName, storage);
 		}
 	}
 }

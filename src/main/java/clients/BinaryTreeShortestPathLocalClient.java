@@ -1,13 +1,13 @@
 package clients;
 
-import edu.ucsb.jpregel.system.WorkerOutputMakerStandard;
-import edu.ucsb.jpregel.system.MasterOutputMakerStandard;
 import edu.ucsb.jpregel.system.ClientToMaster;
-import edu.ucsb.jpregel.system.WorkerGraphMakerBinaryTree;
-import edu.ucsb.jpregel.system.MasterGraphMakerBinaryTree;
 import edu.ucsb.jpregel.system.Job;
-import edu.ucsb.jpregel.system.VertexShortestPathBinaryTree;
 import edu.ucsb.jpregel.system.LocalReservationService;
+import edu.ucsb.jpregel.system.MasterGraphMakerBinaryTree;
+import edu.ucsb.jpregel.system.MasterOutputMakerStandard;
+import edu.ucsb.jpregel.system.WorkerGraphMakerBinaryTree;
+import edu.ucsb.jpregel.system.WorkerOutputMakerStandard;
+import vertices.VertexShortestPathBinaryTree;
 
 /**
  *

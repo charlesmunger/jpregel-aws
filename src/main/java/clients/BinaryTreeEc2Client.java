@@ -4,11 +4,11 @@
  */
 package clients;
 
-import api.Cluster;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import edu.ucsb.jpregel.clouds.modules.AWSModule;
 import edu.ucsb.jpregel.system.*;
+import vertices.VertexShortestPathBinaryTree;
 
 /**
  *
@@ -32,11 +32,11 @@ public class BinaryTreeEc2Client {
 			new WorkerGraphMakerBinaryTree(),
 			new MasterOutputMakerStandard(),
 			new WorkerOutputMakerStandard());
-		JobRunData run3 = master.run(job3);
+//		JobRunData run3 = master.run(job3);
 //        System.out.println(run1);
 //        System.out.println(run2);
-		System.out.println(run3);
-		master.terminate();
-		System.exit(0);
+//		System.out.println(run3);
+//		master.terminate();
+//		System.exit(0);
 	}
 }

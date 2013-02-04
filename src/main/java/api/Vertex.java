@@ -134,16 +134,7 @@ public interface Vertex<VertexIdType, VertexValueType, EdgeValueType, MessageVal
      * @return the value associated with this vertex.
      */
     VertexValueType getVertexValue();
-    
-//    /**
-//     * Get the number of the Worker to which this part is assigned.
-//     * 
-//     * @param partId 
-//     * @param numWorkers
-//     * @return Worker number (>= 1)
-//     */
-//    int getWorkerNum( int partId, int numWorkers );
-    
+        
     /**
      * Make a vertex from its String representation.
      * 

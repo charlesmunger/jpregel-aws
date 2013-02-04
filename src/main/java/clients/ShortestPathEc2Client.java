@@ -6,7 +6,6 @@ import edu.ucsb.jpregel.system.MasterOutputMakerStandard;
 import edu.ucsb.jpregel.system.WorkerGraphMakerStandard;
 import edu.ucsb.jpregel.system.Job;
 import edu.ucsb.jpregel.system.VertexShortestPath;
-import edu.ucsb.jpregel.aws.Ec2ReservationService;
 
 /**
  *
@@ -26,7 +25,7 @@ public class ShortestPathEc2Client  {
                 new WorkerOutputMakerStandard()
                 );
         System.out.println( job + "\n        numWorkers:" + numWorkers );
-        System.out.println(Ec2ReservationService.newMassiveCluster(numWorkers).run(job));
+//        System.out.println(Ec2ReservationService.newMassiveCluster(numWorkers).run(job));
         System.out.println("Currently, termination of premade clusters is not implemented.");
         System.out.println("Please don't forget to terminate via the webui.");
     }

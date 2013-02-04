@@ -12,20 +12,19 @@
 package edu.ucsb.jpregel.system;
 
 import api.Aggregator;
+import edu.ucsb.jpregel.system.commands.*;
 import java.io.IOException;
 import static java.lang.System.out;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jicosfoundation.*;
-import edu.ucsb.jpregel.system.commands.*;
 
 /**
  *
@@ -56,11 +55,23 @@ public abstract class Worker extends ServiceImpl
     };
     
     private final static RemoteExceptionHandler REMOTE_EXCEPTION_HANDLER = new DefaultRemoteExceptionHandler();
+
+    private static void tryAgain(int i)
+    {
+        System.out.println("Master not up yet. Trying again in 5 seconds...");
+        try
+        {
+            Thread.sleep(5000);
+        } catch (InterruptedException ex1)
+        {
+            System.out.println("Waiting interrupted, trying again immediately");
+        }
+    }
+    
     private final Proxy masterProxy;
-    private final int numAvailableProcessors = Runtime.getRuntime().availableProcessors();
+    private int myWorkerNum = 0;
     private final ComputeThread[] computeThreads;
     
-    private int myWorkerNum;
     private Map<Integer, Service> workerNumToWorkerMap;
     private Job job;
     private ConcurrentMap<Integer, Part> partIdToPartMap; 
@@ -85,9 +96,6 @@ public abstract class Worker extends ServiceImpl
     private final Command MessageReceived = new MessageReceived();
     private final Service master;
     
-    // configuration variables
-    static final boolean BATCH_MESSAGES = true;
-    
     public Worker( Service master ) throws RemoteException
     {
         // set Jicos Service attributes
@@ -97,6 +105,8 @@ public abstract class Worker extends ServiceImpl
         this.master = master;
         masterProxy = new ProxyMaster( master, this, REMOTE_EXCEPTION_HANDLER );
         addProxy(master, masterProxy);
+                
+        int numAvailableProcessors = Runtime.getRuntime().availableProcessors();
         System.out.println("Worker.constructor: Available processors: " + numAvailableProcessors ) ; 
         computeThreads = new ComputeThread[ numAvailableProcessors ];
         for ( int i = 0; i < computeThreads.length; i++ )
@@ -108,9 +118,9 @@ public abstract class Worker extends ServiceImpl
     public void init() throws RemoteException 
     {
         super.setService( this );
-        super.register( master );
-        CommandSynchronous command = new RegisterWorker( serviceName(), numAvailableProcessors ); 
-        myWorkerNum = (Integer) master.executeCommand( this, command );
+        CommandSynchronous command = new RegisterWorker( serviceName(), Runtime.getRuntime().availableProcessors() ); 
+        myWorkerNum =((Integer) master.executeCommand( this, command )); 
+        super.register ( master );
         startComputeThreads();
     }
     
@@ -122,18 +132,6 @@ public abstract class Worker extends ServiceImpl
         }
     }
     
-    private static void tryAgain(int i)
-    {
-        System.out.println("Master not up yet. Trying again in 5 seconds...");
-        try
-        {
-            Thread.sleep(5000);
-        } catch (InterruptedException ex1)
-        {
-            System.out.println("Waiting interrupted, trying again immediately");
-        }
-    }
- 
     public void addVertexToPart( int partId, VertexImpl vertex )
     {
         Part part = partIdToPartMap.get( partId );
@@ -155,7 +153,11 @@ public abstract class Worker extends ServiceImpl
     
     synchronized public Job getJob() { return job; }
     
-    public int getWorkerNum( int partId ) { return job.getWorkerNum( partId, workerNumToWorkerMap.size() ); }
+    public int getWorkerNum( int partId )
+    {
+        int numWorkers = workerNumToWorkerMap.size();
+        return ( partId % numWorkers ) + 1;
+    }
       
     // TODO omit this method by converting all worker graph makers
     synchronized public void addVertex( VertexImpl vertex, String stringVertex )
@@ -288,19 +290,9 @@ public abstract class Worker extends ServiceImpl
         sendCommand( master, command );
         
         // output part sizes to see how PartId for vertices are distributed
-        Collection<Integer> partIdSet = partIdToPartMap.keySet();
-        for ( Integer partId : partIdSet )
+        for ( Part part : partSet )
         {
-            Part part = partIdToPartMap.get(partId);
-            Map<Object, VertexImpl> vertexIdToVertexMap = part.getVertexIdToVertexMap();
-            System.out.println("Worker.processInputFile: workerNum: " + myWorkerNum + "  partId: " + partId 
-                    + "  Size: " + vertexIdToVertexMap.size() );
-//            Collection<Object> vertexIdSet = vertexIdToVertexMap.keySet();
-//            for ( Object vertexId : vertexIdSet )
-//            {
-//                System.out.println("    workerNum: " + myWorkerNum + "  partId: " + partId
-//                        + "  vertexId: " + ((Integer) vertexId ) );
-//            }
+            out.println("Worker.processInputFile: worker: " + myWorkerNum  + " PartId: " + part.getPartId() + " size: " + part.getVertexIdToVertexMap().size() );
         }
     }
     
@@ -374,27 +366,6 @@ public abstract class Worker extends ServiceImpl
     // Command: StartSuperStep
     public void startSuperStep( ComputeInput computeInput ) throws InterruptedException
     {
-        long freeMemory = Runtime.getRuntime().freeMemory();
-        long maxMemory = Runtime.getRuntime().maxMemory();
-        int percentFreeMemory = (int) (((float) freeMemory / maxMemory) * 100);
-        System.out.println("Worker " + myWorkerNum + ":  SuperStep: " + superStep
-                        + "  Maximum FREE memory: " + percentFreeMemory + "%"
-                        + " : " + (freeMemory / 1000) + "KB");
-        // BEGIN DEBUG
-//        for ( Integer partId : partIdToPartMap.keySet() )
-//        {
-//            if ( partIdToPartMap.get( partId ) == null )
-//            {
-//                System.out.println("Worker.startSuperStep: workerNum: " + myWorkerNum 
-//                        + "  missing partId: " + partId );
-//            }
-//            else
-//            {
-//                System.out.println("Worker.startSuperStep: workerNum: " + myWorkerNum
-//                +  "  PRESENT partId: " + partId );
-//            }
-//        }
-        // END DEBUG
         barrierComputation( computeInput );
         ComputeOutput computeOutput = new ComputeOutput( thereIsANextStep, stepAggregator, problemAggregator, deltaNumVertices );
         Command command = new SuperStepComplete( computeOutput );

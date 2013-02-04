@@ -6,8 +6,6 @@ import edu.ucsb.jpregel.system.MasterOutputMakerStandard;
 import edu.ucsb.jpregel.system.VertexPageRank;
 import edu.ucsb.jpregel.system.WorkerGraphMakerStandard;
 import edu.ucsb.jpregel.system.Job;
-import edu.ucsb.jpregel.aws.Ec2ReservationService;
-import api.Cluster;
 
 public class PageRankEc2Client 
 {
@@ -24,8 +22,8 @@ public class PageRankEc2Client
                 new WorkerOutputMakerStandard()
                 );
         System.out.println( job + "\n       numWorkers:" + numWorkers );
-        Cluster master = Ec2ReservationService.newSmallCluster(numWorkers);
-        master.run( job);    
+//        Cluster master = Ec2ReservationService.newSmallCluster(numWorkers);
+//        master.run( job);    
         System.exit( 0 );
     }
 }

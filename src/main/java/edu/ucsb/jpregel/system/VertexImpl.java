@@ -158,11 +158,7 @@ implements Vertex<VertexIdType, VertexValueType, EdgeValueType, MessageValueType
         
     @Override
     public VertexValueType getVertexValue() { return vertexValue; }
-    
-    public int getWorkerNum( int partId, int numWorkers ) { System.out.println("VertexImpl.getWorkerNum: partId: "
-            + partId);
-        return ( partId % numWorkers ) + 1; }
-    
+        
     @Override
     public abstract VertexImpl make( String line );
     

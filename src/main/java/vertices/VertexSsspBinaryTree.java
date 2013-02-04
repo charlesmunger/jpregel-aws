@@ -53,7 +53,4 @@ public class VertexSsspBinaryTree extends VertexShortestPath
         int partId = ( shiftAmount >= 0 ) ? vertexId >> shiftAmount : vertexId << -shiftAmount;
         return partId - numParts;
     }
-    
-    @Override
-    public int getWorkerNum( int partId, int numWorkers ) { return partId / ( 2 * availableProcessors ) + 1; }
 }
