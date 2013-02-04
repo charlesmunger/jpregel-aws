@@ -5,7 +5,7 @@ import api.Vertex;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import org.infinispan.util.concurrent.jdk8backported.ConcurrentHashMapV8;
 
 /**
  *
@@ -16,7 +16,7 @@ public final class Part
     private final int partId;
     private final Job job;
     
-    private Map<Object, VertexImpl> vertexIdToVertexMap = new ConcurrentHashMap<Object, VertexImpl>( 8000 , 0.9f, 2);
+    private Map<Object, VertexImpl> vertexIdToVertexMap = new ConcurrentHashMapV8<Object, VertexImpl>( 8000 , 0.9f, 2);
     private OntoMap<Set<VertexImpl>> superstepToActiveSetMap = new OntoMap<Set<VertexImpl>>( new ActiveSet() );
     
     // superStep parameters

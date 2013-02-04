@@ -2,6 +2,7 @@ package edu.ucsb.jpregel.system;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import org.infinispan.util.concurrent.jdk8backported.ConcurrentHashMapV8;
 
 /**
  * A map that creates objects on demand as they are requested. Uses Longs as
@@ -32,7 +33,7 @@ final public class OntoMap<V> {
 	}
 
 	public OntoMap(int size, Factory<V> factory) {
-		map = new ConcurrentHashMap<Long, Holder<V>>(100, 0.9f, 2);
+		map = new ConcurrentHashMapV8<Long, Holder<V>>(100, 0.9f, 2);
 		this.factory = factory;
 	}
 
