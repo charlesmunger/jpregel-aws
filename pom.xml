@@ -49,11 +49,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>edu.ucsb.petercappello</groupId>
-			<artifactId>jicosfoundation</artifactId>
-			<version>1</version>
-		</dependency>
-		<dependency>
 			<groupId>org.jclouds</groupId>
 			<artifactId>jclouds-allcompute</artifactId>
 			<version>1.5.4</version>
