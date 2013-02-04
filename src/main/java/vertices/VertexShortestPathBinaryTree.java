@@ -13,6 +13,7 @@ import java.util.StringTokenizer;
  */
 public final class VertexShortestPathBinaryTree extends VertexShortestPath
 {
+    private static final Integer MAX = new Integer(Integer.MAX_VALUE);
     public VertexShortestPathBinaryTree() {}
     
     public VertexShortestPathBinaryTree( Integer vertexId, Map<Integer, Integer> edgeMap )
@@ -43,7 +44,8 @@ public final class VertexShortestPathBinaryTree extends VertexShortestPath
     }
     
     @Override
-    public int getPartId(Integer id, int numparts) {
+    public int getPartId(Integer idi, int numparts) {
+        int id = idi.intValue();
         numparts--;
         if(id < (numparts)) {
             return 0;
@@ -56,6 +58,6 @@ public final class VertexShortestPathBinaryTree extends VertexShortestPath
     
     @Override
     public void initialValue(Integer vertexId) {
-          setVertexValue( new Message( vertexId, Integer.MAX_VALUE ) );
+          setVertexValue( new Message( vertexId, MAX) );
     }
 }
