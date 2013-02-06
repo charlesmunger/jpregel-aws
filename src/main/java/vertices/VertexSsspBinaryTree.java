@@ -12,12 +12,16 @@ import java.util.StringTokenizer;
  */
 public class VertexSsspBinaryTree extends VertexShortestPath
 {
+    private static final Integer MAX_VALUE = new Integer( Integer.MAX_VALUE );
+    private static final Integer ZERO = new Integer( 0 );
+    private static final Integer ONE = new Integer( 1 );
+    
     public VertexSsspBinaryTree() {}
     
     public VertexSsspBinaryTree( Integer vertexId, Message<Integer, Integer> vertexValue, Map<Integer, Integer> edgeMap )
     { 
-        super( vertexId, edgeMap ,2);
-        setVertexValue( new Message( vertexId, Integer.MAX_VALUE ) );
+        super( vertexId, edgeMap , 2);
+        setVertexValue( new Message( vertexId, MAX_VALUE ) );
     }
     
     @Override
@@ -31,13 +35,13 @@ public class VertexSsspBinaryTree extends VertexShortestPath
     
     public VertexImpl make( Integer vertexId, int numChildren )
     {
-        Integer initialKnownDistance = ( vertexId == 1 ) ? 0 : Integer.MAX_VALUE;
-        Message<Integer, Integer> vertexValue = new Message<Integer, Integer>( 1, initialKnownDistance );
+        Integer initialKnownDistance = vertexId.equals(ONE) ? ZERO : MAX_VALUE;
+        Message<Integer, Integer> vertexValue = new Message<Integer, Integer>( ONE, initialKnownDistance );
         Map<Integer, Integer> edgeMap = new HashMap<Integer, Integer>( numChildren );
         switch ( numChildren )
         {
-            case 2: edgeMap.put( 2 * vertexId + 1, 1 );
-            case 1: edgeMap.put( 2 * vertexId,     1 );
+            case 2: edgeMap.put( 2 * vertexId + 1, ONE );
+            case 1: edgeMap.put( 2 * vertexId,     ONE );
             default: break; // no children
         }
         return new VertexSsspBinaryTree( vertexId, vertexValue, edgeMap );
