@@ -1,5 +1,7 @@
 package clients;
 
+import JpLAN.LANReservationService;
+import api.Cluster;
 import edu.ucsb.jpregel.system.ClientToMaster;
 import edu.ucsb.jpregel.system.Job;
 import edu.ucsb.jpregel.system.LocalReservationService;
@@ -30,6 +32,7 @@ public class BinaryTreeShortestPathLocalClient
                 new WorkerOutputMakerStandard()                 
                 );
         System.out.println( job + "\n    numWorkers: " + numWorkers );
+        //Cluster master = LANReservationService.newLocalCluster(numWorkers);
         ClientToMaster master = LocalReservationService.newCluster(numWorkers);
         System.out.println(master.run(job));
         
