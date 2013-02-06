@@ -1,6 +1,5 @@
 package edu.ucsb.jpregel.system;
 
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import org.infinispan.util.concurrent.jdk8backported.ConcurrentHashMapV8;
 
