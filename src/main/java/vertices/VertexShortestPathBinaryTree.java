@@ -18,7 +18,7 @@ public final class VertexShortestPathBinaryTree extends VertexShortestPath
     
     public VertexShortestPathBinaryTree( Integer vertexId, Map<Integer, Integer> edgeMap )
     { 
-        super( vertexId, edgeMap ,2);
+        super( vertexId, edgeMap ,edgeMap.size());
         setVertexValue( new Message( vertexId, Integer.MAX_VALUE ) );
     }
     
@@ -34,11 +34,16 @@ public final class VertexShortestPathBinaryTree extends VertexShortestPath
     public VertexImpl make( Integer vertexId, int numChildren )
     {
         Map<Integer, Integer> edgeMap = new HashMap<Integer, Integer>( numChildren );
+        if(vertexId.intValue() == 5000000) {
+            System.out.println("debug");
+        }
         switch ( numChildren )
         {
             case 2: edgeMap.put( 2 * vertexId + 1, 1 );
-            case 1: edgeMap.put( 2 * vertexId,     1 );
-            default: break; // no children
+            case 1: edgeMap.put( 2 * vertexId,     1 ); 
+            case 0: break;
+            default: System.err.println("More than two children?" + vertexId + " num: "+ numChildren);
+                break; // no children
         }
         return new VertexShortestPathBinaryTree( vertexId, edgeMap );
     }

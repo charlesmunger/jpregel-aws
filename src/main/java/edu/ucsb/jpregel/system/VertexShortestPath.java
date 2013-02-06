@@ -18,6 +18,7 @@ import java.util.StringTokenizer;
 public class VertexShortestPath extends VertexImpl<Integer, Message<Integer, Integer>, Integer, Integer>
 {
     private static final Combiner sCombiner = new CombinerMinInteger();
+    private static final MessageQ<Integer,Integer> mq= new MessageQ<Integer, Integer>(sCombiner);
     private static final ThreadLocal< StringBuilder> uniqueNum = new ThreadLocal<StringBuilder>() {
 
 		@Override
@@ -75,7 +76,7 @@ public class VertexShortestPath extends VertexImpl<Integer, Message<Integer, Int
                 minDistanceMessage = message;
             }
         }
-        if ( minDistanceMessage.getMessageValue() < ((Message<Integer, Integer>) getVertexValue() ).getMessageValue() )
+        if ( minDistanceMessage.getMessageValue() < getVertexValue().getMessageValue() )
         {   // There is a new shorter path from the source to me
             setVertexValue( minDistanceMessage ); // update my value: the shortest path to me
             
@@ -101,21 +102,18 @@ public class VertexShortestPath extends VertexImpl<Integer, Message<Integer, Int
 
       
     @Override
-    public String output() 
-    {
-        StringBuilder stringBuilder = uniqueNum.get();
-        stringBuilder.append( "" );
-        if ( getNumVertices()-10 <= getVertexId() )
-        {
-            System.out.println("   VertexShprintlnortestPath.output: VertexId: " + getVertexId());
-            stringBuilder.append( getVertexId() );
-            stringBuilder.append( " : ");
-            stringBuilder.append( getVertexValue().getVertexId() );
-            stringBuilder.append( " - ");
-            stringBuilder.append( getVertexValue().getMessageValue() );
+    public String output() {
+        String toString = "";
+        if (getVertexId().intValue() >= (getNumVertices())) {
+            StringBuilder stringBuilder = uniqueNum.get();
+            stringBuilder.append(getVertexId());
+            stringBuilder.append(" : ");
+            stringBuilder.append(getVertexValue().getVertexId());
+            stringBuilder.append(" - ");
+            stringBuilder.append(getVertexValue().getMessageValue());
+            toString = stringBuilder.toString();
+            stringBuilder.setLength(0);
         }
-        String toString = stringBuilder.toString();
-        stringBuilder.setLength(0);
         return toString;
     }
         
@@ -126,5 +124,10 @@ public class VertexShortestPath extends VertexImpl<Integer, Message<Integer, Int
 
     public void initialValue(Integer vertexId) {
         setVertexValue( new Message<Integer, Integer>( vertexId, Integer.MAX_VALUE ) );
+    }
+    
+    @Override
+    public Factory<MessageQ> getMessageQType() {
+        return mq;
     }
 }
