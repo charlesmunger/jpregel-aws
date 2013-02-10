@@ -60,8 +60,9 @@ implements Vertex<VertexIdType, VertexValueType, EdgeValueType, MessageValueType
     private       Part            part;
     
     private Map<VertexIdType, EdgeValueType> edgeMap;
-    private OntoMap<MessageQ<VertexIdType, MessageValueType>> superstepToMessageQMap;
+    private OntoMap<MessageQ> superstepToMessageQMap;
 //    private OntoMap<MessageValueType> superstepToInboxMap;
+    private static final Factory<MessageQ> MESSAGE_Q_COMBINER = new MessageQ( null );
             
     public VertexImpl() { vertexId = null; }
           
@@ -69,7 +70,7 @@ implements Vertex<VertexIdType, VertexValueType, EdgeValueType, MessageValueType
     {
         this.vertexId = vertexId;
         this.edgeMap = edgeMap;
-        superstepToMessageQMap = new OntoMap<MessageQ<VertexIdType, MessageValueType>>(numOutgoingEdges, new MessageQ( combiner ) );
+        superstepToMessageQMap = new OntoMap<MessageQ>(numOutgoingEdges, getMessageQType() );
     }
     
     public VertexImpl( VertexIdType vertexId, Map<VertexIdType, EdgeValueType> edgeMap)
@@ -217,4 +218,8 @@ implements Vertex<VertexIdType, VertexValueType, EdgeValueType, MessageValueType
     void setPart( Part part ) { this.part = part; }
     
     void setNumVertices( int numV ) { numVertices = numV; }
+
+    public Factory<MessageQ> getMessageQType() {
+        return MESSAGE_Q_COMBINER;
+    }
 }

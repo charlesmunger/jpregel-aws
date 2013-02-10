@@ -94,6 +94,9 @@ public final class Part
     {
         VertexImpl vertex = vertexIdToVertexMap.get( vertexId );
         assert vertex != null : vertexId;
+        if(vertex == null) {
+            System.out.println("VertexID null: "+vertexId);
+        }
         vertex.receiveMessage( message, superStep );
         addToActiveSet( superStep, vertex );
     }

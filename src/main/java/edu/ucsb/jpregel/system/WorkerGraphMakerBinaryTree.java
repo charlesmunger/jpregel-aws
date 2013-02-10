@@ -16,6 +16,7 @@ import vertices.VertexShortestPathBinaryTree;
  */
 public class WorkerGraphMakerBinaryTree extends WorkerGraphMaker
 {
+    private static final VertexShortestPathBinaryTree vertexMaker = new VertexShortestPathBinaryTree();
     private static final ThreadLocal< StringBuilder> uniqueNum = new ThreadLocal<StringBuilder>() {
 
 		@Override
@@ -44,12 +45,13 @@ public class WorkerGraphMakerBinaryTree extends WorkerGraphMaker
             int startVertexId = getToken( stringTokenizer );
             int stopVertexId  = getToken( stringTokenizer );
             numVertices       = getToken( stringTokenizer );
+            int lastTwoChildVertex = Math.min(stopVertexId,(numVertices -1)/2);
             System.out.println("BinaryTreeWorkerGraphMaker.make: workerNum: " + workerNum 
                     + ", startVertexId: " + startVertexId 
-                    + ", stopVertexId: "  + stopVertexId  + ", numVertices: " + numVertices );
+                    + ", stopVertexId: "  + stopVertexId  + ", numVertices: " + numVertices 
+                    + ", lastTwoChildVertex: "+ lastTwoChildVertex);
                         
             // construct vertices
-            VertexShortestPathBinaryTree vertexMaker = new VertexShortestPathBinaryTree();
             /*
              * Let the binary tree have nodes numbered 1 to N, where 1 is
              * the root, and if the node numbered n has 2 children, 
@@ -61,13 +63,13 @@ public class WorkerGraphMakerBinaryTree extends WorkerGraphMaker
              *  0 children, otherwise (i.e., (N + 1)/2 <= n <= N).
              */
             ExecutorService exec = Executors.newFixedThreadPool( Runtime.getRuntime().availableProcessors() );
-            makeNodes(exec,startVertexId, (numVertices - 1)/2, 2, vertexMaker, job, worker, workerNum );
+            makeNodes(exec,startVertexId, lastTwoChildVertex, 2, vertexMaker, job, worker, workerNum );
             if ( numVertices % 2 == 0)
             {
-                //makeNodes(exec,numVertices/2, numVertices/2, 1, vertexMaker, job, worker, workerNum );
-                makeNodes(exec,numVertices/2, numVertices/2, 1, vertexMaker, job, worker, workerNum );
+                System.out.println("From " + Math.max(lastTwoChildVertex+1, startVertexId) + " to " + Math.min(lastTwoChildVertex+1, stopVertexId));
+                makeNodes(exec,Math.max(lastTwoChildVertex+1, startVertexId), Math.min(lastTwoChildVertex+1, stopVertexId), 1, vertexMaker, job, worker, workerNum );
             }
-            makeNodes(exec,numVertices/2 + 1, stopVertexId, 0, vertexMaker, job, worker, workerNum );
+            makeNodes(exec,Math.max((numVertices+1)/2, startVertexId), stopVertexId, 0, vertexMaker, job, worker, workerNum );
             exec.shutdown();
             exec.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
         }
@@ -133,7 +135,6 @@ public class WorkerGraphMakerBinaryTree extends WorkerGraphMaker
                 worker.addVertexToPart(partId, vertex);
             } else
             {   // vertex belongs to another worker
-                stringVertex.delete(0, stringVertex.length());
                 stringVertex.append(vertexId).append(" ").append(numChildren);
                 worker.addRemoteVertex(destinationWorkerNum, partId, stringVertex.toString() );
                 stringVertex.setLength(0);

@@ -206,7 +206,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     // Command: InputFileProcessingComplete
     synchronized public void inputFileProcessingComplete( int workerNum, int numVertices ) 
     {
-        this.numVertices += numVertices;
+        this.numVertices = numVertices;
 //        processAcknowledgement( barrierGraphMade );
         acceptAcknowledgement( barrierGraphMade );
     }
