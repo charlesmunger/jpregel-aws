@@ -17,11 +17,12 @@ import vertices.VertexShortestPathBinaryTree;
  * 
  * @author Pete Cappello
  */
-public class WorkerGraphMakerBinaryTree2 implements WorkerGraphMaker
+public class WorkerGraphMakerBinaryTree2 extends WorkerGraphMaker
 {
     private final VertexShortestPathBinaryTree vertexFactory = new VertexShortestPathBinaryTree();
     private int numParts;
     private int numVertices;
+    private int numPartsPerWorker;
     
     // variable cache
     private int lgNumParts;
@@ -33,7 +34,6 @@ public class WorkerGraphMakerBinaryTree2 implements WorkerGraphMaker
     public int makeGraph(Worker worker) 
     {
         int numVerticesMade = 0;
-        System.out.println("WorkerGraphMakerBinaryTree2.make: workerNum: " + worker.getWorkerNum() );
         Job job = worker.getJob();
         FileSystem fileSystem = job.getFileSystem();
         try
@@ -49,25 +49,25 @@ public class WorkerGraphMakerBinaryTree2 implements WorkerGraphMaker
             numVertices = getToken( stringTokenizer );
             int numWorkers = getToken( stringTokenizer );
             int numCores = Runtime.getRuntime().availableProcessors();
-            int numPartsPerWorker = 2 * numCores;
+            numPartsPerWorker = 2 * numCores;
             treeHeight = Log2.lg( numVertices );
             numParts = numWorkers * numPartsPerWorker;
             lgNumParts = Log2.lg( numParts );
             partTreeHeight = treeHeight - lgNumParts;
             numPartTreeFullDepthLeaves = 1 << partTreeHeight;
-            System.out.println("WorkerGraphMakerBinaryTree2.make: workerNum: " + worker.getWorkerNum() +
-                    "  numVertices: " + numVertices + " treeHeight: " + treeHeight +
-                    " numParts: " + numParts + " lgNumParts: " + lgNumParts + " partTreeHeight: " + partTreeHeight
-                    + " numPartTreeFullDepthLeaves: " + numPartTreeFullDepthLeaves);
+//            System.out.println("WorkerGraphMakerBinaryTree2.make: workerNum: " + worker.getWorkerNum() +
+//                    "  numVertices: " + numVertices + " treeHeight: " + treeHeight +
+//                    " numParts: " + numParts + " lgNumParts: " + lgNumParts + " partTreeHeight: " + partTreeHeight
+//                    + " numPartTreeFullDepthLeaves: " + numPartTreeFullDepthLeaves);
             
             // determine my partitions
             int myStartPartId = (worker.getWorkerNum() - 1) * numPartsPerWorker;
             int myStopPartId = myStartPartId + numPartsPerWorker - 1;
-            System.out.println("WorkerGraphMakerBinaryTree2.make: workerNum: " + worker.getWorkerNum()
-                    + ", numVertices: " + numVertices 
-                    + ", numWorkers: "  + numWorkers  + ", numCores: " + numCores 
-                    + ", numParts: " + numParts
-                    + ", myStartPart: " + myStartPartId + ", myStopPart: " + myStopPartId);
+//            System.out.println("WorkerGraphMakerBinaryTree2.make: workerNum: " + worker.getWorkerNum()
+//                    + ", numVertices: " + numVertices 
+//                    + ", numWorkers: "  + numWorkers  + ", numCores: " + numCores 
+//                    + ", numParts: " + numParts
+//                    + ", myStartPart: " + myStartPartId + ", myStopPart: " + myStopPartId);
             
             // for each of my partitions, p, produce p's vertices.
             ExecutorService executorService = Executors.newFixedThreadPool( numCores );
@@ -75,6 +75,8 @@ public class WorkerGraphMakerBinaryTree2 implements WorkerGraphMaker
             for ( int partId = myStartPartId; partId <= myStopPartId; partId++ )
             {
                 int partSize = getPartSize( partId );
+//                System.out.println("WorkerGraphMakerBinaryTree2.makeGraph: partId: " + partId
+//                        + " partSize: " + partSize);
                 numVerticesMade += partSize;
                 Callable<Object> task = new PopulatePart( worker, partId, partSize );
                 executorService.submit( task );
@@ -89,6 +91,12 @@ public class WorkerGraphMakerBinaryTree2 implements WorkerGraphMaker
             System.exit( 1 );
         }
         return numVerticesMade;
+    }
+    
+    @Override
+    public int getWorkerNum( int partId, int numWorkers )
+    {
+        return partId / numPartsPerWorker + 1;
     }
     
     private int getPartSize( int partId )
@@ -146,23 +154,22 @@ public class WorkerGraphMakerBinaryTree2 implements WorkerGraphMaker
         @Override
         public Object call()
         {
-            System.out.println("PopulatePart: workerNum: " + worker.getWorkerNum() + "  partId: " + partId + "  partSize: " + partSize );
+//            System.out.println("PopulatePart: workerNum: " + worker.getWorkerNum() + "  partId: " + partId + "  partSize: " + partSize );
             
             int numVerticesMade = 0;
             
             // make taproot vertices
             int vertexId = numParts + partId;
-//            System.out.println("call: partId: " + partId + "  root: " + vertexId);
             VertexImpl vertex;
             while ( Integer.numberOfTrailingZeros( vertexId ) > 0 )
             {
-//                System.out.println("   taproot partId: " + partId + "  vertexId: " + vertexId);
+//                System.out.println("Populate.call:  taproot partId: " + partId + "  vertexId: " + vertexId);
                 vertex = vertexFactory.make( vertexId, 2 );
                 worker.addVertexToPart(partId, vertex);
                 numVerticesMade++;
                 vertexId /= 2;
             }
-//            System.out.println("   LAST taproot partId: " + partId + "  vertexId: " + vertexId);
+            System.out.println("Populate.call:   LAST taproot partId: " + partId + "  vertexId: " + vertexId);
             vertex = vertexFactory.make( vertexId, 2 );
             worker.addVertexToPart(partId, vertex);
             numVerticesMade++;
@@ -188,6 +195,7 @@ public class WorkerGraphMakerBinaryTree2 implements WorkerGraphMaker
                 }
                 vertex = vertexFactory.make( vertexId, numChildren );
                 worker.addVertexToPart(partId, vertex);
+//                System.out.println("PopulatePart.call: partId: " + partId + " numVerticesMade: " + numVerticesMade + " vertexId: " + vertexId);
             }
             
             // BEGIN DEBUG

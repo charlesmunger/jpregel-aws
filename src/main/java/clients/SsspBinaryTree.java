@@ -1,9 +1,7 @@
 package clients;
 
-import api.ClusterImpl;
 import edu.ucsb.jpregel.system.ClientToMaster;
 import edu.ucsb.jpregel.system.Job;
-import edu.ucsb.jpregel.system.JobRunData;
 import edu.ucsb.jpregel.system.LocalReservationService;
 import edu.ucsb.jpregel.system.MasterGraphMakerBinaryTree2;
 import edu.ucsb.jpregel.system.MasterOutputMakerStandard;

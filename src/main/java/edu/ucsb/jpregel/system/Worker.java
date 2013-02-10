@@ -155,8 +155,10 @@ public abstract class Worker extends ServiceImpl
     
     public int getWorkerNum( int partId )
     {
-        int numWorkers = workerNumToWorkerMap.size();
-        return ( partId % numWorkers ) + 1;
+//        int numWorkers = workerNumToWorkerMap.size();
+//        System.out.println("Worker.getWorkerNum: for partId " + partId + " workerNum " + (( partId % numWorkers ) + 1));
+//        return ( partId % numWorkers ) + 1;
+        return job.getWorkerGraphMaker().getWorkerNum( partId, workerNumToWorkerMap.size() );
     }
       
     // TODO omit this method by converting all worker graph makers
@@ -408,7 +410,7 @@ public abstract class Worker extends ServiceImpl
         problemAggregator = job.makeProblemAggregator(); // construct new problem aggregator for this step
         stepAggregator    = job.makeStepAggregator(); // construct new step aggregator
         deltaNumVertices = 0;
-                
+               
         for ( int i = 0; i < computeThreads.length; i++ )
         {
             computeThreads[ i ].workIsAvailable( superStep, computeInput ); // notify ComputeThread

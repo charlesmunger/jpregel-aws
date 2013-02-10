@@ -5,9 +5,8 @@ import java.io.BufferedReader;
 import static java.lang.System.err;
 import static java.lang.System.exit;
 
-public class WorkerGraphMakerPageRank implements WorkerGraphMaker 
+public class WorkerGraphMakerPageRank extends WorkerGraphMaker
 {
-
     @Override
     public int makeGraph(Worker worker) 
     {
@@ -42,7 +41,6 @@ public class WorkerGraphMakerPageRank implements WorkerGraphMaker
             exception.printStackTrace();
             exit( 1 );
         }
-
         return numVertices;
     }
 }

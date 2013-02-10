@@ -7,7 +7,6 @@ import java.util.Map;
 import jicosfoundation.Command;
 import jicosfoundation.Proxy;
 import jicosfoundation.Service;
-import jicosfoundation.ServiceImpl;
 import edu.ucsb.jpregel.system.MessageQ;
 import edu.ucsb.jpregel.system.Worker;
 

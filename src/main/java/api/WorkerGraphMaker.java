@@ -6,7 +6,12 @@ import edu.ucsb.jpregel.system.Worker;
  *
  * @author Pete Cappello
  */
-public interface WorkerGraphMaker extends java.io.Serializable
+public abstract class WorkerGraphMaker implements java.io.Serializable
 {
-    int makeGraph( Worker worker );
+    abstract public int makeGraph( Worker worker );
+    
+    public int getWorkerNum( int partId, int numWorkers )
+    {
+        return ( partId % numWorkers ) + 1;
+    }
 }

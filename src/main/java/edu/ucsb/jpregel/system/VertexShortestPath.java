@@ -105,9 +105,9 @@ public class VertexShortestPath extends VertexImpl<Integer, Message<Integer, Int
     {
         StringBuilder stringBuilder = uniqueNum.get();
         stringBuilder.append( "" );
-        if ( getNumVertices()-10 <= getVertexId() )
+        if ( getNumVertices() - 10 <= getVertexId() )
         {
-            System.out.println("   VertexShprintlnortestPath.output: VertexId: " + getVertexId());
+            System.out.println("   VertexShortestPath.output: VertexId: " + getVertexId());
             stringBuilder.append( getVertexId() );
             stringBuilder.append( " : ");
             stringBuilder.append( getVertexValue().getVertexId() );

@@ -55,6 +55,13 @@ public class VertexSsspBinaryTree extends VertexShortestPath
     {
         int shiftAmount = Integer.numberOfLeadingZeros( numParts ) - Integer.numberOfLeadingZeros( vertexId );
         int partId = ( shiftAmount >= 0 ) ? vertexId >> shiftAmount : vertexId << -shiftAmount;
+//        System.out.println("VertexSsspBinaryTree.getPartId: vertexId: " + vertexId 
+//                + " numParts: " + numParts 
+//                + " Integer.numberOfLeadingZeros( numParts ): " + Integer.numberOfLeadingZeros( numParts )
+//                + " Integer.numberOfLeadingZeros( vertexId ): " + Integer.numberOfLeadingZeros( vertexId )
+//                + " shiftAmount: " + shiftAmount
+//                + " partId: " + partId
+//                + " returned partId: " + (partId - numParts));
         return partId - numParts;
     }
 }

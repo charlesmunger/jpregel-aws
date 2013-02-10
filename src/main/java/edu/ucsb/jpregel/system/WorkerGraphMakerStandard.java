@@ -13,7 +13,7 @@ import static java.lang.System.exit;
  *
  * @author Pete Cappello
  */
-public class WorkerGraphMakerStandard implements WorkerGraphMaker
+public class WorkerGraphMakerStandard extends WorkerGraphMaker
 {
 
     private static final long serialVersionUID = 1L;

@@ -14,9 +14,8 @@ import vertices.VertexShortestPathBinaryTree;
  *
  * @author Pete Cappello
  */
-public class WorkerGraphMakerBinaryTree implements WorkerGraphMaker
+public class WorkerGraphMakerBinaryTree extends WorkerGraphMaker
 {
-    
     private static final ThreadLocal< StringBuilder> uniqueNum = new ThreadLocal<StringBuilder>() {
 
 		@Override

@@ -25,7 +25,7 @@ import java.util.StringTokenizer;
  *
  * @author Pete Cappello
  */
-public class WorkerGraphMakerGrid implements WorkerGraphMaker
+public class WorkerGraphMakerGrid extends WorkerGraphMaker
 {
     @Override
     public int makeGraph( Worker worker ) 
