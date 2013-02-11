@@ -92,19 +92,14 @@ public class VertexShortestPath extends VertexImpl<Integer, Message<Integer, Int
 //            aggregateOutputProblemAggregator( new IntegerSumAggregator( getEdgeMapSize() ));
 //            aggregateOutputStepAggregator(    new IntegerSumAggregator( getEdgeMapSize() ));
         }
-        
-        /* This vote will be overturned, if during this step, a vertex for whom 
-         * I am a target vertex discovers a shorter path to itself, 
-         * in which case, it will send me a message.
-         */   
-//        voteToHalt(); 
     }
 
       
     @Override
     public String output() {
         String toString = "";
-        if (getVertexId().intValue() >= (getNumVertices())) {
+        if ( getVertexId().intValue() >= getNumVertices() - 10 )
+        {
             StringBuilder stringBuilder = uniqueNum.get();
             stringBuilder.append(getVertexId());
             stringBuilder.append(" : ");

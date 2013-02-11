@@ -60,7 +60,6 @@ public class MasterGraphMakerBinaryTree2 implements MasterGraphMaker
             StringBuilder string = new StringBuilder();
             string.append(numV).append(' ');
             string.append(numWorkers);
-            System.out.println("BinaryTreeMasterGraphMaker2.make: worker: " + fileNum + " " + string);
             try
             {
                 bufferedWriter.write( new String( string ) );

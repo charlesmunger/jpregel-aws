@@ -1,13 +1,13 @@
 package edu.ucsb.jpregel.system;
 
 import api.Aggregator;
+import edu.ucsb.jpregel.system.commands.*;
 import static java.lang.System.out;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import jicosfoundation.*;
-import edu.ucsb.jpregel.system.commands.*;
 
 /**
  * Code mobility: jPregel comes with several vertex subclasses.
@@ -206,7 +206,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     // Command: InputFileProcessingComplete
     synchronized public void inputFileProcessingComplete( int workerNum, int numVertices ) 
     {
-        this.numVertices = numVertices;
+        this.numVertices += numVertices;
 //        processAcknowledgement( barrierGraphMade );
         acceptAcknowledgement( barrierGraphMade );
     }

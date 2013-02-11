@@ -169,7 +169,7 @@ public class WorkerGraphMakerBinaryTree2 extends WorkerGraphMaker
                 numVerticesMade++;
                 vertexId /= 2;
             }
-            System.out.println("Populate.call:   LAST taproot partId: " + partId + "  vertexId: " + vertexId);
+//            System.out.println("Populate.call:   LAST taproot partId: " + partId + "  vertexId: " + vertexId);
             vertex = vertexFactory.make( vertexId, 2 );
             worker.addVertexToPart(partId, vertex);
             numVerticesMade++;
