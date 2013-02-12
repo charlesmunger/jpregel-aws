@@ -106,6 +106,7 @@ public abstract class CloudMachineGroup<T> extends MachineGroup<T> {
 			SshClient ssh = context.utils().sshForNode().apply(nm);
 			try { //TODO upload api metadata
 				ssh.connect();
+                                ssh.exec("echo \"grant{ permission java.security.AllPermission;>;\" > ~/policy ");
 				ssh.put("~/" + JARNAME, Payloads.newPayload(jar));
 				ssh.execChannel("java -server -cp " + JARNAME
 					+ " -Djava.security.policy=policy "

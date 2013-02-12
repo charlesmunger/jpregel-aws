@@ -18,7 +18,10 @@ import org.jclouds.apis.ApiMetadata;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.RunNodesException;
+import org.jclouds.compute.domain.Image;
 import org.jclouds.compute.domain.NodeMetadata;
+import org.jclouds.compute.domain.OsFamily;
+import org.jclouds.compute.domain.Template;
 import org.jclouds.compute.domain.TemplateBuilder;
 import org.jclouds.compute.options.TemplateOptions.Builder;
 import org.jclouds.scriptbuilder.domain.Statement;
@@ -36,10 +39,15 @@ public class CloudReservationService extends ReservationServiceImpl {
     private final ApiMetadata storage;
 
     @Inject
-    public CloudReservationService(@Named("compute") ApiMetadata apiMetadata,@Named("storage") ApiMetadata storage) {
-        this.compute = apiMetadata;
+    public CloudReservationService(
+    @Named("compute") ApiMetadata compute,
+    @Named("storage") ApiMetadata storage, 
+    @Named("cUser") String cUser,
+    @Named("cPass") String cPass) {
+        this.compute = compute;
 	this.storage = storage;
-        context = new ContextBuilder(apiMetadata).credentials(null, null).build(ComputeServiceContext.class).getComputeService();
+        context = new ContextBuilder(compute).credentials(cUser, cPass).build(ComputeServiceContext.class).getComputeService();
+        System.out.println(context);
     }
 
     @Override
@@ -77,8 +85,10 @@ public class CloudReservationService extends ReservationServiceImpl {
             Statement bootInstructions = AdminAccess.standard();
 
             // to run commands as root, we use the runScript option in the template.
-            templateBuilder.options(Builder.runScript(bootInstructions));
-            Set<? extends NodeMetadata> createNodesInGroup = context.createNodesInGroup(SECURITY_GROUP, 1, templateBuilder.build());
+            Template build = templateBuilder.options(Builder.runScript(bootInstructions)).hardwareId(instanceType).osFamily(OsFamily.CENTOS).build();
+            System.out.println(build.getOptions().getPublicKey());
+            System.out.println(build.getOptions().getPrivateKey());
+            Set<? extends NodeMetadata> createNodesInGroup = context.createNodesInGroup(SECURITY_GROUP, 1, build);
             return new CloudMasterMachineGroup(createNodesInGroup, compute);
         } catch (RunNodesException ex) {
             Logger.getLogger(CloudReservationService.class.getName()).log(Level.SEVERE, null, ex);

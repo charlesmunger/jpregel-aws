@@ -4,10 +4,14 @@
  */
 package clients;
 
+import api.MachineGroup;
+import api.ReservationService;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import edu.ucsb.jpregel.clouds.modules.AWSModule;
 import edu.ucsb.jpregel.system.*;
+import java.util.concurrent.Future;
+import org.jclouds.ec2.domain.InstanceType;
 import vertices.VertexShortestPathBinaryTree;
 
 /**
@@ -16,27 +20,24 @@ import vertices.VertexShortestPathBinaryTree;
  */
 public class BinaryTreeEc2Client {
 
-	public static void main(String[] args) throws Exception {
-		int numWorkers = Integer.parseInt(args[1]);
-		Injector injector = Guice.createInjector(new AWSModule());
-		ReservationServiceImpl instance = injector.getInstance(ReservationServiceImpl.class);
-
-
-		if (args.length > 2) {
-//            new AmazonS3Client(PregelAuthenticator.get()).putObject(args[0], "input", new File(args[2]));
-		}
-		Job job3 = new Job("Binary Tree Shortest Path three", // jobName
-			args[0] + "3", // jobDirectoryName
-			new VertexShortestPathBinaryTree(), // vertexFactory
-			new MasterGraphMakerBinaryTree(),
-			new WorkerGraphMakerBinaryTree(),
-			new MasterOutputMakerStandard(),
-			new WorkerOutputMakerStandard());
-//		JobRunData run3 = master.run(job3);
-//        System.out.println(run1);
-//        System.out.println(run2);
-//		System.out.println(run3);
+    public static void main(String[] args) throws Exception {
+        int numWorkers = Integer.parseInt(args[1]);
+        Injector injector = Guice.createInjector(new AWSModule("AKIAJUS57AJP3HWCSPAA", "rjqAEE9+D72Z0ixMxgvoJ60LB6LDDM0LpOls2shd"));
+        ReservationService instance = injector.getInstance(ReservationService.class);
+        Future<MachineGroup<ClientToMaster>> reserveMaster = instance.reserveMaster(InstanceType.M1_SMALL);
+        Future<MachineGroup<Worker>> reserveWorkers = instance.reserveWorkers(InstanceType.M1_SMALL, numWorkers);
+        Future<ClientToMaster> master = reserveMaster.get().deploy("");
+        reserveWorkers.get().deploy(reserveMaster.get().getHostname());
+        Job job3 = new Job("Binary Tree Shortest Path three", // jobName
+                args[0] + "3", // jobDirectoryName
+                new VertexShortestPathBinaryTree(), // vertexFactory
+                new MasterGraphMakerBinaryTree(),
+                new WorkerGraphMakerBinaryTree(),
+                new MasterOutputMakerStandard(),
+                new WorkerOutputMakerStandard());
+        JobRunData run3 = master.get().run(job3);
+      	System.out.println(run3);
 //		master.terminate();
 //		System.exit(0);
-	}
+    }
 }

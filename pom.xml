@@ -51,12 +51,12 @@
 		<dependency>
 			<groupId>org.jclouds</groupId>
 			<artifactId>jclouds-allcompute</artifactId>
-			<version>1.5.4</version>
+			<version>1.5.7</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jclouds</groupId>
 			<artifactId>jclouds-allblobstore</artifactId>
-			<version>1.5.4</version>
+			<version>1.5.7</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.inject</groupId>

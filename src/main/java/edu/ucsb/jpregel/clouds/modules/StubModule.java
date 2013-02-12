@@ -4,33 +4,31 @@
  */
 package edu.ucsb.jpregel.clouds.modules;
 
-import api.ReservationService;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 import edu.ucsb.jpregel.clouds.CloudFileSystem;
-import edu.ucsb.jpregel.clouds.CloudReservationService;
 import edu.ucsb.jpregel.system.FileSystem;
 import org.jclouds.apis.ApiMetadata;
-import org.jclouds.ec2.EC2ApiMetadata;
-import org.jclouds.s3.S3ApiMetadata;
+import org.jclouds.blobstore.TransientApiMetadata;
+import org.jclouds.compute.stub.StubApiMetadata;
 
 /**
  *
  * @author Charles
  */
-public class AWSModule extends AbstractModule {
+public class StubModule extends AbstractModule {
     private final String sAccess;
     private final String sModify;
 
-    public AWSModule(String sAccess, String sModify) {
+    StubModule(String sAccess, String sModify) {
         this.sAccess = sAccess;
         this.sModify = sModify;
     }
 	@Override
 	protected void configure() {
-		bind(ApiMetadata.class).annotatedWith(Names.named("storage")).toInstance(new S3ApiMetadata());
-		bind(ApiMetadata.class).annotatedWith(Names.named("compute")).toInstance(new EC2ApiMetadata());
-                bind(ReservationService.class).to(CloudReservationService.class);
+		bind(FileSystem.class).to(CloudFileSystem.class);
+		bind(ApiMetadata.class).annotatedWith(Names.named("storage")).toInstance(new StubApiMetadata());
+		bind(ApiMetadata.class).annotatedWith(Names.named("compute")).toInstance(new TransientApiMetadata());
                 bindConstant().annotatedWith(Names.named("sAccess")).to(sAccess);
                 bindConstant().annotatedWith(Names.named("sModify")).to(sModify);
                 bindConstant().annotatedWith(Names.named("cUser")).to(sAccess);

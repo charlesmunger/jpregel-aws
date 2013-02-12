@@ -4,8 +4,12 @@
  */
 package edu.ucsb.jpregel.clouds;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
 import com.google.inject.Inject;
+import com.google.inject.Module;
 import com.google.inject.name.Named;
+import com.google.inject.name.Names;
 import edu.ucsb.jpregel.system.ClientToMaster;
 import edu.ucsb.jpregel.system.FileSystem;
 import edu.ucsb.jpregel.system.Master;
@@ -55,26 +59,33 @@ class CloudMasterMachineGroup extends CloudMachineGroup<ClientToMaster> {
 
 	public static class CloudMaster extends Master {
 
-		private final ApiMetadata storage;
+		private final Module credentialsModule;
 
 		public static void main(String[] args) throws AlreadyBoundException, InterruptedException, IOException {
 			System.setSecurityManager(new RMISecurityManager());
 			Registry registry = LocateRegistry.createRegistry(Master.PORT);
-			ApiMetadata storage = (ApiMetadata) new ObjectInputStream(new FileInputStream("storage"));
-			ClientToMaster master = new CloudMaster(storage);
+			Module m = (Module) new ObjectInputStream(new FileInputStream("credentialsModule"));
+			ClientToMaster master = Guice.createInjector(m).getInstance(CloudMaster.class);
 			registry.bind(Master.SERVICE_NAME, master);
 			master.init(Integer.parseInt(args[0]));
 			registry.bind(Master.CLIENT_SERVICE_NAME, master);
 			System.out.println("Master ready");
 		}
 		@Inject
-		public CloudMaster(@Named("storage") ApiMetadata storage) throws RemoteException {
-			this.storage = storage;
+		public CloudMaster(Module credentialsModule) throws RemoteException {
+			this.credentialsModule = credentialsModule;
 		}
 
 		@Override
-		public FileSystem makeFileSystem(String jobDirectoryName) {
-			return null;//new CloudFileSystem(jobDirectoryName, storage);
+		public FileSystem makeFileSystem(final String jobDirectoryName) {
+                    return Guice.createInjector(credentialsModule, new AbstractModule() {
+
+                        @Override
+                        protected void configure() {
+                            bindConstant().annotatedWith(Names.named("jobDirectoryName")).to(jobDirectoryName);
+                            bind(FileSystem.class).to(CloudFileSystem.class);
+                        }
+                    }).getInstance(FileSystem.class);
 		}
 	}
 }
