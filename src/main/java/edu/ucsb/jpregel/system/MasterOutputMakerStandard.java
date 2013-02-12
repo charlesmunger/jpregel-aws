@@ -14,7 +14,7 @@ public class MasterOutputMakerStandard implements MasterOutputMaker
 {
     @Override
     public void write(FileSystem fileSystem, int numWorkers) {
-        char[] cbuf = new char[8*1024*1024*10];
+        char[] cbuf = new char[8*1024]; //*1024*10
         BufferedReader bufferedReader = null;
         BufferedWriter bufferedWriter = fileSystem.getFileOutputStream();
         try {

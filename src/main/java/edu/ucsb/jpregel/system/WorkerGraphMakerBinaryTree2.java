@@ -153,9 +153,7 @@ public class WorkerGraphMakerBinaryTree2 extends WorkerGraphMaker
 
         @Override
         public Object call()
-        {
-//            System.out.println("PopulatePart: workerNum: " + worker.getWorkerNum() + "  partId: " + partId + "  partSize: " + partSize );
-            
+        {            
             int numVerticesMade = 0;
             
             // make taproot vertices
@@ -163,13 +161,11 @@ public class WorkerGraphMakerBinaryTree2 extends WorkerGraphMaker
             VertexImpl vertex;
             while ( Integer.numberOfTrailingZeros( vertexId ) > 0 )
             {
-//                System.out.println("Populate.call:  taproot partId: " + partId + "  vertexId: " + vertexId);
                 vertex = vertexFactory.make( vertexId, 2 );
                 worker.addVertexToPart(partId, vertex);
                 numVerticesMade++;
                 vertexId /= 2;
             }
-//            System.out.println("Populate.call:   LAST taproot partId: " + partId + "  vertexId: " + vertexId);
             vertex = vertexFactory.make( vertexId, 2 );
             worker.addVertexToPart(partId, vertex);
             numVerticesMade++;
@@ -195,7 +191,6 @@ public class WorkerGraphMakerBinaryTree2 extends WorkerGraphMaker
                 }
                 vertex = vertexFactory.make( vertexId, numChildren );
                 worker.addVertexToPart(partId, vertex);
-//                System.out.println("PopulatePart.call: partId: " + partId + " numVerticesMade: " + numVerticesMade + " vertexId: " + vertexId);
             }
             
             // BEGIN DEBUG
