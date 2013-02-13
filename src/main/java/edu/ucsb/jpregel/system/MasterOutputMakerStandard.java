@@ -12,21 +12,26 @@ import static java.lang.System.exit;
  */
 public class MasterOutputMakerStandard implements MasterOutputMaker 
 {
+    private static final int CHAR_BUFFER_SIZE = 8 * 1024;
+    
     @Override
-    public void write(FileSystem fileSystem, int numWorkers) {
-        char[] cbuf = new char[8*1024]; //*1024*10
+    public void write(FileSystem fileSystem, int numWorkers)
+    {
+        char[] charBuffer = new char[ CHAR_BUFFER_SIZE ]; 
         BufferedReader bufferedReader = null;
         BufferedWriter bufferedWriter = fileSystem.getFileOutputStream();
         try {
-            for (int fileNum = 1; fileNum <= numWorkers; fileNum++) {
+            for (int fileNum = 1; fileNum <= numWorkers; fileNum++)
+            {
                 try {
                     bufferedReader = fileSystem.getWorkerOutputFileInputStream(fileNum);
                 } catch(Exception e) {
                     System.out.println("Error getting input stream for file " +fileNum + " with message " + e.getLocalizedMessage());
                 }
                 int readBytes;
-                while((readBytes = bufferedReader.read(cbuf)) != -1) {
-                    bufferedWriter.write(cbuf, 0, readBytes);
+                while((readBytes = bufferedReader.read( charBuffer )) != -1)
+                {
+                    bufferedWriter.write( charBuffer, 0, readBytes );
                 }
                 bufferedReader.close();
             }
