@@ -1,7 +1,10 @@
 package edu.ucsb.jpregel.clouds;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
+import com.google.inject.Module;
 import com.google.inject.name.Named;
+import com.google.inject.name.Names;
 import edu.ucsb.jpregel.system.FileSystem;
 import java.io.*;
 import org.jclouds.ContextBuilder;
@@ -16,10 +19,10 @@ public class CloudFileSystem extends FileSystem {
 
     @Inject
     public CloudFileSystem(
-    @Named("jobDirectoryName") String jobDirectoryName, 
-    @Named("storage") ApiMetadata apiMetadata, 
-    @Named("sAccess") String access, 
-    @Named("sModify") String modify) {
+            @Named("jobDirectoryName") String jobDirectoryName,
+            @Named("storage") ApiMetadata apiMetadata,
+            @Named("sAccess") String access,
+            @Named("sModify") String modify) {
         super(jobDirectoryName);
         this.context = new ContextBuilder(apiMetadata).credentials(access, modify).build(BlobStoreContext.class);
         this.storage = context.createInputStreamMap(jobDirectoryName);
@@ -57,7 +60,7 @@ public class CloudFileSystem extends FileSystem {
 
     @Override
     public BufferedReader getWorkerOutputFileInputStream(int workerNum) throws FileNotFoundException {
-        return new BufferedReader(new InputStreamReader(storage.get("out/"+workerNum)));
+        return new BufferedReader(new InputStreamReader(storage.get("out/" + workerNum)));
     }
 
     @Override
@@ -70,8 +73,9 @@ public class CloudFileSystem extends FileSystem {
     }
 
     private class S3Writer extends BufferedWriter {
+
         private final String path;
-        
+
         S3Writer(String path) throws FileNotFoundException {
             super(new OutputStreamWriter(new FileOutputStream(new File(path))));
             this.path = path;
@@ -82,5 +86,15 @@ public class CloudFileSystem extends FileSystem {
             super.close();
             storage.putFile(path, new File(path));
         }
+    }
+
+    public static Module getModule(final String jobDirectoryName) {
+        return new AbstractModule() {
+            @Override
+            protected void configure() {
+                bindConstant().annotatedWith(Names.named("jobDirectoryName")).to(jobDirectoryName);
+                bind(FileSystem.class).to(CloudFileSystem.class);
+            }
+        };
     }
 }

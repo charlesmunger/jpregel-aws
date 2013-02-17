@@ -73,5 +73,15 @@
 	  <artifactId>infinispan-core</artifactId>
 	  <version>5.2.0.CR3</version>
 	 </dependency>
+	 <dependency>
+	  <groupId>org.jclouds.driver</groupId>
+	  <artifactId>jclouds-sshj</artifactId>
+	  <version>1.5.7</version>
+	 </dependency>
+	 <dependency>
+	  <groupId>ch.qos.logback</groupId>
+	  <artifactId>logback-classic</artifactId>
+	  <version>1.0.9</version>
+	 </dependency>
 	</dependencies>
 </project>

@@ -7,18 +7,16 @@ package edu.ucsb.jpregel.clouds.modules;
 import api.ReservationService;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
-import edu.ucsb.jpregel.clouds.CloudFileSystem;
 import edu.ucsb.jpregel.clouds.CloudReservationService;
-import edu.ucsb.jpregel.system.FileSystem;
+import java.io.Serializable;
 import org.jclouds.apis.ApiMetadata;
-import org.jclouds.ec2.EC2ApiMetadata;
 import org.jclouds.s3.S3ApiMetadata;
 
 /**
  *
  * @author Charles
  */
-public class AWSModule extends AbstractModule {
+public class AWSModule extends AbstractModule implements Serializable {
     private final String sAccess;
     private final String sModify;
 
@@ -29,7 +27,7 @@ public class AWSModule extends AbstractModule {
 	@Override
 	protected void configure() {
 		bind(ApiMetadata.class).annotatedWith(Names.named("storage")).toInstance(new S3ApiMetadata());
-		bind(ApiMetadata.class).annotatedWith(Names.named("compute")).toInstance(new EC2ApiMetadata());
+		bindConstant().annotatedWith(Names.named("compute")).to("aws-ec2");
                 bind(ReservationService.class).to(CloudReservationService.class);
                 bindConstant().annotatedWith(Names.named("sAccess")).to(sAccess);
                 bindConstant().annotatedWith(Names.named("sModify")).to(sModify);
