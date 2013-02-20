@@ -10,6 +10,9 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import edu.ucsb.jpregel.clouds.modules.AWSModule;
 import edu.ucsb.jpregel.system.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 import java.util.concurrent.Future;
 import org.jclouds.ec2.domain.InstanceType;
 import vertices.VertexShortestPathBinaryTree;
@@ -22,7 +25,9 @@ public class BinaryTreeEc2Client {
 
     public static void main(String[] args) throws Exception {
         int numWorkers = Integer.parseInt(args[1]);
-        Injector injector = Guice.createInjector(new AWSModule("AKIAJUS57AJP3HWCSPAA", "rjqAEE9+D72Z0ixMxgvoJ60LB6LDDM0LpOls2shd"));
+        final AWSModule awsModule = new AWSModule("AKIAJUS57AJP3HWCSPAA", "rjqAEE9+D72Z0ixMxgvoJ60LB6LDDM0LpOls2shd");
+        new ObjectOutputStream(new FileOutputStream(new File("credentialsModule"))).writeObject(awsModule);
+        Injector injector = Guice.createInjector(awsModule);
         ReservationService instance = injector.getInstance(ReservationService.class);
         Future<MachineGroup<ClientToMaster>> reserveMaster = instance.reserveMaster(InstanceType.M1_SMALL);
         Future<MachineGroup<Worker>> reserveWorkers = instance.reserveWorkers(InstanceType.M1_SMALL, numWorkers);

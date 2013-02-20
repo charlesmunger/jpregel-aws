@@ -109,21 +109,24 @@ public abstract class CloudMachineGroup<T> extends MachineGroup<T> {
                 ssh.connect();
                 System.out.println("Connected");
                 ssh.exec("echo \"grant{ permission java.security.AllPermission;>;\" > ~/policy ");
+                System.out.println("Policy uploaded");
                 ssh.put("~/credentialsModule", Payloads.newFilePayload(new File("credentialsModule")));
                 ssh.put("~/" + JARNAME, Payloads.newPayload(jar));
+                System.out.println("Jar uploaded");
                 ExecChannel execChannel = ssh.execChannel("java -server -cp " + JARNAME
                         + " -Djava.security.policy=policy "
                         + heapSize(nm.getHardware().getRam())
                         + " " + mainClass + " "
                         + args[0]);
-                Thread.sleep(10000);
-                BufferedReader br = new BufferedReader(new InputStreamReader(execChannel.getOutput()));
-                String s;
-                System.out.println("Deployed");
-                while ((s = br.readLine()) != null) {
-                    System.out.println(s);
-                }
-                br.close();
+                System.out.println("Executions submitted");
+//                Thread.sleep(10000);
+//                BufferedReader br = new BufferedReader(new InputStreamReader(execChannel.getOutput()));
+//                String s;
+//                System.out.println("Deployed");
+//                while ((s = br.readLine()) != null) {
+//                    System.out.println(s);
+//                }
+//                br.close();
             } catch (Exception ex) {
                 Logger.getLogger(CloudMachineGroup.class.getName()).log(Level.SEVERE, null, ex);
             } finally {
