@@ -31,18 +31,19 @@ public class BinaryTreeEc2Client {
         ReservationService instance = injector.getInstance(ReservationService.class);
         Future<MachineGroup<ClientToMaster>> reserveMaster = instance.reserveMaster(InstanceType.M1_SMALL);
         Future<MachineGroup<Worker>> reserveWorkers = instance.reserveWorkers(InstanceType.M1_SMALL, numWorkers);
-        Future<ClientToMaster> master = reserveMaster.get().deploy("");
+        Future<ClientToMaster> master = reserveMaster.get().deploy(args[1]);
         reserveWorkers.get().deploy(reserveMaster.get().getHostname());
-        Job job3 = new Job("Binary Tree Shortest Path three", // jobName
-                args[0] + "3", // jobDirectoryName
+        Job job3 = new Job("Binary Tree Shortest Path", // jobName
+                args[0], // jobDirectoryName
                 new VertexShortestPathBinaryTree(), // vertexFactory
                 new MasterGraphMakerBinaryTree(),
                 new WorkerGraphMakerBinaryTree(),
                 new MasterOutputMakerStandard(),
                 new WorkerOutputMakerStandard());
         JobRunData run3 = master.get().run(job3);
-      	System.out.println(run3);
-//		master.terminate();
-//		System.exit(0);
+        System.out.println(run3);
+        reserveMaster.get().terminate();
+        reserveWorkers.get().terminate();
+        System.exit(0);
     }
 }
