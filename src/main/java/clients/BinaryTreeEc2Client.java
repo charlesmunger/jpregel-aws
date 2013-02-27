@@ -25,7 +25,7 @@ public class BinaryTreeEc2Client {
 
     public static void main(String[] args) throws Exception {
         int numWorkers = Integer.parseInt(args[1]);
-        final AWSModule awsModule = new AWSModule("AKIAJUS57AJP3HWCSPAA", "rjqAEE9+D72Z0ixMxgvoJ60LB6LDDM0LpOls2shd");
+        final AWSModule awsModule = new AWSModule(args[2], args[3]);
         new ObjectOutputStream(new FileOutputStream(new File("credentialsModule"))).writeObject(awsModule);
         Injector injector = Guice.createInjector(awsModule);
         ReservationService instance = injector.getInstance(ReservationService.class);

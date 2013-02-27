@@ -5,7 +5,9 @@
 package edu.ucsb.jpregel.clouds;
 
 import api.MachineGroup;
+import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.io.Files;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Module;
@@ -14,7 +16,9 @@ import edu.ucsb.jpregel.system.ClientToMaster;
 import edu.ucsb.jpregel.system.FileSystem;
 import edu.ucsb.jpregel.system.ReservationServiceImpl;
 import edu.ucsb.jpregel.system.Worker;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.rmi.RemoteException;
 import java.util.Properties;
@@ -32,6 +36,7 @@ import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.Template;
 import org.jclouds.compute.domain.TemplateBuilder;
 import org.jclouds.compute.options.TemplateOptions.Builder;
+import org.jclouds.domain.LoginCredentials;
 import org.jclouds.logging.slf4j.config.SLF4JLoggingModule;
 import org.jclouds.scriptbuilder.domain.Statement;
 import org.jclouds.scriptbuilder.statements.login.AdminAccess;
@@ -47,6 +52,7 @@ public class CloudReservationService extends ReservationServiceImpl {
     public static final String SECURITY_GROUP = "jpregelgroup";
     private final String compute;
     private final ApiMetadata storage;
+    private final String username = System.getProperty("user.name");
 
     @Inject
     public CloudReservationService(
@@ -122,14 +128,46 @@ public class CloudReservationService extends ReservationServiceImpl {
     private Set<? extends NodeMetadata> reserveNodes(String instanceType, int count) throws RunNodesException {
         System.out.printf(">> adding node to group %s%n", SECURITY_GROUP);
         TemplateBuilder templateBuilder = context.templateBuilder();
-        Statement bootInstructions = AdminAccess.standard();
-        Template build = templateBuilder.options(Builder.runScript(bootInstructions))
+        Statement bootInstructions = AdminAccess.builder()
+                .adminPublicKey(new File("key.pub"))
+                .adminPrivateKey(new File("key"))
+                .authorizeAdminPublicKey(true)
+                .adminUsername(username)
+                .installAdminPrivateKey(true)
+                .build();
+        Template build = templateBuilder.options(Builder.runScript(bootInstructions)
+//                .overrideLoginCredentials(getLoginForCommandExecution())
+                )
                 .hardwareId(instanceType)
                 .build();
         System.out.println(build.getOptions().getPublicKey());
         System.out.println(build.getOptions().getPrivateKey());
         Set<? extends NodeMetadata> createNodesInGroup = context
                 .createNodesInGroup(SECURITY_GROUP, count, build);
+        System.out.println(createNodesInGroup.iterator().next().getCredentials().getPrivateKey());
         return createNodesInGroup;
     }
+    
+
+    private static String getPublicKey() {
+        try {
+            return Files.toString(new File("key.pub"), Charsets.UTF_8);
+        } catch (IOException ex) {
+            Logger.getLogger(CloudReservationService.class.getName()).log(Level.SEVERE, null, ex);
+            System.exit(1);
+            return null;
+        }
+    }
+    
+      private LoginCredentials getLoginForCommandExecution() {
+      try {
+        String privateKey = Files.toString(
+            new File("key"), Charsets.UTF_8);
+        return LoginCredentials.builder().user(username).privateKey(privateKey).build();
+      } catch (Exception e) {
+         System.err.println("error reading ssh key " + e.getMessage());
+         System.exit(1);
+         return null;
+      }
+   }
 }

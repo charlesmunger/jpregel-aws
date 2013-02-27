@@ -5,13 +5,13 @@
 package edu.ucsb.jpregel.clouds;
 
 import api.MachineGroup;
+import com.google.common.base.Charsets;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
+import com.google.common.io.Files;
 import com.google.inject.Inject;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -22,7 +22,13 @@ import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.RunScriptOnNodesException;
 import org.jclouds.compute.domain.ExecChannel;
 import org.jclouds.compute.domain.NodeMetadata;
+import org.jclouds.compute.options.RunScriptOptions;
+import org.jclouds.compute.predicates.NodePredicates;
+import org.jclouds.domain.LoginCredentials;
 import org.jclouds.io.Payloads;
+import org.jclouds.scriptbuilder.ScriptBuilder;
+import org.jclouds.scriptbuilder.domain.Statement;
+import org.jclouds.scriptbuilder.domain.Statements;
 import org.jclouds.ssh.SshClient;
 
 /**
@@ -73,23 +79,38 @@ public abstract class CloudMachineGroup<T> extends MachineGroup<T> {
 
     @Override
     public final T syncDeploy(String... args) {
-        System.out.println("syncDeploying");
-        ExecutorService e = Executors.newCachedThreadPool();
-        for (NodeMetadata n : nodes) {
-            e.submit(new LaunchTask(n, this.getClass().getName(), args));
-        }
         try {
-            e.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
-        } catch (InterruptedException ex) {
+            System.out.println("syncDeploying");
+            
+//            for (Map.Entry string : comp.runScriptOnNodesMatching(
+//                    NodePredicates.runningInGroup(CloudReservationService.SECURITY_GROUP),
+//                    new ScriptBuilder().addStatement(Statements.), 
+//                    RunScriptOptions.Builder.overrideLoginCredentials(getLoginForCommandExecution())).entrySet()) {
+//                System.out.println(string);
+//            }
+            
+            
+            ExecutorService e = Executors.newCachedThreadPool();
+            for (NodeMetadata n : nodes) {
+                e.submit(new LaunchTask(n, this.getClass().getName(), args));
+            }
+            try {
+                e.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(CloudMachineGroup.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            e.shutdown();
+            return getRemoteReference();
+        } catch (Exception ex) {
             Logger.getLogger(CloudMachineGroup.class.getName()).log(Level.SEVERE, null, ex);
         }
-        e.shutdown();
         return getRemoteReference();
     }
 
     protected abstract T getRemoteReference();
 
     private class LaunchTask implements Runnable {
+        public static final String CREDENTIALS_MODULE = "credentialsModule";
 
         private final String mainClass;
         private final NodeMetadata nm;
@@ -105,12 +126,13 @@ public abstract class CloudMachineGroup<T> extends MachineGroup<T> {
         public void run() {
             System.out.println("Connecting");
             SshClient ssh = comp.getContext().utils().sshForNode().apply(nm);
+            System.out.println("Got client "+ ssh.getUsername()+"@"+ssh.getHostAddress());
             try {
                 ssh.connect();
                 System.out.println("Connected");
-                ssh.exec("echo \"grant{ permission java.security.AllPermission;>;\" > ~/policy ");
+                ssh.exec("echo \"grant{ permission java.security.AllPermission;};\" > ~/policy ");
                 System.out.println("Policy uploaded");
-                ssh.put("~/credentialsModule", Payloads.newFilePayload(new File("credentialsModule")));
+                ssh.put("~/"+CREDENTIALS_MODULE, Payloads.newFilePayload(new File(CREDENTIALS_MODULE)));
                 ssh.put("~/" + JARNAME, Payloads.newPayload(jar));
                 System.out.println("Jar uploaded");
                 ExecChannel execChannel = ssh.execChannel("java -server -cp " + JARNAME
