@@ -17,6 +17,7 @@ import java.io.ObjectOutputStream;
 import java.util.concurrent.Future;
 import org.jclouds.ec2.domain.InstanceType;
 import vertices.VertexShortestPathBinaryTree;
+import vertices.VertexSsspBinaryTree;
 
 /**
  *
@@ -30,24 +31,20 @@ public class BinaryTreeEc2Client {
         new ObjectOutputStream(new FileOutputStream(new File(CloudMachineGroup.CREDENTIALS_MODULE))).writeObject(awsModule);
         Injector injector = Guice.createInjector(awsModule);
         ReservationService instance = injector.getInstance(ReservationService.class);
-        Future<MachineGroup<ClientToMaster>> reserveMaster = instance.reserveMaster(InstanceType.M1_SMALL);
-        Future<MachineGroup<Worker>> reserveWorkers = instance.reserveWorkers(InstanceType.M1_SMALL, numWorkers);
+        Future<MachineGroup<ClientToMaster>> reserveMaster = instance.reserveMaster(InstanceType.CC2_8XLARGE);
+        Future<MachineGroup<Worker>> reserveWorkers = instance.reserveWorkers(InstanceType.CC2_8XLARGE, numWorkers);
         Future<ClientToMaster> master = reserveMaster.get().deploy(args[1]);
         reserveWorkers.get().deploy(reserveMaster.get().getHostname());
-        final ClientToMaster rMaster = master.get();
-
-        Job job3 = new Job("Binary Tree Shortest Path", // jobName
-                args[0], // jobDirectoryName
-                new VertexShortestPathBinaryTree(), // vertexFactory
-                new MasterGraphMakerBinaryTree(),
-                new WorkerGraphMakerBinaryTree(),
-                new MasterOutputMakerStandard(),
-                new WorkerOutputMakerStandard());
-
-        JobRunData run3 = rMaster.run(job3);
-        System.out.println(run3);
-        reserveMaster.get().terminate();
-        reserveWorkers.get().terminate();
-        System.exit(0);
+		ClientToMaster rMaster = master.get();
+		Job job3 = new Job("Binary Tree Shortest Path", // jobName
+			    args[0] +"2", // jobDirectoryName
+			    new VertexSsspBinaryTree(), // vertexFactory
+			    new MasterGraphMakerBinaryTree2(),
+			    new WorkerGraphMakerBinaryTree2(),
+			    new MasterOutputMakerStandard(),
+			    new WorkerOutputMakerStandard());
+		JobRunData run3 = rMaster.run(job3);
+	    System.out.println(run3);
+	System.exit(0);
     }
 }

@@ -48,7 +48,7 @@ public class CloudReservationService extends ReservationServiceImpl {
             @Named("cPass") String cPass) {
         Properties properties = new Properties();
         properties.setProperty(AWSEC2Constants.PROPERTY_EC2_AMI_QUERY, "owner-id=137112412989;state=available;image-type=machine");
-        properties.setProperty(AWSEC2Constants.PROPERTY_EC2_CC_AMI_QUERY, "");
+        properties.setProperty(AWSEC2Constants.PROPERTY_EC2_CC_AMI_QUERY, "owner-id=137112412989;state=available;image-type=machine");
         Iterable<Module> modules = ImmutableSet.<Module>of(new SLF4JLoggingModule(), new SshjSshClientModule());
         context = ContextBuilder.newBuilder(compute)
                 .credentials(cUser, cPass)

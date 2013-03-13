@@ -14,6 +14,7 @@ import java.util.StringTokenizer;
 public final class VertexShortestPathBinaryTree extends VertexShortestPath
 {
     private static final Integer MAX = new Integer(Integer.MAX_VALUE);
+    
     public VertexShortestPathBinaryTree() {}
     
     public VertexShortestPathBinaryTree( Integer vertexId, Map<Integer, Integer> edgeMap )
