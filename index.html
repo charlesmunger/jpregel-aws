@@ -23,12 +23,13 @@ layout: default
 		<a href="http://www.jclouds.org/">jclouds</a> enlarges. 
 		Since jPregel uses <a href="http://maven.apache.org/">Maven</a> for dependency management, 
 		upgrading with <a href="http://www.jclouds.org/">jclouds</a> is automated. 
-		Our use of Maven also increases efficiency and ease of deployment.
+		Our use of <a href="http://maven.apache.org/">Maven</a> also increases efficiency and ease of deployment.
 	</p>
 	<p>
 		In addition, jPregel run times are good enough to be suitable for serious large-scale applications. 
 		We achieve a high degree of concurrency, first, by declaring war on Java synchronized  methods: 
-		We systematically avoid synchronized methods, providing more fine-grained synchronization on critical data structures. 
+		We systematically avoid synchronized methods, providing more fine-grained synchronization on critical 
+		data structures. 
 		We similarly declared war on the Java new keyword, 
 		using techniques that dramatically reduce garbage generation and improve garbage collection. 
 		Through these any myriad incremental performance improvements 
