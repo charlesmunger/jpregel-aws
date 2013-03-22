@@ -64,12 +64,12 @@
         <dependency>
             <groupId>org.jclouds</groupId>
             <artifactId>jclouds-allcompute</artifactId>
-            <version>1.5.7</version>
+            <version>1.6.0-rc.1</version>
         </dependency>
         <dependency>
             <groupId>org.jclouds</groupId>
             <artifactId>jclouds-allblobstore</artifactId>
-            <version>1.5.7</version>
+            <version>1.6.0-rc.1</version>
         </dependency>
         <dependency>
             <groupId>com.google.inject</groupId>
@@ -89,12 +89,18 @@
         <dependency>
             <groupId>org.jclouds.driver</groupId>
             <artifactId>jclouds-sshj</artifactId>
-            <version>1.5.7</version>
+            <version>1.6.0-rc.1</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.0.9</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jclouds</groupId>
+            <artifactId>jclouds-blobstore</artifactId>
+            <version>1.6.0-rc.1</version>
+            <type>jar</type>
         </dependency>
     </dependencies>
 </project>

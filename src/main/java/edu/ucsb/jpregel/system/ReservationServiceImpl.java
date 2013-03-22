@@ -38,7 +38,21 @@ public abstract class ReservationServiceImpl implements ReservationService {
             }
         });
     }
+    
+    public Future<MachineGroup[]> reserveBoth(final String instanceType, final int numberOfWorkers)
+    {
+        return exec.submit(new Callable<MachineGroup[]> () {
 
+            @Override
+            public MachineGroup[] call() throws Exception
+            {
+                return callBoth(instanceType, numberOfWorkers);
+            }
+        });
+    }
+    
+    public MachineGroup[] callBoth(String instanceType, int numberOfWorkers){return null;
+};
     public abstract MachineGroup<Worker>callWorker(String instanceType, int numberOfWorkers);
     public abstract MachineGroup<ClientToMaster>callMaster(String instanceType);
 }

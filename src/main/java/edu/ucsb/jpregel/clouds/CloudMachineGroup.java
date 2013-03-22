@@ -9,6 +9,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.google.inject.Module;
+import com.google.inject.name.Named;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -19,10 +20,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.jclouds.apis.ApiMetadata;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.RunScriptOnNodesException;
-import org.jclouds.compute.domain.ExecChannel;
 import org.jclouds.compute.domain.NodeMetadata;
+import org.jclouds.compute.options.RunScriptOptions;
 import org.jclouds.io.Payloads;
 import org.jclouds.ssh.SshClient;
 
@@ -35,11 +37,14 @@ public abstract class CloudMachineGroup<T> extends MachineGroup<T> {
     protected final Set<? extends NodeMetadata> nodes;
     protected final ComputeService comp;
     public static final String JARNAME = "jpregel.jar";
-    private static final File jar = new File("target/" + JARNAME);
+    public static final String BUCKET_NAME = "jpregel";
+    public static final File jar = new File("target/" + JARNAME);
     public static final String CREDENTIALS_MODULE = "credentialsModule";
+    private final String url;
 
     @Inject
-    CloudMachineGroup(Set<? extends NodeMetadata> nodes, ComputeService compute) {
+    CloudMachineGroup(Set<? extends NodeMetadata> nodes, ComputeService compute, @Named("storage") ApiMetadata ap) {
+        this.url = ap.getDefaultEndpoint().get();
         this.nodes = nodes;
         this.comp = compute;
     }
@@ -64,7 +69,7 @@ public abstract class CloudMachineGroup<T> extends MachineGroup<T> {
                 public boolean apply(NodeMetadata t) {
                     return nodes.contains(t);
                 }
-            }, "killall -9 java; cd; rm -rf *");
+            }, "killall -9 java; cd; rm -rf *", RunScriptOptions.Builder.blockOnComplete(true).overrideLoginUser(System.getProperty("user.name")));
         } catch (RunScriptOnNodesException ex) {
             Logger.getLogger(CloudMachineGroup.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -119,8 +124,8 @@ public abstract class CloudMachineGroup<T> extends MachineGroup<T> {
                 ssh.exec("echo \"grant{ permission java.security.AllPermission;};\" > ~/policy ");
                 System.out.println("Policy uploaded");
                 ssh.put(CREDENTIALS_MODULE, Payloads.newFilePayload(new File(CREDENTIALS_MODULE)));
-                ssh.put(JARNAME, Payloads.newPayload(jar));
-                System.out.println("Jar uploaded");
+                ssh.exec("wget -N "+url+"/"+BUCKET_NAME+ "/"+JARNAME);
+                System.out.println("Jar downloaded from "+url+"/"+BUCKET_NAME+ "/"+JARNAME);
                 ssh.execChannel("java -server "
                         + "-XX:+UseConcMarkSweepGC "
                         + "-XX:+AggressiveOpts "
