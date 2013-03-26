@@ -57,4 +57,7 @@ public class VertexSsspBinaryTree extends VertexShortestPath
         int partId = ( shiftAmount >= 0 ) ? vertexId >> shiftAmount : vertexId << -shiftAmount;
         return partId - numParts;
     }
+    
+    @Override
+    public void initialValue(Integer vertexId) { setVertexValue( new Message( vertexId, MAX_VALUE ) ); }
 }

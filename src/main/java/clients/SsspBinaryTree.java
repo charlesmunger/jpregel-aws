@@ -10,7 +10,7 @@ import edu.ucsb.jpregel.system.WorkerOutputMakerStandard;
 import vertices.VertexSsspBinaryTree;
 
 /**
- * A client that uses a preexisting AWS Cluster.
+ * An SSSP binary tree client that uses a "local" cluster.
  * 
  * @author Pete Cappello
  */
@@ -22,7 +22,7 @@ public class SsspBinaryTree
      */
     public static void main( String[] args ) throws Exception
     {
-        int numWorkers = Integer.parseInt(args[1]);
+        int numWorkers = Integer.parseInt( args[1] );
         Job job = new Job("Binary Tree Shortest Path",  // jobName
                 args[0],
                 new VertexSsspBinaryTree(),     // vertexFactory

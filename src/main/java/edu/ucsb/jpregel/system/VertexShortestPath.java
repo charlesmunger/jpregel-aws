@@ -66,7 +66,7 @@ public class VertexShortestPath extends VertexImpl<Integer, Message<Integer, Int
     @Override
     public void compute() 
     {
-        // compute currently known minimum distance from source to me
+        // compute currently known shortest path from source to me
         int minDistance = isSource() ? 0 : Integer.MAX_VALUE;
         Message<Integer, Integer> minDistanceMessage = new Message<Integer, Integer>( getVertexId(), minDistance );
         for ( Message<Integer, Integer> message : getMessageQ() )
@@ -77,10 +77,10 @@ public class VertexShortestPath extends VertexImpl<Integer, Message<Integer, Int
             }
         }
         if ( minDistanceMessage.getMessageValue() < getVertexValue().getMessageValue() )
-        {   // There is a new shorter path from the source to me
+        {   // There is a shorter path to me
             setVertexValue( minDistanceMessage ); // update my value: the shortest path to me
             
-            // To each of my target vertices: The shortest known path to you through me just got shorter 
+            // To each target vertex: The shortest known path to you via me just got shorter 
             for ( Integer targetVertexId : getEdgeTargets() )
             {
                 Integer edgeValue = getEdgeMap().get( targetVertexId );
