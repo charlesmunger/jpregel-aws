@@ -284,33 +284,4 @@ abstract public class ServiceImpl extends UnicastRemoteObject
         ObjectInputStream objectInputStream = new ObjectInputStream( new ByteArrayInputStream( bytes ) );
         return objectInputStream.readObject();
     }
-    
-    protected class BarrierComputation
-    {
-        private Command command;
-        private AtomicInteger unfinishedCommands;
-        
-        public BarrierComputation( Command command )
-        {
-            this.command = command;
-            unfinishedCommands = new AtomicInteger( proxyManager.size() );
-        }
-        
-        public void start() throws InterruptedException
-        {
-            ServiceImpl.this.broadcast( command, ServiceImpl.this );
-            while ( unfinishedCommands.get() > 0 )
-            {
-                synchronized ( this ) { wait(); }
-            }
-        }
-        
-        public void acknowledge()
-        {
-            if ( unfinishedCommands.decrementAndGet() == 0 )
-            {
-                synchronized ( this ) { notify(); }
-            }
-        }
-    }
 }

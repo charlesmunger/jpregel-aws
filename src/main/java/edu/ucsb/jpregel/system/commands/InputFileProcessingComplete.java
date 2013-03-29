@@ -5,19 +5,18 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import jicosfoundation.Command;
 import jicosfoundation.Proxy;
-import jicosfoundation.ServiceImpl;
 import edu.ucsb.jpregel.system.Master;
 
 /**
  *
  * @author Pete Cappello
  */
-public class InputFileProcessingComplete implements Command
+public class InputFileProcessingComplete implements Command<Master>
 {
     private int workerNum;
     private int numVertices;
     
-    public InputFileProcessingComplete(){}
+//    public InputFileProcessingComplete(){}
     public InputFileProcessingComplete( int workerNum, int numVertices )
     { 
         this.workerNum = workerNum;
@@ -28,21 +27,20 @@ public class InputFileProcessingComplete implements Command
     public void execute(Proxy proxy) { proxy.sendCommand( this ); }
 
     @Override
-    public void execute(ServiceImpl serviceImpl) throws Exception 
+    public void execute( Master master ) throws Exception 
     {
-        Master master = (Master) serviceImpl;
         master.inputFileProcessingComplete( workerNum, numVertices );
     }
 
     @Override
-    public void writeExternal(ObjectOutput oo) throws IOException
+    public void writeExternal( ObjectOutput oo ) throws IOException
     {
         oo.writeInt(workerNum);
         oo.writeInt(numVertices);
     }
 
     @Override
-    public void readExternal(ObjectInput oi) throws IOException, ClassNotFoundException
+    public void readExternal( ObjectInput oi ) throws IOException, ClassNotFoundException
     {
         workerNum = oi.readInt();
         numVertices = oi.readInt();

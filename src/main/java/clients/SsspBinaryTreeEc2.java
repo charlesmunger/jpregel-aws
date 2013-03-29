@@ -45,7 +45,7 @@ public class SsspBinaryTreeEc2
         final ClientToMaster rMaster = master.get();
 
         Job job3 = new Job("Binary Tree Shortest Path", // jobName
-                args[0], // jobDirectoryName
+                args[0], 
                 new VertexShortestPathBinaryTree(), // vertexFactory
                 new MasterGraphMakerBinaryTree2(),
                 new WorkerGraphMakerBinaryTree2(),

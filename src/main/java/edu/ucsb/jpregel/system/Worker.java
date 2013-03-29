@@ -156,7 +156,6 @@ public abstract class Worker extends ServiceImpl
     public int getWorkerNum( int partId )
     {
 //        int numWorkers = workerNumToWorkerMap.size();
-//        System.out.println("Worker.getWorkerNum: for partId " + partId + " workerNum " + (( partId % numWorkers ) + 1));
 //        return ( partId % numWorkers ) + 1;
         return job.getWorkerGraphMaker().getWorkerNum( partId, workerNumToWorkerMap.size() );
     }
@@ -260,8 +259,8 @@ public abstract class Worker extends ServiceImpl
         {
             System.gc();
         }
-        Command command = new GarbageCollected();
-        sendCommand(master, command);
+        Command command = new WorkerCommandCompleted();
+        sendCommand( master, command );
      }
     
     // Command: MessageReceived
@@ -337,7 +336,7 @@ public abstract class Worker extends ServiceImpl
             computeThread.initJob();
         }
         
-        Command command = new JobSet( myWorkerNum );
+        Command command = new WorkerCommandCompleted();
         sendCommand( master, command );
      }
     
@@ -353,7 +352,7 @@ public abstract class Worker extends ServiceImpl
             addProxy( workerService, workerProxy );
         }
         
-        Command command = new WorkerMapSet();
+        Command command = new WorkerCommandCompleted();
         sendCommand( master, command );
      }
     
@@ -380,12 +379,11 @@ public abstract class Worker extends ServiceImpl
         try
         {
             job.makeOutputFile( this );
-        } catch (IOException ex)
+        } catch ( IOException exception )
         {
-            Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger( Worker.class.getName() ).log( Level.SEVERE, null, exception );
         }
-//        Command command = new CommandComplete( myWorkerNum );
-        Command command = new WorkerOutputWritten();
+        Command command = new WorkerCommandCompleted();
         sendCommand( master, command );
     }
     
@@ -493,7 +491,7 @@ public abstract class Worker extends ServiceImpl
         {
             Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
         }
-        Command command = new CommandComplete( myWorkerNum );
+        Command command = new WorkerCommandCompleted();
         sendCommand( master, command );
     }
 

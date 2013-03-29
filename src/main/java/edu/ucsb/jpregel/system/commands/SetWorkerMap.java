@@ -7,18 +7,16 @@ import java.util.Map;
 import jicosfoundation.Command;
 import jicosfoundation.Proxy;
 import jicosfoundation.Service;
-import jicosfoundation.ServiceImpl;
 import edu.ucsb.jpregel.system.Worker;
 
 /**
- *
+ * Worker: Set integerToWorkerMap.
  * @author Pete Cappello
  */
-public class SetWorkerMap implements Command
+public class SetWorkerMap implements Command<Worker>
 {
     private Map<Integer, Service> integerToWorkerMap;
     
-    public SetWorkerMap(){}
     public SetWorkerMap( Map<Integer, Service> integerToWorkerMap )
     { 
         this.integerToWorkerMap = integerToWorkerMap;
@@ -28,9 +26,8 @@ public class SetWorkerMap implements Command
     public void execute(Proxy proxy) { proxy.sendCommand( this ); }
 
     @Override
-    public void execute(ServiceImpl serviceImpl) throws Exception 
+    public void execute( Worker worker) throws Exception 
     {
-        Worker worker = (Worker) serviceImpl;
         worker.setWorkerMap( integerToWorkerMap );
     }
 

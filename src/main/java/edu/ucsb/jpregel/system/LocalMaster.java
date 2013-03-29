@@ -23,7 +23,8 @@ public class LocalMaster extends Master
     }
     
     @Override
-    public void collectWorkerGarbage() {
+    public void collectWorkerGarbage() 
+    {
         System.gc();
     }
 }

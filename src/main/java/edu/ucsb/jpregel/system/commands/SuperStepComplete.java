@@ -13,34 +13,30 @@ import edu.ucsb.jpregel.system.Master;
  *
  * @author Pete Cappello
  */
-public class SuperStepComplete implements Command
+public class SuperStepComplete implements Command<Master>
 {
-    ComputeOutput computeOutput;
-    public SuperStepComplete(){}
+    private ComputeOutput computeOutput;
+
     public SuperStepComplete( ComputeOutput computeOutput ) { this.computeOutput = computeOutput; }
 
     @Override
-    public void execute(Proxy proxy) 
-    { 
-        proxy.sendCommand( this ); 
-    }
+    public void execute(Proxy proxy) { proxy.sendCommand( this ); }
 
     @Override
-    public void execute(ServiceImpl serviceImpl) throws Exception 
+    public void execute( Master master ) throws Exception 
     {
-        Master master = (Master) serviceImpl;
         master.superStepComplete( computeOutput );
     }
 
     @Override
-    public void writeExternal(ObjectOutput oo) throws IOException
+    public void writeExternal( ObjectOutput oo ) throws IOException
     {
-        oo.writeObject(computeOutput);
+        oo.writeObject( computeOutput );
     }
 
     @Override
-    public void readExternal(ObjectInput oi) throws IOException, ClassNotFoundException
+    public void readExternal( ObjectInput oi ) throws IOException, ClassNotFoundException
     {
-        computeOutput = (ComputeOutput) oi.readObject();
+        computeOutput = ( ComputeOutput ) oi.readObject();
     }
 }
