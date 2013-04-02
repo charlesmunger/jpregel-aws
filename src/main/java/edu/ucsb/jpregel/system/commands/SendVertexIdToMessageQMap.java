@@ -20,7 +20,6 @@ public class SendVertexIdToMessageQMap implements Command<Worker>
     private Map<Object, MessageQ> vertexIdToMessageQMap;
     private Long superStep;
     
-    public SendVertexIdToMessageQMap(){}
     public SendVertexIdToMessageQMap( Service sendingWorker, Map<Object, MessageQ> vertexIdToMessageQMap, Long superStep )
     {
         this.sendingWorker = sendingWorker;
@@ -32,7 +31,7 @@ public class SendVertexIdToMessageQMap implements Command<Worker>
     public void execute( Proxy proxy ) { proxy.sendCommand( this ); }
 
     @Override
-    public void execute(Worker worker) throws Exception 
+    public void execute( Worker worker) throws Exception 
     {
         worker.receiveVertexIdToMessageQMap( sendingWorker, vertexIdToMessageQMap, superStep );
     }

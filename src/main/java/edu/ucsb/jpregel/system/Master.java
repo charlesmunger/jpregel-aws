@@ -7,6 +7,7 @@ import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import jicosfoundation.*;
 
@@ -27,10 +28,10 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     static private final Department[] departments = { ServiceImpl.ASAP_DEPARTMENT };
     static private Class[][] command2DepartmentArray = 
     {
-        {   // ASAP Commands
+        {   // ASAP Commands  
             InputFileProcessingComplete.class,
             SuperStepComplete.class,
-            WorkerCommandCompleted.class
+            MasterCommandCompleted.class
         }
     };
         
@@ -39,18 +40,16 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     protected AtomicInteger numRegisteredWorkers = new AtomicInteger();
     private volatile int numProcessorsPerWorker;
     
-    // computation control
-    protected int numUnfinishedWorkers;
-    protected boolean commandExeutionIsComplete;
-    protected boolean thereIsANextStep;
-    
-    // Worker synchronization barrier controller
-    private CountDownLatch countDownLatch;
+    // flow control attributes
+    protected int numUnfinishedWorkers; // TODO use CountDownLatch
+    protected boolean commandExeutionIsComplete; // TODO use CountDownLatch
+    private CountDownLatch countDownLatch; // Worker synchronization barrier controller
+    protected AtomicBoolean thereIsANextStep;
     
     // graph state
     protected Aggregator stepAggregator;
     protected Aggregator problemAggregator;
-    protected int numVertices;
+    protected AtomicInteger numVertices;
     
     long maxMemory = Runtime.getRuntime().maxMemory();
 
@@ -128,10 +127,11 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         problemAggregator = job.makeProblemAggregator();
         long superStep = 0;
         long startStepTime = System.currentTimeMillis(); // monitor step time
-        for ( thereIsANextStep = true; thereIsANextStep; superStep++ ) 
+        thereIsANextStep = new AtomicBoolean( true );
+        for ( ; thereIsANextStep.get(); superStep++ ) 
         {
-            thereIsANextStep = false;           // until a Worker says otherwise
-            ComputeInput computeInput = new ComputeInput( stepAggregator, problemAggregator, numVertices );
+            thereIsANextStep = new AtomicBoolean(); // false, until a Worker says otherwise
+            ComputeInput computeInput = new ComputeInput( problemAggregator, numVertices.get() );
             stepAggregator = job.makeStepAggregator(); // initialize stepAggregator
             command = new StartSuperStep( computeInput );
             barrier( command );
@@ -158,7 +158,10 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     /**
      * initialize master Job data structures
      */
-    private void initJob() { numVertices = 0; }
+    private void initJob()
+    { 
+        numVertices = new AtomicInteger(); 
+    }
     
     private long monitorStepProgress( long startStepTime, long superStep )
     {
@@ -176,20 +179,19 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     @Override
     public void shutdown(){} //Master deployment and shutdown is handled at the machine level. 
 
-
     /* _____________________________
      *  
      * Command implementations: Synchronize or explain why it is not needed!
      * _____________________________
      */    
     // Command: InputFileProcessingComplete
-    synchronized public void inputFileProcessingComplete( int workerNum, int numVertices ) 
+    public void inputFileProcessingComplete( int workerNum, int numVertices ) 
     {
-        this.numVertices += numVertices;
-        workerCommandCompleted();
+        this.numVertices.addAndGet( numVertices );
+        commandCompleted();
     }
         
-    public void workerCommandCompleted() { countDownLatch.countDown(); }
+    public void commandCompleted() { countDownLatch.countDown(); }
 
     // Command: RegisterWorker
     synchronized public int registerWorker(ServiceName serviceName, int numWorkerProcessors ) 
@@ -212,14 +214,14 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         return workerNum;
     }
 
-    // Command: SuperStepComplete
+    // Command: SuperStepComplete: Needs to be thread-safe!
     public void superStepComplete(ComputeOutput computeOutput) 
     {
-        thereIsANextStep |= computeOutput.getThereIsANextStep();
-        numVertices += computeOutput.deltaNumVertices();
+        thereIsANextStep.weakCompareAndSet( false, computeOutput.getThereIsANextStep() );
+        numVertices.addAndGet( computeOutput.deltaNumVertices() );
         stepAggregator.aggregate(computeOutput.getStepAggregator());
         problemAggregator.aggregate(computeOutput.getProblemAggregator());
-        workerCommandCompleted();
+        commandCompleted();
     }
     
     protected void collectWorkerGarbage() throws InterruptedException

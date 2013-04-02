@@ -17,71 +17,74 @@ import org.infinispan.util.concurrent.jdk8backported.ConcurrentHashMapV8;
  */
 final public class OntoMap<V> {
 
-	private static final ThreadLocal< Holder> uniqueNum = new ThreadLocal<Holder>() {
-
+	private static final ThreadLocal< Holder> uniqueNum = new ThreadLocal<Holder>() 
+        {
 		@Override
-		protected Holder initialValue() {
-			return new Holder();
-		}
+		protected Holder initialValue() { return new Holder(); }
 	};
 	private final Factory<V> factory;
 	private final ConcurrentMap<Long, Holder<V>> map;
 
-	public OntoMap(Factory<V> factory) {
-		this(100, factory);
+	public OntoMap(Factory<V> factory) { this(100, factory); }
+
+	public OntoMap( int size, Factory<V> factory ) 
+        {
+            map = new ConcurrentHashMapV8<Long, Holder<V>>( 100, 0.9f, 2 );
+            this.factory = factory;
 	}
 
-	public OntoMap(int size, Factory<V> factory) {
-		map = new ConcurrentHashMapV8<Long, Holder<V>>(100, 0.9f, 2);
-		this.factory = factory;
+	public V get( final Long key ) 
+        {
+            final Holder<V> h = uniqueNum.get();
+            final Holder<V> putIfAbsent = map.putIfAbsent(key, h);
+            if (putIfAbsent != null) 
+            {
+                return putIfAbsent.blockingGet();
+            } 
+            else 
+            {
+                final V make = factory.make();
+                h.fill(make);
+                uniqueNum.set(new Holder());
+                return make;
+            }
 	}
 
-	public V get(final Long key) {
-		final Holder<V> h = uniqueNum.get();
-		final Holder<V> putIfAbsent = map.putIfAbsent(key, h);
-		if (putIfAbsent != null) {
-			return putIfAbsent.blockingGet();
-		} else {
-			final V make = factory.make();
-			h.fill(make);
-			uniqueNum.set(new Holder());
-			return make;
-		}
+	public V remove(Long key) 
+        {
+            final Holder<V> remove = map.remove(key);
+            return remove == null ? null : remove.get();
 	}
 
-	public V remove(Long key) {
-		final Holder<V> remove = map.remove(key);
-		return remove == null ? null : remove.get();
-	}
+	private static class Holder<T> 
+        {
+            private volatile T contents = null;
 
-	private static class Holder<T> {
+            void fill(T contents) 
+            {
+                    this.contents = contents;
+                    synchronized (this) { notifyAll(); }
+            }
 
-		private volatile T contents = null;
+            T blockingGet() 
+            {
+                if ( contents == null ) 
+                {
+                    synchronized (this) 
+                    {
+                        try 
+                        {
+                            while ( contents == null ) { wait(); }
+                        } 
+                        catch ( InterruptedException ex ) 
+                        {
+                            System.out.println( "Wait interrupted in get" );
+                        }
+                    }
+                }
+                return contents;
+            }
 
-		void fill(T contents) {
-			this.contents = contents;
-			synchronized (this) {
-				notifyAll();
-			}
-		}
-
-		T blockingGet() {
-			if (contents == null) {
-				synchronized (this) {
-					try {
-						while (contents == null) {
-							wait();
-						}
-					} catch (InterruptedException ex) {
-						System.out.println("Wait interrupted in get");
-					}
-				}
-			}
-			return contents;
-		}
-
-		T get() {
-			return contents;
-		}
+            T get() { return contents; }
 	}
 }

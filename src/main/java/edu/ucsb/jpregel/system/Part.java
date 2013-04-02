@@ -3,6 +3,7 @@ package edu.ucsb.jpregel.system;
 import api.Aggregator;
 import api.Vertex;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import org.infinispan.util.concurrent.jdk8backported.ConcurrentHashMapV8;
@@ -15,24 +16,26 @@ public final class Part
 {
     private final int partId;
     private final Job job;
+    private Worker worker;
     
     private Map<Object, VertexImpl> vertexIdToVertexMap = new ConcurrentHashMapV8<Object, VertexImpl>( 8000 , 0.9f, 2);
     private OntoMap<Set<VertexImpl>> superstepToActiveSetMap = new OntoMap<Set<VertexImpl>>( new ActiveSet() );
     
     // superStep parameters
-    private ComputeThread computeThread;
     private long superStep;
+    private Map<Integer, Map<Object, MessageQ>> workerNumToVertexIdToMessageQMapMap;
     private ComputeInput computeInput;
     
     // superStep parameters modified by each vertex.compute()
-    private Aggregator outputProblemAggregator;
-    private Aggregator outputStepAggregator;
+    private Aggregator problemAggregator;
+    private Aggregator stepAggregator;
     private int numMessagesSent; 
     
-    Part( int partId, Job job )
+    Part( int partId, Job job, Worker worker )
     {
         this.partId = partId;
         this.job    = job;
+        this.worker = worker;
     }
     
     /*
@@ -53,18 +56,18 @@ public final class Part
         superstepToActiveSetMap.get( superStep ).add( vertex ); 
     }
      
-    void aggregateOutputProblemAggregator( Aggregator aggregator ) { outputProblemAggregator.aggregate(aggregator); }
+    void aggregateOutputProblemAggregator( Aggregator aggregator ) { problemAggregator.aggregate(aggregator); }
     
-    void aggregateOutputStepAggregator( Aggregator aggregator ) { outputStepAggregator.aggregate(aggregator); }
+    void aggregateOutputStepAggregator( Aggregator aggregator ) { stepAggregator.aggregate(aggregator); }
     
-    ComputeOutput doSuperStep( ComputeThread computeThread, long superStep, ComputeInput computeInput )
+    ComputeOutput doSuperStep( long superStep, ComputeInput computeInput )
     {
-        this.computeThread = computeThread;
         this.superStep = superStep;
         this.computeInput = computeInput;
+        workerNumToVertexIdToMessageQMapMap = new HashMap<Integer, Map<Object, MessageQ>>();
         numMessagesSent = 0;
-        outputStepAggregator    = job.makeStepAggregator();
-        outputProblemAggregator = job.makeProblemAggregator();
+        stepAggregator    = job.makeStepAggregator();
+        problemAggregator = job.makeProblemAggregator();
         Set<VertexImpl> activeSet = superstepToActiveSetMap.get( superStep );
         for ( VertexImpl vertex : activeSet )
         {
@@ -73,12 +76,14 @@ public final class Part
         }
         superstepToActiveSetMap.remove( superStep ); // active vertex set now is garbage
         boolean thereIsNextStep = numMessagesSent > 0;
-        return new ComputeOutput( thereIsNextStep, outputStepAggregator, outputProblemAggregator );
+        return new ComputeOutput( thereIsNextStep, workerNumToVertexIdToMessageQMapMap, stepAggregator, problemAggregator );
     }
         
     ComputeInput getComputeInput() { return computeInput; }
         
     int getPartId() { return partId; }
+    
+    Aggregator getStepAggregator() { return stepAggregator; }
     
     long getSuperStep() { return superStep; }
     
@@ -94,8 +99,9 @@ public final class Part
     {
         VertexImpl vertex = vertexIdToVertexMap.get( vertexId );
         assert vertex != null : vertexId;
-        if(vertex == null) {
-            System.out.println("VertexID null: "+vertexId);
+        if ( vertex == null ) 
+        {
+            System.out.println( "VertexID null: " + vertexId );
         }
         vertex.receiveMessage( message, superStep );
         addToActiveSet( superStep, vertex );
@@ -116,20 +122,48 @@ public final class Part
     void removeVertex( Object vertexId )
     {
         vertexIdToVertexMap.remove( vertexId );
-        computeThread.removeVertex();
+        worker.removeVertex();
     }
     
-    void sendMessage( Object vertexId, Message message, long superStep )
+    void sendMessage( Object receivingVertexId, Message message, long superStep )
     {
         numMessagesSent++;
-        int receivingPartId = job.getPartId( vertexId );
-        if ( receivingPartId == this.partId )
+        int receivingPartId = job.getPartId( receivingVertexId );
+        if ( receivingPartId == partId )
         {
-            receiveMessage( vertexId, message, superStep );
+            // message is for vertex in this Part
+            receiveMessage( receivingVertexId, message, superStep );
+            return;
         }
-        else
+        
+        // message is for a vertex in another part
+        Part receivingPart = worker.getPart( receivingPartId );
+        if ( receivingPart != null )
         {
-            computeThread.sendMessage( receivingPartId, vertexId, message, superStep );
+            // receivingPart is internal to this Worker
+            receivingPart.receiveMessage( receivingVertexId, message, superStep );
+            return;
         }
+        
+        // receivingPart is external to this Worker
+        int workerNum = worker.getWorkerNum( receivingPartId );
+        assert workerNum != worker.getWorkerNum();
+        
+        //     get vertexIdToMessageQMap for destination Worker
+        Map<Object, MessageQ> vertexIdToMessageQMap = workerNumToVertexIdToMessageQMapMap.get( workerNum );
+        if ( vertexIdToMessageQMap == null )
+        {
+            vertexIdToMessageQMap = new HashMap<Object, MessageQ>();
+            workerNumToVertexIdToMessageQMapMap.put( workerNum, vertexIdToMessageQMap );
+        }
+
+        //     get receivingVertex's MessageQ
+        MessageQ receivingVertexMessageQ = vertexIdToMessageQMap.get( receivingVertexId );
+        if ( receivingVertexMessageQ == null )
+        {
+            receivingVertexMessageQ = new MessageQ( job.getVertexFactory().getCombiner() );
+            vertexIdToMessageQMap.put( receivingVertexId, receivingVertexMessageQ );
+        }
+        receivingVertexMessageQ.add( message );
     }
 }

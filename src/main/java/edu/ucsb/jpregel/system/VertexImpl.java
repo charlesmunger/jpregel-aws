@@ -114,7 +114,7 @@ implements Vertex<VertexIdType, VertexValueType, EdgeValueType, MessageValueType
     public Map<VertexIdType, EdgeValueType> getEdgeMap() { return edgeMap; }
     
     @Override
-    public Aggregator getInputStepAggregator()    { return part.getComputeInput().getStepAggregator();    }
+    public Aggregator getInputStepAggregator()    { return part.getStepAggregator();    }
     
     @Override
     public Aggregator getInputProblemAggregator() { return part.getComputeInput().getProblemAggregator(); }
@@ -219,7 +219,5 @@ implements Vertex<VertexIdType, VertexValueType, EdgeValueType, MessageValueType
     
     void setNumVertices( int numV ) { numVertices = numV; }
 
-    public Factory<MessageQ> getMessageQType() {
-        return MESSAGE_Q_COMBINER;
-    }
+    protected Factory<MessageQ> getMessageQType() { return MESSAGE_Q_COMBINER; }
 }

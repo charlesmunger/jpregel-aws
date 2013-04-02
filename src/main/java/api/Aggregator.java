@@ -1,7 +1,7 @@
 package api;
 
 /**
- *
+ * Implementation must be thread-safe.
  * @author Pete Cappello
  */
 abstract public class Aggregator<ElementType> implements java.io.Serializable

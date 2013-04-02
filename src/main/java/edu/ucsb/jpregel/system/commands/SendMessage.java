@@ -13,7 +13,7 @@ import edu.ucsb.jpregel.system.Worker;
  *
  * @author cappello
  */
-public class SendMessage implements Command
+public class SendMessage implements Command<Worker>
 {
     private int sendingWorkerNum;
     private int partId;
@@ -21,7 +21,6 @@ public class SendMessage implements Command
     private Message message;
     private long superStep;
     
-    public SendMessage(){}
     public SendMessage( int sendingWorkerNum, int partId, Object vertexId, Message message, Long superStep )
     {
         this.sendingWorkerNum = sendingWorkerNum;
@@ -35,9 +34,8 @@ public class SendMessage implements Command
     public void execute( Proxy proxy ) { proxy.sendCommand( this ); }
 
     @Override
-    public void execute( ServiceImpl serviceImpl ) throws Exception 
+    public void execute( Worker worker ) throws Exception 
     {
-        Worker worker = (Worker) serviceImpl;
         worker.receiveMessage( sendingWorkerNum, partId, vertexId, message, superStep );
     }
 
@@ -46,7 +44,6 @@ public class SendMessage implements Command
     {
         oo.writeInt(sendingWorkerNum);
         oo.writeInt(partId);
-//        oo.writeInt(vertexId);
         oo.writeObject(vertexId);
         oo.writeObject(message);
         oo.writeLong(superStep);
@@ -63,7 +60,8 @@ public class SendMessage implements Command
     }
     
     @Override
-    public String toString() {
-        return sendingWorkerNum+" "+partId+" "+vertexId+" message: ({"+message+"} "+superStep;
+    public String toString() 
+    {
+        return sendingWorkerNum + " " + partId + " " + vertexId + " message: ({" + message + "} " +superStep;
     }
 }

@@ -1,23 +1,30 @@
 package edu.ucsb.jpregel.system;
 
 import api.Aggregator;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- *
+ * Aggregates sum of AtomicInteger objects.
+ * Thread-safe.
  * @author Pete Cappello
  */
-public class AggregatorSumInteger extends Aggregator<Integer>
+public class AggregatorSumInteger extends Aggregator<AtomicInteger>
 {
-    private static final Integer ZERO = new Integer( 0 );
+    private static final AtomicInteger ZERO = new AtomicInteger();
+    
     public AggregatorSumInteger() { super(); }
     
-    public AggregatorSumInteger( Integer integer ) { super( integer ); }
+    public AggregatorSumInteger( AtomicInteger atomicInteger ) { super( atomicInteger ); }
     
     @Override
-    public void aggregate( Aggregator<Integer> aggregator ) { this.element += aggregator.get(); }
+    public void aggregate( Aggregator<AtomicInteger> aggregator )
+    {
+        // 1st get returns AtomicInteger; 2nd get returns its int value
+        element.addAndGet( aggregator.get().get() );
+    }
     
     @Override
-    public Integer identityElement() { return ZERO; }
+    public AtomicInteger identityElement() { return ZERO; }
     
     @Override
     public Aggregator make() { return new AggregatorSumInteger(); }

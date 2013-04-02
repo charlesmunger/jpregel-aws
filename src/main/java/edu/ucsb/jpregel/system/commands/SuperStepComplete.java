@@ -5,7 +5,6 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import jicosfoundation.Command;
 import jicosfoundation.Proxy;
-import jicosfoundation.ServiceImpl;
 import edu.ucsb.jpregel.system.ComputeOutput;
 import edu.ucsb.jpregel.system.Master;
 

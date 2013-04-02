@@ -1,19 +1,19 @@
 package edu.ucsb.jpregel.system.commands;
 
-import edu.ucsb.jpregel.system.Master;
 import edu.ucsb.jpregel.system.NoFieldCommand;
+import edu.ucsb.jpregel.system.Worker;
 import jicosfoundation.Proxy;
 
 /**
  * Acknowledge completion of Worker command.
- * @author Pete Cappello
+ * @author cappello
  */
-public class WorkerCommandCompleted extends NoFieldCommand<Master>
+public class WorkerCommandCompleted extends NoFieldCommand<Worker>
 {
     public void execute( Proxy proxy ) { proxy.sendCommand( this ); }
 
-    public void execute( Master master ) throws Exception
+    public void execute( Worker worker ) throws Exception
     {
-        master.workerCommandCompleted();
+        worker.workerCommandCompleted();
     }
 }

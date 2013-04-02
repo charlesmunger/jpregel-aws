@@ -7,7 +7,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2:exec</goal>
             </goals>
             <properties>
-                <exec.args>-server -verbosegc -Xms2g -Xmx2g -XX:+UseConcMarkSweepGC -XX:+AggressiveOpts -XX:+UseFastAccessorMethods -XX:+UseCompressedStrings -classpath %classpath clients.SsspBinaryTree examples/SsspBinaryTreeLocal 4</exec.args>
+                <exec.args>-server -verbosegc -Xms2g -Xmx2g -XX:+UseConcMarkSweepGC -XX:+AggressiveOpts -XX:+UseFastAccessorMethods -XX:+UseCompressedStrings -classpath %classpath clients.SsspBinaryTree examples/SsspBinaryTreeLocal 8</exec.args>
                 <exec.executable>java</exec.executable>
                 <exec.classpathScope>runtime</exec.classpathScope>
                 <exec.workingdir></exec.workingdir>
@@ -20,7 +20,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2:exec</goal>
             </goals>
             <properties>
-                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -server -verbosegc -Xms2g -Xmx2g -XX:+UseConcMarkSweepGC -XX:+AggressiveOpts -XX:+UseFastAccessorMethods -XX:+UseCompressedStrings -classpath %classpath clients.SsspBinaryTree examples/SsspBinaryTreeLocal 4</exec.args>
+                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -server -verbosegc -Xms2g -Xmx2g -XX:+UseConcMarkSweepGC -XX:+AggressiveOpts -XX:+UseFastAccessorMethods -XX:+UseCompressedStrings -classpath %classpath clients.SsspBinaryTree examples/SsspBinaryTreeLocal 8</exec.args>
                 <exec.executable>java</exec.executable>
                 <exec.classpathScope>runtime</exec.classpathScope>
                 <jpda.listen>true</jpda.listen>
@@ -34,7 +34,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2:exec</goal>
             </goals>
             <properties>
-                <exec.args>${profiler.args} -server -verbosegc -Xms2g -Xmx2g -XX:+UseConcMarkSweepGC -XX:+AggressiveOpts -XX:+UseFastAccessorMethods -XX:+UseCompressedStrings -classpath %classpath clients.SsspBinaryTree examples/SsspBinaryTreeLocal 4</exec.args>
+                <exec.args>${profiler.args} -server -verbosegc -Xms2g -Xmx2g -XX:+UseConcMarkSweepGC -XX:+AggressiveOpts -XX:+UseFastAccessorMethods -XX:+UseCompressedStrings -classpath %classpath clients.SsspBinaryTree examples/SsspBinaryTreeLocal 8</exec.args>
                 <exec.executable>${profiler.java}</exec.executable>
                 <exec.workingdir></exec.workingdir>
             </properties>
