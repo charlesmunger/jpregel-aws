@@ -74,7 +74,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
 
     public Master() throws RemoteException { super(command2DepartmentArray);
 		try {
-			Runtime.getRuntime().exec("java -jar "+CloudMachineGroup.JARNAME+" com.simontuffs.onejar.Boot");
+			Runtime.getRuntime().exec("java -cp "+CloudMachineGroup.JARNAME+" com.simontuffs.onejar.Boot");
 		} catch (IOException ex) {
 			System.out.println("Error staring pheme");
 		}
