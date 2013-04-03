@@ -17,7 +17,7 @@ import vertices.VertexShortestPathBinaryTree;
  */
 public class BinaryTreeShortestPathLocalClient 
 {  
-    /**
+    /**;
      * @param args [0]: Job directory name
      */
     public static void main( String[] args ) throws Exception
@@ -36,6 +36,6 @@ public class BinaryTreeShortestPathLocalClient
         ClientToMaster master = LocalReservationService.newCluster(numWorkers);
         System.out.println(master.run(job));
         
-        System.exit( 0 );
+//        System.exit( 0 );
     }
 }

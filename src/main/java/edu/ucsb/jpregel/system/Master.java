@@ -1,12 +1,17 @@
 package edu.ucsb.jpregel.system;
 
 import api.Aggregator;
+import api.MachineGroup;
+import edu.ucsb.jpregel.clouds.CloudMachineGroup;
 import edu.ucsb.jpregel.system.commands.*;
+import java.io.IOException;
 import static java.lang.System.out;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import jicosfoundation.*;
 
 /**
@@ -67,7 +72,13 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     protected Aggregator problemAggregator;
     protected int numVertices;
 
-    public Master() throws RemoteException { super(command2DepartmentArray); } // set Master as a Jicos Service
+    public Master() throws RemoteException { super(command2DepartmentArray);
+		try {
+			Runtime.getRuntime().exec("java -jar "+CloudMachineGroup.JARNAME+" com.simontuffs.onejar.Boot");
+		} catch (IOException ex) {
+			System.out.println("Error staring pheme");
+		}
+    } // set Master as a Jicos Service
 
     @Override
     public synchronized void init(int numWorkers) throws RemoteException, InterruptedException 

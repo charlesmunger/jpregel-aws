@@ -102,5 +102,10 @@
             <version>1.6.0-rc.1</version>
             <type>jar</type>
         </dependency>
+        <dependency>
+            <groupId>com.blopker.pheme</groupId>
+            <artifactId>pheme</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 </project>
