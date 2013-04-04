@@ -16,6 +16,8 @@ public class SuperStepComplete implements Command<Master>
 {
     private ComputeOutput computeOutput;
 
+    public SuperStepComplete() {}
+    
     public SuperStepComplete( ComputeOutput computeOutput ) { this.computeOutput = computeOutput; }
 
     @Override

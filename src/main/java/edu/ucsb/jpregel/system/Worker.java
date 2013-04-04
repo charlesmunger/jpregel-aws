@@ -47,6 +47,7 @@ public abstract class Worker extends ServiceImpl
             AddVertexToWorker.class,
             AddVertexToPartComplete.class,
             CollectGarbage.class,
+            DoNextSuperStep.class,
             MasterCommandCompleted.class,
             ReadWorkerInputFile.class,
             SendMessage.class,
@@ -54,7 +55,6 @@ public abstract class Worker extends ServiceImpl
             SetJob.class,
             SetWorkerMap.class,
             ShutdownWorker.class,
-            StartSuperStep.class,
             WorkerCommandCompleted.class,
             WriteWorkerOutputFile.class,
         } 
@@ -336,7 +336,7 @@ public abstract class Worker extends ServiceImpl
         System.exit( 0 );
     }
     
-    // Command: StartSuperStep
+    // Command: DoNextSuperStep
     public void startSuperStep( ComputeInput computeInput ) throws InterruptedException
     {
         // super step initialization

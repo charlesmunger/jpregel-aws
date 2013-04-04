@@ -20,6 +20,9 @@ public class SendVertexIdToMessageQMap implements Command<Worker>
     private Map<Object, MessageQ> vertexIdToMessageQMap;
     private Long superStep;
     
+    public SendVertexIdToMessageQMap() {}
+    
+    
     public SendVertexIdToMessageQMap( Service sendingWorker, Map<Object, MessageQ> vertexIdToMessageQMap, Long superStep )
     {
         this.sendingWorker = sendingWorker;

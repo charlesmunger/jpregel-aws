@@ -17,6 +17,8 @@ public class SetWorkerMap implements Command<Worker>
 {
     private Map<Integer, Service> integerToWorkerMap;
     
+    public SetWorkerMap() {}
+    
     public SetWorkerMap( Map<Integer, Service> integerToWorkerMap )
     { 
         this.integerToWorkerMap = integerToWorkerMap;

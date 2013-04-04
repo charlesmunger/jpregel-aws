@@ -12,6 +12,8 @@ import jicosfoundation.ServiceImpl;
  */
 public abstract class NoFieldCommand<S extends ServiceImpl> implements Command<S>
 {
+    public NoFieldCommand() {}
+    
     @Override
     public void writeExternal(ObjectOutput oo) throws IOException{}
 

@@ -16,7 +16,8 @@ public class InputFileProcessingComplete implements Command<Master>
     private int workerNum;
     private int numVertices;
     
-//    public InputFileProcessingComplete(){}
+    public InputFileProcessingComplete(){}
+    
     public InputFileProcessingComplete( int workerNum, int numVertices )
     { 
         this.workerNum = workerNum;

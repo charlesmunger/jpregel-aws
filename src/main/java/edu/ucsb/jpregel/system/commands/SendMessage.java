@@ -21,6 +21,8 @@ public class SendMessage implements Command<Worker>
     private Message message;
     private long superStep;
     
+    public SendMessage() {}
+    
     public SendMessage( int sendingWorkerNum, int partId, Object vertexId, Message message, Long superStep )
     {
         this.sendingWorkerNum = sendingWorkerNum;

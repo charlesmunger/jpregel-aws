@@ -10,6 +10,8 @@ import edu.ucsb.jpregel.system.Worker;
  */
 public class CollectGarbage extends NoFieldCommand<Worker>
 {
+    public CollectGarbage() {}
+    
     @Override
     public void execute(Proxy proxy) { proxy.sendCommand( this ); }
 

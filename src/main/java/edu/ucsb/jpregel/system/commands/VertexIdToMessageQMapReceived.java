@@ -13,6 +13,8 @@ import edu.ucsb.jpregel.system.Worker;
  */
 public class VertexIdToMessageQMapReceived implements Command<Worker>
 {
+    public VertexIdToMessageQMapReceived() {}
+    
     @Override
     public void execute(Proxy proxy) { proxy.sendCommand( this ); }
 

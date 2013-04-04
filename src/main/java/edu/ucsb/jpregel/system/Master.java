@@ -19,6 +19,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
 {
     // constants
     public static final RemoteExceptionHandler REMOTE_EXCEPTION_HANDLER = new DefaultRemoteExceptionHandler();
+    private static final int NUM_STEPS_PER_MEASUREMENT = 1;
     
     // ServiceImpl attributes
     final static public String SERVICE_NAME = "Master";
@@ -57,14 +58,14 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     public Master() throws RemoteException { super( command2DepartmentArray ); }
 
     @Override
-    public synchronized void init(int numWorkers) throws RemoteException, InterruptedException 
+    public synchronized void init( int numWorkers ) throws RemoteException, InterruptedException 
     {
         super.setService(this);
         super.setDepartments(departments);
         
         // Ensure that registrations are not lost before barrier is set to numWorkers
         numUnfinishedWorkers += numWorkers;
-        if (numUnfinishedWorkers > 0 && ! commandExeutionIsComplete) 
+        if ( numUnfinishedWorkers > 0 && ! commandExeutionIsComplete ) 
         {
             wait(); // until numUnfinishedWorkers == 0
         }
@@ -92,10 +93,10 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     @Override
     public JobRunData run( Job job ) throws InterruptedException
     {  
-        // all Workers have registered with Master
+        // assert that all Workers are registered with Master
         assert integerToWorkerMap.size() == numRegisteredWorkers.get();
         
-        // initialize job statistics gathering
+        // initialize job statistics
         job = new Job( job, numRegisteredWorkers.get() * numProcessorsPerWorker * NUM_PARTS_PER_PROCESSOR );
         JobRunData jobRunData = new JobRunData(job, integerToWorkerMap.size());
         initJob();
@@ -104,10 +105,9 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         
         // broadcaast to workers: set Job & FileSystem
         countDownLatch = new CountDownLatch( integerToWorkerMap.size() );
-        Command command = new SetJob( job );
-        broadcast(command, this);
+        broadcast( new SetJob( job ), this );
 
-        // while workers SetJob, read Master input file, write Worker input files
+        // while workers SetJob: read Master input file, write Worker input files
         job.readJobInputFile(fileSystem, integerToWorkerMap.size() );
           
         // wait for all workers to complete SetJob command
@@ -115,8 +115,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         jobRunData.setEndTimeSetWorkerJobAndMakeWorkerFiles();
 
         // broadcaast to workers: read your input file
-        command = new ReadWorkerInputFile();
-        barrier( command );
+        barrier( new ReadWorkerInputFile() );
         jobRunData.setEndTimeReadWorkerInputFile();
         
         // broadcaast to workers: Collect your garbage
@@ -130,23 +129,21 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         thereIsANextStep = new AtomicBoolean( true );
         for ( ; thereIsANextStep.get(); superStep++ ) 
         {
+            // super step initialization
             thereIsANextStep = new AtomicBoolean(); // false, until a Worker says otherwise
             ComputeInput computeInput = new ComputeInput( problemAggregator, numVertices.get() );
             stepAggregator = job.makeStepAggregator(); // initialize stepAggregator
-            command = new StartSuperStep( computeInput );
-            barrier( command );
-            if (superStep % 1 == 0) 
-            {
-                startStepTime = monitorStepProgress( startStepTime, superStep );
-            }
+            
+            // broadcast to workers: do next super step
+            barrier( new DoNextSuperStep( computeInput ) );
+            startStepTime = monitorStepProgress( startStepTime, superStep );
         }
         jobRunData.setEndTimeComputation();
         jobRunData.setNumSuperSteps( superStep );
 
         // broadcaast to workers: write your output file
         System.out.println("Master.run: writing worker output files.");
-        command = new WriteWorkerOutputFile();
-        barrier( command );
+        barrier( new WriteWorkerOutputFile() );
         jobRunData.setEndTimeWriteWorkerOutputFiles();
 
         job.processWorkerOutputFiles(fileSystem, integerToWorkerMap.size());
@@ -158,13 +155,14 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     /**
      * initialize master Job data structures
      */
-    private void initJob()
-    { 
-        numVertices = new AtomicInteger(); 
-    }
+    private void initJob() { numVertices = new AtomicInteger(); }
     
     private long monitorStepProgress( long startStepTime, long superStep )
     {
+        if ( superStep % NUM_STEPS_PER_MEASUREMENT != 0 )
+        {
+            return startStepTime;
+        }
         long endStepTime = System.currentTimeMillis();
         long elapsedTime = endStepTime - startStepTime;
         long freeMemory = Runtime.getRuntime().freeMemory();
@@ -214,7 +212,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         return workerNum;
     }
 
-    // Command: SuperStepComplete: Needs to be thread-safe!
+    // Command: SuperStepComplete: Must be thread-safe!
     public void superStepComplete(ComputeOutput computeOutput) 
     {
         thereIsANextStep.weakCompareAndSet( false, computeOutput.getThereIsANextStep() );
@@ -226,8 +224,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     
     protected void collectWorkerGarbage() throws InterruptedException
     {
-        Command command = new CollectGarbage();
-        barrier( command );
+        barrier( new CollectGarbage() );
     }
     
     private void barrier( Command command ) throws InterruptedException
@@ -239,7 +236,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         
     synchronized private void processAcknowledgement() 
     {
-        if (--numUnfinishedWorkers == 0) 
+        if ( --numUnfinishedWorkers == 0 ) 
         {
             commandExeutionIsComplete = true;
             notify();

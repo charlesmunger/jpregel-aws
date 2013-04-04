@@ -16,6 +16,8 @@ public class SetJob implements Command<Worker>
 {
     private Job workerJob;
     
+    public SetJob() {}
+    
     public SetJob( Job workerJob)
     {
         this.workerJob = workerJob;

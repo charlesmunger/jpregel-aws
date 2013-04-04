@@ -11,13 +11,15 @@ import java.util.concurrent.Future;
  *
  * @author charlesmunger
  */
-public abstract class ReservationServiceImpl implements ReservationService {
+public abstract class ReservationServiceImpl implements ReservationService 
+{
     private ExecutorService exec = Executors.newCachedThreadPool();
+    
     @Override
     public Future<MachineGroup<Worker>> reserveWorkers(final String instanceType, final int numberOfWorkers)
     {
-        return exec.submit(new Callable<MachineGroup<Worker>> () {
-
+        return exec.submit(new Callable<MachineGroup<Worker>> () 
+        {
             @Override
             public MachineGroup<Worker> call() throws Exception
             {
@@ -29,8 +31,8 @@ public abstract class ReservationServiceImpl implements ReservationService {
     @Override
     public Future<MachineGroup<ClientToMaster>> reserveMaster(final String instanceType)
     {
-        return exec.submit(new Callable<MachineGroup<ClientToMaster>> () {
-
+        return exec.submit(new Callable<MachineGroup<ClientToMaster>> () 
+        {
             @Override
             public MachineGroup<ClientToMaster> call() throws Exception
             {
@@ -40,5 +42,6 @@ public abstract class ReservationServiceImpl implements ReservationService {
     }
 
     public abstract MachineGroup<Worker>callWorker(String instanceType, int numberOfWorkers);
+    
     public abstract MachineGroup<ClientToMaster>callMaster(String instanceType);
 }
