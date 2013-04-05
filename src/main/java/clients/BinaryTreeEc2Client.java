@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package clients;
 
 import api.MachineGroup;
@@ -19,12 +15,17 @@ import org.jclouds.ec2.domain.InstanceType;
 import vertices.VertexShortestPathBinaryTree;
 
 /**
- *
+ * Problem: SSSP; Graph family: binary tree; Cloud: AWS.
+ * @param args [0] directory name on S3
+ *             [1] numbers of worker machines
+ *             [2] access key
+ *             [3] secret key
  * @author Charles
  */
-public class BinaryTreeEc2Client {
-
-    public static void main(String[] args) throws Exception {
+public class BinaryTreeEc2Client
+{
+    public static void main( String[] args ) throws Exception 
+    {
         int numWorkers = Integer.parseInt(args[1]);
         final AWSModule awsModule = new AWSModule(args[2], args[3]);
         new ObjectOutputStream(new FileOutputStream(new File(CloudMachineGroup.CREDENTIALS_MODULE))).writeObject(awsModule);
@@ -37,7 +38,7 @@ public class BinaryTreeEc2Client {
         final ClientToMaster rMaster = master.get();
 
         Job job3 = new Job("Binary Tree Shortest Path", // jobName
-                args[0], // jobDirectoryName
+                args[0], 
                 new VertexShortestPathBinaryTree(), // vertexFactory
                 new MasterGraphMakerBinaryTree(),
                 new WorkerGraphMakerBinaryTree(),

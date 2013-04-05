@@ -11,7 +11,10 @@ Without this configuration present, some functionality in the IDE may be limited
             <configuration id="BinaryTreeLocal" profiles=""/>
             <configuration id="LANMaster" profiles=""/>
             <configuration id="LANWorker" profiles=""/>
+            <configuration id="SsspBinaryTreeAWS" profiles=""/>
+            <configuration id="SsspBinaryTreeCloud" profiles=""/>
             <configuration id="SsspBinaryTreeLocal" profiles=""/>
+            <configuration id="SsspBinaryTreeLan" profiles=""/>
         </configurations>
     </config-data>
 </project-shared-configuration>
