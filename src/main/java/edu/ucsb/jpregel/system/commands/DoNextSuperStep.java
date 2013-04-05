@@ -26,7 +26,7 @@ public class DoNextSuperStep implements Command<Worker>
     @Override
     public void execute( Worker worker  ) throws Exception 
     {
-        worker.startSuperStep( computeInput );
+        worker.doNextSuperStep( computeInput );
     } 
     
     @Override

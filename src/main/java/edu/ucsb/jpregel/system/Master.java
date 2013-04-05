@@ -189,8 +189,6 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         commandCompleted();
     }
         
-    public void commandCompleted() { countDownLatch.countDown(); }
-
     // Command: RegisterWorker
     synchronized public int registerWorker(ServiceName serviceName, int numWorkerProcessors ) 
     {
@@ -221,6 +219,9 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         problemAggregator.aggregate(computeOutput.getProblemAggregator());
         commandCompleted();
     }
+    
+    // Command: MasterCommandCompleted
+    public void commandCompleted() { countDownLatch.countDown(); }
     
     protected void collectWorkerGarbage() throws InterruptedException
     {
