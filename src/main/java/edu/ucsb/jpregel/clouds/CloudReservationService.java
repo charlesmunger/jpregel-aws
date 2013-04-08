@@ -6,6 +6,7 @@ package edu.ucsb.jpregel.clouds;
 
 import api.MachineGroup;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.google.inject.Module;
 import com.google.inject.name.Named;
@@ -13,11 +14,13 @@ import edu.ucsb.jpregel.system.ClientToMaster;
 import edu.ucsb.jpregel.system.ReservationServiceImpl;
 import edu.ucsb.jpregel.system.Worker;
 import java.io.File;
+import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.jclouds.ContextBuilder;
+import org.jclouds.apis.ApiMetadata;
 import org.jclouds.aws.ec2.reference.AWSEC2Constants;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
@@ -40,15 +43,19 @@ public class CloudReservationService extends ReservationServiceImpl {
     private final ComputeService context;
     public static final String SECURITY_GROUP = "jpregelgroup";
     private final String username = System.getProperty("user.name");
+    private final ApiMetadata storage;
 
     @Inject
     public CloudReservationService(
             @Named("compute") String compute,
             @Named("cUser") String cUser,
-            @Named("cPass") String cPass) {
+            @Named("cPass") String cPass,
+            @Named("storage") ApiMetadata ap) {
+        this.storage = ap;
         Properties properties = new Properties();
         properties.setProperty(AWSEC2Constants.PROPERTY_EC2_AMI_QUERY, "owner-id=137112412989;state=available;image-type=machine");
-        properties.setProperty(AWSEC2Constants.PROPERTY_EC2_CC_AMI_QUERY, "");
+        properties.setProperty(AWSEC2Constants.PROPERTY_EC2_CC_AMI_QUERY, "owner-id=137112412989;state=available;image-type=machine");
+        properties.setProperty(AWSEC2Constants.PROPERTY_EC2_GENERATE_INSTANCE_NAMES, "false");
         Iterable<Module> modules = ImmutableSet.<Module>of(new SLF4JLoggingModule(), new SshjSshClientModule());
         context = ContextBuilder.newBuilder(compute)
                 .credentials(cUser, cPass)
@@ -63,7 +70,7 @@ public class CloudReservationService extends ReservationServiceImpl {
     public MachineGroup<Worker> callWorker(String instanceType, int numberOfWorkers) {
         try {
             Set<? extends NodeMetadata> reserveNodes = reserveNodes(instanceType, numberOfWorkers);
-            return new CloudWorkerMachineGroup(reserveNodes, context);
+            return new CloudWorkerMachineGroup(reserveNodes, context, storage);
         } catch (RunNodesException ex) {
             Logger.getLogger(CloudReservationService.class.getName()).log(Level.SEVERE, null, ex);
             return null;
@@ -74,15 +81,33 @@ public class CloudReservationService extends ReservationServiceImpl {
     public MachineGroup<ClientToMaster> callMaster(String instanceType) {
         try {
             Set<? extends NodeMetadata> createNodesInGroup = reserveNodes(instanceType, 1);
-            return new CloudMasterMachineGroup(createNodesInGroup, context);
+            return new CloudMasterMachineGroup(createNodesInGroup, context, storage);
         } catch (RunNodesException ex) {
             Logger.getLogger(CloudReservationService.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
     }
 
+    @Override
+    public MachineGroup[] callBoth(String instanceType, int numberOfWorkers) {
+        MachineGroup[] m = new MachineGroup[2];
+
+        try {
+            Set<? extends NodeMetadata> reserveNodes = reserveNodes(instanceType, numberOfWorkers + 1);
+            ImmutableSet<NodeMetadata> master = ImmutableSet.of(Iterables.getFirst(reserveNodes, null));
+            Iterator i = reserveNodes.iterator();
+            i.next();
+            ImmutableSet copyOf = ImmutableSet.copyOf(i);
+            m[0] = new CloudMasterMachineGroup(master, context, storage);
+            m[1] = new CloudWorkerMachineGroup(copyOf, context, storage);
+        } catch (RunNodesException ex) {
+            Logger.getLogger(CloudReservationService.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return m;
+    }
+
     private Set<? extends NodeMetadata> reserveNodes(String instanceType, int count) throws RunNodesException {
-        System.out.printf(">> adding nodes to group %s %n", SECURITY_GROUP,count);
+        System.out.printf(">> adding nodes to group %s %n", SECURITY_GROUP, count);
         TemplateBuilder templateBuilder = context.templateBuilder();
         Statement bootInstructions = AdminAccess.builder()
                 .adminPublicKey(new File("key.pub"))

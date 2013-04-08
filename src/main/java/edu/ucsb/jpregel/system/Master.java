@@ -1,7 +1,10 @@
 package edu.ucsb.jpregel.system;
 
 import api.Aggregator;
+import api.MachineGroup;
+import edu.ucsb.jpregel.clouds.CloudMachineGroup;
 import edu.ucsb.jpregel.system.commands.*;
+import java.io.IOException;
 import static java.lang.System.out;
 import java.rmi.RemoteException;
 import java.util.HashMap;
@@ -9,6 +12,8 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import jicosfoundation.*;
 
 /**
@@ -93,7 +98,8 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     @Override
     public JobRunData run( Job job ) throws InterruptedException
     {  
-        // assert that all Workers are registered with Master
+        try{
+        // all Workers have registered with Master
         assert integerToWorkerMap.size() == numRegisteredWorkers.get();
         
         // initialize job statistics
@@ -143,6 +149,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
 
         // broadcaast to workers: write your output file
         System.out.println("Master.run: writing worker output files.");
+        System.out.println(jobRunData);
         barrier( new WriteWorkerOutputFile() );
         jobRunData.setEndTimeWriteWorkerOutputFiles();
 
@@ -150,6 +157,11 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         jobRunData.setEndTimeRun();
         
         return jobRunData;
+        } catch(RuntimeException r) {
+            System.out.println(r.getLocalizedMessage());
+            r.printStackTrace(System.out);
+        }
+        return null;
     }
     
     /**

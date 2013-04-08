@@ -16,6 +16,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Set;
+import org.jclouds.apis.ApiMetadata;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.domain.NodeMetadata;
 
@@ -35,8 +36,8 @@ class CloudMasterMachineGroup extends CloudMachineGroup<ClientToMaster> {
         System.out.println("Master ready");
     }
 
-    public CloudMasterMachineGroup(Set<? extends NodeMetadata> nodes, ComputeService cs) {
-        super(nodes, cs);
+    public CloudMasterMachineGroup(Set<? extends NodeMetadata> nodes, ComputeService cs, ApiMetadata ap) {
+        super(nodes, cs, ap);
     }
     
     @Override
