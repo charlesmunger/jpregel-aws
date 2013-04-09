@@ -98,7 +98,8 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     @Override
     public JobRunData run( Job job ) throws InterruptedException
     {  
-        try{
+        try
+        {
         // all Workers have registered with Master
         assert integerToWorkerMap.size() == numRegisteredWorkers.get();
         
@@ -149,7 +150,6 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
 
         // broadcaast to workers: write your output file
         System.out.println("Master.run: writing worker output files.");
-        System.out.println(jobRunData);
         barrier( new WriteWorkerOutputFile() );
         jobRunData.setEndTimeWriteWorkerOutputFiles();
 
@@ -157,7 +157,9 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         jobRunData.setEndTimeRun();
         
         return jobRunData;
-        } catch(RuntimeException r) {
+        } 
+        catch(RuntimeException r) 
+        {
             System.out.println(r.getLocalizedMessage());
             r.printStackTrace(System.out);
         }
