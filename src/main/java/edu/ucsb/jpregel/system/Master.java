@@ -1,10 +1,7 @@
 package edu.ucsb.jpregel.system;
 
 import api.Aggregator;
-import api.MachineGroup;
-import edu.ucsb.jpregel.clouds.CloudMachineGroup;
 import edu.ucsb.jpregel.system.commands.*;
-import java.io.IOException;
 import static java.lang.System.out;
 import java.rmi.RemoteException;
 import java.util.HashMap;
@@ -12,8 +9,6 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import jicosfoundation.*;
 
 /**
@@ -49,7 +44,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     // flow control attributes
     protected int numUnfinishedWorkers; // TODO use CountDownLatch
     protected boolean commandExeutionIsComplete; // TODO use CountDownLatch
-    private CountDownLatch countDownLatch; // Worker synchronization barrier controller
+    private CountDownLatch countDownLatch; // Worker synchronization doWorkerPhase controller
     protected AtomicBoolean thereIsANextStep;
     
     // graph state
@@ -57,7 +52,11 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     protected Aggregator problemAggregator;
     protected AtomicInteger numVertices;
     
-    long maxMemory = Runtime.getRuntime().maxMemory();
+    private long maxMemory = Runtime.getRuntime().maxMemory();
+    
+    // job attributes
+    private Job job;
+    private JobRunData jobRunData;
 
     // set Master as a Jicos Service
     public Master() throws RemoteException { super( command2DepartmentArray ); }
@@ -68,7 +67,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         super.setService(this);
         super.setDepartments(departments);
         
-        // Ensure that registrations are not lost before barrier is set to numWorkers
+        // Ensure that registrations are not lost before numUnfinishedWorkers is set to numWorkers
         numUnfinishedWorkers += numWorkers;
         if ( numUnfinishedWorkers > 0 && ! commandExeutionIsComplete ) 
         {
@@ -81,8 +80,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     public synchronized void setWorkerMap() throws InterruptedException 
     {
         // broadcaast to workers: set your integerToWorkerMap
-        Command command = new SetWorkerMap( integerToWorkerMap );
-        barrier( command );
+        doWorkerStep( new SetWorkerMap( integerToWorkerMap ) );
     }
 
     @Override
@@ -93,43 +91,38 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     }
 
     /*
-     * @param Job   - problem and instance parameters
+     * @param clientJob - problem & instance parameters
      */
     @Override
-    public JobRunData run( Job job ) throws InterruptedException
+    public JobRunData run( Job clientJob ) throws InterruptedException
     {  
         try
         {
         // all Workers have registered with Master
         assert integerToWorkerMap.size() == numRegisteredWorkers.get();
         
-        // initialize job statistics
-        job = new Job( job, numRegisteredWorkers.get() * numProcessorsPerWorker * NUM_PARTS_PER_PROCESSOR );
-        JobRunData jobRunData = new JobRunData(job, integerToWorkerMap.size());
-        initJob();
-        String jobDirectoryName = job.getJobDirectoryName();
-        FileSystem fileSystem = makeFileSystem( jobDirectoryName );
+        // initialize job & statistics
+        initJob( clientJob );
+        FileSystem fileSystem = makeFileSystem( job.getJobDirectoryName() );
         
-        // broadcaast to workers: set Job & FileSystem
+        // phase: workers set Job & FileSystem
         countDownLatch = new CountDownLatch( integerToWorkerMap.size() );
         broadcast( new SetJob( job ), this );
 
         // while workers SetJob: read Master input file, write Worker input files
         job.readJobInputFile(fileSystem, integerToWorkerMap.size() );
           
-        // wait for all workers to complete SetJob command
+        // wait for all workers to complete SetJob & FileSystem
         countDownLatch.await();
-        jobRunData.setEndTimeSetWorkerJobAndMakeWorkerFiles();
+        jobRunData.logPhaseEndTime();
 
-        // broadcaast to workers: read your input file
-        barrier( new ReadWorkerInputFile() );
-        jobRunData.setEndTimeReadWorkerInputFile();
+        doWorkerPhase( new ReadWorkerInputFile() ); // phase: workers: read your input file
         
-        // broadcaast to workers: Collect your garbage
+        // phase: workers: Collect your garbage
         collectWorkerGarbage();
-        jobRunData.setEndTimeGarbageCollected();
+        jobRunData.logPhaseEndTime();
 
-        // computation phase
+        // phase: computation
         problemAggregator = job.makeProblemAggregator();
         long superStep = 0;
         long startStepTime = System.currentTimeMillis(); // monitor step time
@@ -142,26 +135,24 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
             stepAggregator = job.makeStepAggregator(); // initialize stepAggregator
             
             // broadcast to workers: do next super step
-            barrier( new DoNextSuperStep( computeInput ) );
+            doWorkerStep( new DoNextSuperStep( computeInput ) );
             startStepTime = monitorStepProgress( startStepTime, superStep );
         }
-        jobRunData.setEndTimeComputation();
+        jobRunData.logPhaseEndTime();
         jobRunData.setNumSuperSteps( superStep );
 
-        // broadcaast to workers: write your output file
-        System.out.println("Master.run: writing worker output files.");
-        barrier( new WriteWorkerOutputFile() );
-        jobRunData.setEndTimeWriteWorkerOutputFiles();
+        doWorkerPhase( new WriteWorkerOutputFile() ); // phase: workers: write your output file
 
+        // phase: process worker output files
         job.processWorkerOutputFiles(fileSystem, integerToWorkerMap.size());
-        jobRunData.setEndTimeRun();
+        jobRunData.logPhaseEndTime();
         
         return jobRunData;
         } 
-        catch(RuntimeException r) 
+        catch(RuntimeException runTimeException) 
         {
-            System.out.println(r.getLocalizedMessage());
-            r.printStackTrace(System.out);
+            System.out.println( runTimeException.getLocalizedMessage() );
+            runTimeException.printStackTrace(System.out);
         }
         return null;
     }
@@ -169,7 +160,12 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     /**
      * initialize master Job data structures
      */
-    private void initJob() { numVertices = new AtomicInteger(); }
+    private void initJob( Job clientJob )
+    {
+        job = new Job( clientJob, numRegisteredWorkers.get() * numProcessorsPerWorker * NUM_PARTS_PER_PROCESSOR );
+        jobRunData = new JobRunData( job, integerToWorkerMap.size() );
+        numVertices = new AtomicInteger(); 
+    }
     
     private long monitorStepProgress( long startStepTime, long superStep )
     {
@@ -239,10 +235,17 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     
     protected void collectWorkerGarbage() throws InterruptedException
     {
-        barrier( new CollectGarbage() );
+        doWorkerPhase( new CollectGarbage() );
     }
     
-    private void barrier( Command command ) throws InterruptedException
+    private void doWorkerPhase( Command command ) throws InterruptedException
+    {
+        doWorkerStep( command );
+        jobRunData.logPhaseEndTime();
+    }
+    
+    // do a worker barrier computation
+    private void doWorkerStep( Command command ) throws InterruptedException
     {
         countDownLatch = new CountDownLatch( integerToWorkerMap.size() );
         broadcast( command, this );
@@ -258,5 +261,5 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
         }
     }
 
-    public abstract FileSystem makeFileSystem(String jobDirectoryName);
+    public abstract FileSystem makeFileSystem( String jobDirectoryName );
 }
