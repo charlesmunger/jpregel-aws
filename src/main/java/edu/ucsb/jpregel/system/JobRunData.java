@@ -1,19 +1,28 @@
 package edu.ucsb.jpregel.system;
 
+import java.io.Serializable;
 import static java.lang.System.currentTimeMillis;
 import java.text.DateFormat;
 import java.util.Date;
 
 /**
- * Repository of job quantities &amp; execution time per job phase.
+ * Repository of job quantities &amp; execution times of each job phase.
  *
  * @author Pete Cappello
  */
-public class JobRunData implements java.io.Serializable
+public class JobRunData implements Serializable
 {
-    private static final int NUM_PHASES = 6;
+    private static final int NUM_PHASES = 7;
+    private static final String[] PHASE_NAMES = 
+    {
+        "Parallel: Worker: Set Job; Master: Write Worker input files",
+        "Worker: Read input file",
+        "Worker: Collect Garbage",
+        "Worker: Compute Graph Problem",
+        "Worker: Write output file",
+        "Master: Process worker output files"
+    };
     private final String jobName;
-    private final long beginRunTime;
     private final Date date;
     private final int numParts;
     private final int numWorkers;
@@ -28,12 +37,12 @@ public class JobRunData implements java.io.Serializable
         date      = new Date();
         numParts = job.getNumParts();
         this.numWorkers = numWorkers;
-        beginRunTime = currentTimeMillis();
+        phaseTimes[ 0 ] = currentTimeMillis();
     }
             
     void setNumSuperSteps( long numSuperSteps ) { this.numSuperSteps = numSuperSteps; }
     
-    void logPhaseEndTime() { phaseTimes[ phase++ ] = currentTimeMillis(); }
+    void logPhaseEndTime() { phaseTimes[ ++phase ] = currentTimeMillis(); }
     
     @Override
     public String toString()
@@ -46,14 +55,14 @@ public class JobRunData implements java.io.Serializable
         string.append( "\n   " ).append( maxMemory / (1024 * 1024) ).append( " Maximum memory (MB)" );
         string.append( "\n   " ).append( numParts ).append( " Parts" );
         string.append( "\n   ").append( numSuperSteps ).append( " super steps   " );
-        string.append( "\n\nElapsed times in milliseconds: \n   " );
-        string.append( phaseTimes[ 5 ] - beginRunTime ).append( " : Total run time\n   " );
-        string.append( phaseTimes[ 0 ] - beginRunTime ).append( " : Set WorkerJob & make Worker files\n   " );
-        string.append( phaseTimes[ 1 ] - phaseTimes[ 0 ] ).append( " : Read Worker input files\n   " );
-        string.append( phaseTimes[ 2 ] - phaseTimes[ 1 ] ).append( " : Worker Garbage Collection\n   ");
-        string.append( phaseTimes[ 3 ] - phaseTimes[ 2 ] ).append( " : Computation\n   " );
-        string.append( ( phaseTimes[ 3 ] - phaseTimes[ 2 ] ) / numSuperSteps ).append( " : average per super step \n   " );
-        string.append( phaseTimes[ 4 ] - phaseTimes[ 3 ] ).append( " : Write Worker output files\n   " );
+        string.append( "\n\nElapsed times in milliseconds: \n\t" );
+        for ( int i = 1; i < phaseTimes.length; i++ )
+        {
+            string.append( phaseTimes[ i ] - phaseTimes[ i - 1 ] ).append( "\t:\t" );
+            string.append( PHASE_NAMES[ i - 1 ] ).append( "\n\t" );
+        }
+        string.append( phaseTimes[ 6 ] - phaseTimes[ 0 ] ).append( "\t:\tTOTAL Job time\n\t" );
+        string.append( ( phaseTimes[ 4 ] - phaseTimes[ 3 ] ) / numSuperSteps ).append( "\t:\tAverage per super step \n   " );
         string.append( "\n________________________________________\n" );
         return new String( string );
     }
@@ -66,13 +75,12 @@ public class JobRunData implements java.io.Serializable
         string.append( maxMemory ).append( ',' );
         string.append( numParts ).append( ',' );
         string.append( numSuperSteps ).append( ',' );
-        string.append( phaseTimes[ 5 ] - beginRunTime ).append( ',' );
-        string.append( phaseTimes[ 0 ] - beginRunTime ).append( ',' );
-        string.append( phaseTimes[ 1 ] - phaseTimes[ 0 ] ).append( ',' );
-        string.append( phaseTimes[ 2 ] - phaseTimes[ 1 ] ).append( ',' );
-        string.append( phaseTimes[ 3 ] - phaseTimes[ 2 ] ).append( ',' );
-        string.append( ( phaseTimes[ 3 ] - phaseTimes[ 2 ] ) / numSuperSteps ).append( ',' );
-        string.append( phaseTimes[ 4 ] - phaseTimes[ 3 ] );
+        for ( int i = 1; i < phaseTimes.length; i++ )
+        {
+            string.append( phaseTimes[ i ] - phaseTimes[ i - 1 ] ).append( ',' );
+        }
+        string.append( phaseTimes[ 6 ] - phaseTimes[ 0 ] ).append( ',' );
+        string.append( ( phaseTimes[ 3 ] - phaseTimes[ 2 ] ) / numSuperSteps );
         return new String( string );
     }
 }
