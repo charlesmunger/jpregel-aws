@@ -7,6 +7,7 @@ import edu.ucsb.jpregel.system.MasterGraphMakerBinaryTree2;
 import edu.ucsb.jpregel.system.MasterOutputMakerStandard;
 import edu.ucsb.jpregel.system.WorkerGraphMakerBinaryTree2;
 import edu.ucsb.jpregel.system.WorkerOutputMakerStandard;
+import java.io.File;
 import vertices.VertexSsspBinaryTree;
 
 /**
@@ -33,7 +34,12 @@ public class SsspBinaryTree
                 );
         System.out.println("SsspBinaryTree: " + job );
         ClientToMaster master = LocalReservationService.newCluster( numWorkers );
+        
+        String dir = "/Users/cappello/NetBeansProjects/munger/jpregel-aws/"; // System.getProperty( "user.dir" );
+        System.out.println( "dir: " + dir);
+        play.core.server.NettyServer.createServer( new File( dir ) );
+        
         System.out.println(master.run(job));
-        System.exit( 0 );
+//        System.exit( 0 );
     }
 }

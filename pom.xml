@@ -14,6 +14,13 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+        <repositories>
+            <repository>
+  		<id>Bos-Awesome-Repo</id>
+  		<name>Bo's Awesome Repo</name>
+  		<url>http://blopker.github.com/maven-repo/</url>
+  	   </repository>
+        </repositories>
 	<build>
 		<plugins>
 			<plugin>
@@ -110,10 +117,10 @@
 			<version>1.6.0-rc.1</version>
 			<type>jar</type>
 		</dependency>
-		<dependency>
-			<groupId>com.blopker.pheme</groupId>
-			<artifactId>pheme</artifactId>
-			<version>1.0-SNAPSHOT</version>
-		</dependency>
+                <dependency>
+                    <groupId>pheme</groupId>
+                    <artifactId>pheme_2.10</artifactId>
+                    <version>1.0</version>
+                </dependency>
 	</dependencies>
 </project>
