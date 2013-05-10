@@ -35,10 +35,7 @@ public class SsspBinaryTree
         System.out.println("SsspBinaryTree: " + job );
         ClientToMaster master = LocalReservationService.newCluster( numWorkers );
         
-        String dir = "/Users/cappello/NetBeansProjects/munger/jpregel-aws/"; // System.getProperty( "user.dir" );
-        System.out.println( "dir: " + dir);
-        play.core.server.NettyServer.createServer( new File( dir ) );
-        
+       play.core.server.NettyServer.main(new String[]{"."}); 
         System.out.println(master.run(job));
 //        System.exit( 0 );
     }
