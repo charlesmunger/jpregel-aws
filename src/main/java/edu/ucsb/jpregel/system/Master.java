@@ -10,6 +10,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import jicosfoundation.*;
+import pheme.api.Component;
+import pheme.api.ComponentType;
+import pheme.api.Pheme;
+import pheme.api.Server;
 
 /**
  * 
@@ -57,9 +61,17 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
     // job attributes
     private Job job;
     private JobRunData jobRunData;
+    
+    // Pheme
+    Pheme pheme = new Pheme( null );
+    Component masterComponent = pheme.register( "Master", ComponentType.COMPUTER);
 
     // set Master as a Jicos Service
-    public Master() throws RemoteException { super( command2DepartmentArray ); }
+    public Master() throws RemoteException 
+    { 
+        super( command2DepartmentArray );
+        Server server = pheme.startServer();
+    }
 
     @Override
     public synchronized void init( int numWorkers ) throws RemoteException, InterruptedException 
@@ -137,6 +149,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
             // broadcast to workers: do next super step
             doWorkerStep( new DoNextSuperStep( computeInput ) );
             startStepTime = monitorStepProgress( startStepTime, superStep );
+            masterComponent.log("INFO", "SuperStep " + superStep);
         }
         jobRunData.logPhaseEndTime();
         jobRunData.setNumSuperSteps( superStep );
@@ -181,6 +194,7 @@ abstract public class Master extends ServiceImpl implements ClientToMaster
                 + " requiring " + (elapsedTime / 1000) + " seconds "
                 + " Maximum memory that is free: " + percentFreeMemory + "%"
                 + " : " + (freeMemory / 1000) + "KB");
+        masterComponent.gauge("Heap % free", percentFreeMemory);
         return endStepTime;
     }
 

@@ -7,7 +7,7 @@ import edu.ucsb.jpregel.system.MasterGraphMakerBinaryTree2;
 import edu.ucsb.jpregel.system.MasterOutputMakerStandard;
 import edu.ucsb.jpregel.system.WorkerGraphMakerBinaryTree2;
 import edu.ucsb.jpregel.system.WorkerOutputMakerStandard;
-import java.io.File;
+import pheme.api.Pheme;
 import vertices.VertexSsspBinaryTree;
 
 /**
@@ -34,8 +34,6 @@ public class SsspBinaryTree
                 );
         System.out.println("SsspBinaryTree: " + job );
         ClientToMaster master = LocalReservationService.newCluster( numWorkers );
-        
-       play.core.server.NettyServer.main(new String[]{"."}); 
         System.out.println(master.run(job));
 //        System.exit( 0 );
     }
